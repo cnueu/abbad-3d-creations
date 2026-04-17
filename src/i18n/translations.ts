@@ -1,6 +1,7 @@
 export type Lang = "en" | "ar";
 
-export const translations = {
+type Dict = any;
+export const translations: { en: Dict; ar: Dict } = {
   en: {
     brand: "ABBAD",
     tagline: "Build any shape. From cubes and sheets.",

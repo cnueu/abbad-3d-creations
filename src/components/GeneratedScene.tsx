@@ -1,9 +1,10 @@
-import { Suspense } from "react";
+import { Suspense, useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment, Bounds } from "@react-three/drei";
+import { OrbitControls, ContactShadows, Environment, Bounds, Edges } from "@react-three/drei";
 
-// Pixel-art / voxel style: simple boxes (NOT the dovetail OBJ) for preview.
-// The real cube/sheet geometry is reserved for math + reports as the user requested.
+// Pixel-art / voxel style preview: simple colored boxes with crisp edges.
+// We intentionally do NOT use the dovetail OBJ here — that geometry is reserved
+// for the math/report layer. The preview is a clean voxel rendering.
 export interface PlacedCube {
   x: number; y: number; z: number; // meters (center)
   size: number; // cm — 10/20/30
@@ -18,7 +19,19 @@ interface SceneProps {
   slides?: Slide[];
 }
 
-export function GeneratedScene({ cubes, slides = [] }: SceneProps) {
+function VoxelCube({ c }: { c: PlacedCube }) {
+  const s = c.size / 100; // cm → m
+  return (
+    <mesh position={[c.x, c.y, c.z]} castShadow receiveShadow>
+      <boxGeometry args={[s, s, s]} />
+      <meshStandardMaterial color={c.color} metalness={0.05} roughness={0.65} flatShading />
+      <Edges threshold={15} color="#0b0d10" />
+    </mesh>
+  );
+}
+
+export function GeneratedScene({ cubes }: SceneProps) {
+  const items = useMemo(() => cubes, [cubes]);
   return (
     <Canvas shadows camera={{ position: [3, 2.4, 3.2], fov: 36 }} gl={{ antialias: true, alpha: true }}>
       <ambientLight intensity={0.55} />
@@ -26,27 +39,7 @@ export function GeneratedScene({ cubes, slides = [] }: SceneProps) {
       <Suspense fallback={null}>
         <Bounds fit clip observe margin={1.5}>
           <group>
-            {cubes.map((c, i) => {
-              const s = c.size / 100; // meters
-              return (
-                <group key={`c${i}`} position={[c.x, c.y, c.z]}>
-                  <mesh castShadow receiveShadow>
-                    <boxGeometry args={[s, s, s]} />
-                    <meshStandardMaterial
-                      color={c.color}
-                      metalness={0.08}
-                      roughness={0.55}
-                      flatShading
-                    />
-                  </mesh>
-                  {/* pixel-style edge outline */}
-                  <lineSegments>
-                    <edgesGeometry args={[(() => { const g = new (require("three").BoxGeometry)(s, s, s); return g; })()]} />
-                    <lineBasicMaterial color="#0b0d10" transparent opacity={0.35} />
-                  </lineSegments>
-                </group>
-              );
-            })}
+            {items.map((c, i) => <VoxelCube key={i} c={c} />)}
           </group>
         </Bounds>
         <ContactShadows position={[0, -0.05, 0]} opacity={0.4} scale={6} blur={2.4} />

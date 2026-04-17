@@ -72,7 +72,7 @@ export default function Studio() {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-design", {
-        body: { shapeName: shapeName || "reference", width, height, purpose, lang, imageDataUrl },
+        body: { shapeName: shapeName || "reference", width, height, purpose, lang, imageDataUrl, systemPrompt },
       });
       if (error) throw error;
       setResult(data as Result);

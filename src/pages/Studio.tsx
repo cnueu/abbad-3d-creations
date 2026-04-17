@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
 import { motion } from "framer-motion";
-import { Sparkles, Download, Loader2, ImagePlus, X } from "lucide-react";
+import { Sparkles, Download, Loader2, ImagePlus, X, RotateCcw } from "lucide-react";
 import { GeneratedScene, buildObj, PlacedCube, Slide } from "@/components/GeneratedScene";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";
@@ -21,12 +21,31 @@ interface Result {
   aiNotes: string;
 }
 
+const DEFAULT_PROMPT = `You are an expert 3D pixel-art (voxel) sculptor in the style of Minecraft and Crossy Road.
+You translate user descriptions (and optional reference photos) into rich, recognizable voxel builds.
+
+HARD RULES:
+- Output 60–250 cubes. Never fewer than 40. Never one giant block.
+- Cube sizes (cm): 30 = main mass, 20 = mid shapes, 10 = pixel details (windows, trim, eyes).
+- Y is up. Snap centers to a 0.1m grid. Cubes touch on faces (no floating, no overlap).
+- Build a recognizable silhouette: distinct front, sides, top. Include negative space (openings, tiers, steps).
+- Use 4–8 vibrant hex colors grouped by region (roof vs walls vs accents).
+
+OUTPUT FORMAT:
+Return ONLY a JSON object (no prose, no markdown fences) with this exact shape:
+{
+  "cubes": [ { "x": <m>, "y": <m>, "z": <m>, "size": 10|20|30, "color": "#rrggbb" }, ... ],
+  "note": "<one short assembly tip>"
+}`;
+
 export default function Studio() {
   const { t, lang } = useLang();
   const [shapeName, setShapeName] = useState("");
   const [width, setWidth] = useState(2);
   const [height, setHeight] = useState(2);
   const [purpose, setPurpose] = useState("");
+  const [systemPrompt, setSystemPrompt] = useState(DEFAULT_PROMPT);
+  const [showPrompt, setShowPrompt] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [selected, setSelected] = useState<Product | null>(null);
@@ -53,7 +72,7 @@ export default function Studio() {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-design", {
-        body: { shapeName: shapeName || "reference", width, height, purpose, lang, imageDataUrl },
+        body: { shapeName: shapeName || "reference", width, height, purpose, lang, imageDataUrl, systemPrompt },
       });
       if (error) throw error;
       setResult(data as Result);
@@ -86,7 +105,7 @@ export default function Studio() {
       <div className="container mx-auto px-6 py-14 max-w-6xl">
         <header className="mb-10">
           <span className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-green-100 mb-3 px-3 py-1 rounded-full border border-[color:var(--card-border)]">
-            <Sparkles className="w-3 h-3" /> Gemini 2.5 Pro · Pixel-Art 3D
+            <Sparkles className="w-3 h-3" /> GPT-OSS-120B · Pixel-Art 3D
           </span>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">
             <span className="text-gradient">{t.studio.title}</span>
@@ -148,6 +167,41 @@ export default function Studio() {
                   <ImagePlus className="w-4 h-4" />
                   {lang === "ar" ? "ارفع صورة لما تريد بناءه" : "Upload a photo of what to build"}
                 </button>
+              )}
+            </div>
+
+            {/* Editable system prompt */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] tracking-[0.18em] uppercase text-foreground/55">
+                  {lang === "ar" ? "تعليمات النموذج (نظام)" : "AI System Prompt"}
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSystemPrompt(DEFAULT_PROMPT)}
+                    className="text-[10px] uppercase tracking-wider text-foreground/55 hover:text-foreground/90 inline-flex items-center gap-1"
+                    title="Reset"
+                  >
+                    <RotateCcw className="w-3 h-3" /> {lang === "ar" ? "إعادة" : "Reset"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowPrompt((v) => !v)}
+                    className="text-[10px] uppercase tracking-wider text-foreground/55 hover:text-foreground/90"
+                  >
+                    {showPrompt ? (lang === "ar" ? "إخفاء" : "Hide") : (lang === "ar" ? "عرض" : "Show")}
+                  </button>
+                </div>
+              </div>
+              {showPrompt && (
+                <textarea
+                  value={systemPrompt}
+                  onChange={(e) => setSystemPrompt(e.target.value)}
+                  rows={10}
+                  spellCheck={false}
+                  className="input-field w-full font-mono text-[11px] leading-relaxed resize-y min-h-[160px]"
+                />
               )}
             </div>
 

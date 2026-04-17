@@ -43,6 +43,7 @@ export default function Studio() {
   const [shapeName, setShapeName] = useState("");
   const [width, setWidth] = useState(2);
   const [height, setHeight] = useState(2);
+  const [depth, setDepth] = useState(2);
   const [purpose, setPurpose] = useState("");
   const [systemPrompt, setSystemPrompt] = useState(DEFAULT_PROMPT);
   const [showPrompt, setShowPrompt] = useState(false);
@@ -72,7 +73,7 @@ export default function Studio() {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-design", {
-        body: { shapeName: shapeName || "reference", width, height, purpose, lang, imageDataUrl, systemPrompt },
+        body: { shapeName: shapeName || "reference", width, height, depth, purpose, lang, imageDataUrl, systemPrompt },
       });
       if (error) throw error;
       setResult(data as Result);
@@ -126,12 +127,15 @@ export default function Studio() {
             <Field label={t.studio.purpose}>
               <input className="input-field" value={purpose} onChange={(e) => setPurpose(e.target.value)} placeholder={t.studio.purposePh} />
             </Field>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <Field label={t.studio.width}>
                 <input type="number" min={0.1} step={0.1} className="input-field" value={width} onChange={(e) => setWidth(+e.target.value)} />
               </Field>
               <Field label={t.studio.height}>
                 <input type="number" min={0.1} step={0.1} className="input-field" value={height} onChange={(e) => setHeight(+e.target.value)} />
+              </Field>
+              <Field label={lang === "ar" ? "العمق (م)" : "Depth (m)"}>
+                <input type="number" min={0.1} step={0.1} className="input-field" value={depth} onChange={(e) => setDepth(+e.target.value)} />
               </Field>
             </div>
             <div className="rounded-xl border border-[color:var(--card-border)] px-4 py-3 text-xs bg-white/[0.02] text-foreground/65 leading-relaxed">

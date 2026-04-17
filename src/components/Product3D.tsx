@@ -1,103 +1,84 @@
 import { Suspense, useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
-import { OrbitControls, Environment, ContactShadows } from "@react-three/drei";
+import { Canvas, useLoader } from "@react-three/fiber";
+import { OrbitControls, Environment, ContactShadows, Center } from "@react-three/drei";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import * as THREE from "three";
 import { Product } from "@/data/products";
 
-/**
- * HoledCube — visual approximation of holedCube.blend.
- * 10cm cube with 4 vertical dovetail-slot grooves on each of the 4 vertical faces.
- * Scale: 1 three.js unit = 1 cm.
- */
-function HoledCube() {
-  const s = 10;
-  // Slot dimensions tuned to match the dovetail slide cross-section (2.3 × 2.3 cm)
-  const slotW = 2.3, slotD = 1.15, slotH = s; // half-depth slot
-  const slots: { pos: [number, number, number]; rot: [number, number, number] }[] = [];
-  // Each face gets two slots near the edges; placed on +X, -X, +Y, -Y faces
-  const offsets = [-2.5, 2.5];
-  for (const o of offsets) {
-    slots.push({ pos: [s / 2 - slotD / 2, o, 0], rot: [0, 0, 0] });
-    slots.push({ pos: [-(s / 2 - slotD / 2), o, 0], rot: [0, 0, 0] });
-    slots.push({ pos: [o, s / 2 - slotD / 2, 0], rot: [0, 0, Math.PI / 2] });
-    slots.push({ pos: [o, -(s / 2 - slotD / 2), 0], rot: [0, 0, Math.PI / 2] });
-  }
+// The .obj file ships both pieces. We split it on first load and re-color them.
+function useObjPieces(color: string) {
+  const obj = useLoader(OBJLoader, "/models/Cube_and_sheet.obj");
+  return useMemo(() => {
+    const meshes: { kind: "cube" | "sheet"; geom: THREE.BufferGeometry }[] = [];
+    obj.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const m = child as THREE.Mesh;
+        const g = (m.geometry as THREE.BufferGeometry).clone();
+        // Heuristic: the slide is much longer in one axis than the cube.
+        g.computeBoundingBox();
+        const bb = g.boundingBox!;
+        const sz = new THREE.Vector3();
+        bb.getSize(sz);
+        const maxDim = Math.max(sz.x, sz.y, sz.z);
+        const minDim = Math.min(sz.x, sz.y, sz.z);
+        const isSheet = maxDim / Math.max(minDim, 0.001) > 3;
+        // center on origin
+        const center = new THREE.Vector3();
+        bb.getCenter(center);
+        g.translate(-center.x, -center.y, -center.z);
+        meshes.push({ kind: isSheet ? "sheet" : "cube", geom: g });
+      }
+    });
+    return meshes;
+  }, [obj, color]);
+}
 
-  const cubeGeo = useMemo(() => new THREE.BoxGeometry(s, s, s), []);
-
+function CubeMesh({ color, scale }: { color: string; scale: number }) {
+  const pieces = useObjPieces(color);
+  const cube = pieces.find((p) => p.kind === "cube");
+  if (!cube) return null;
   return (
-    <group>
-      <mesh castShadow receiveShadow geometry={cubeGeo}>
-        <meshStandardMaterial color="#6db8ac" metalness={0.15} roughness={0.45} />
+    <Center>
+      <mesh geometry={cube.geom} scale={scale} castShadow receiveShadow>
+        <meshStandardMaterial color={color} metalness={0.18} roughness={0.42} />
       </mesh>
-      <lineSegments>
-        <edgesGeometry args={[cubeGeo]} />
-        <lineBasicMaterial color="#a8d5cc" transparent opacity={0.55} />
-      </lineSegments>
-      {slots.map((sl, i) => (
-        <mesh key={i} position={sl.pos} rotation={sl.rot}>
-          <boxGeometry args={[slotD, slotW, slotH]} />
-          <meshStandardMaterial color="#1c3833" roughness={0.9} />
-        </mesh>
-      ))}
-    </group>
+    </Center>
   );
 }
 
-/**
- * DovetailSlide — Dovetail_slide.blend ("Cube.001"): 2.3 × 2.3 × 20 cm.
- * 18 verts / 16 faces — a tapered prism. Approximated as a stacked profile.
- */
-function DovetailSlide() {
-  // Build the dovetail cross-section as an extruded shape.
-  const shape = useMemo(() => {
-    const sh = new THREE.Shape();
-    // Cross-section: trapezoid with narrow neck (dovetail T)
-    //  ┌───┐
-    //  │   │   wide head
-    //  └─┐ ┌─┘
-    //    │ │   neck
-    //    └─┘
-    sh.moveTo(-1.15, 1.15);
-    sh.lineTo(1.15, 1.15);
-    sh.lineTo(1.15, 0.2);
-    sh.lineTo(0.45, -0.2);
-    sh.lineTo(0.45, -1.15);
-    sh.lineTo(-0.45, -1.15);
-    sh.lineTo(-0.45, -0.2);
-    sh.lineTo(-1.15, 0.2);
-    sh.lineTo(-1.15, 1.15);
-    return sh;
-  }, []);
-
-  const geo = useMemo(() => {
-    const g = new THREE.ExtrudeGeometry(shape, { depth: 20, bevelEnabled: false, curveSegments: 1 });
-    g.translate(0, 0, -10);
-    g.rotateX(Math.PI / 2);
-    return g;
-  }, [shape]);
-
+function SheetMesh({ color }: { color: string }) {
+  const pieces = useObjPieces(color);
+  const sheet = pieces.find((p) => p.kind === "sheet");
+  if (!sheet) return null;
   return (
-    <mesh geometry={geo} castShadow receiveShadow>
-      <meshStandardMaterial color="#a8d5cc" metalness={0.3} roughness={0.35} />
-    </mesh>
+    <Center>
+      <mesh geometry={sheet.geom} castShadow receiveShadow>
+        <meshStandardMaterial color={color} metalness={0.3} roughness={0.32} />
+      </mesh>
+    </Center>
   );
 }
 
 export function Product3D({ product, autoRotate = true }: { product: Product; autoRotate?: boolean }) {
-  const camPos: [number, number, number] = product.kind === "cube" ? [16, 13, 18] : [22, 16, 22];
+  // Larger cubes get a slightly farther camera
+  const camDist = product.kind === "cube" ? 3 + product.size * 0.18 : 6;
+  const scale = product.kind === "cube" ? product.size / 10 : 1; // .obj cube is 10cm
   return (
     <Canvas
       shadows
-      camera={{ position: camPos, fov: 32 }}
+      camera={{ position: [camDist, camDist * 0.85, camDist * 1.1], fov: 32 }}
       style={{ width: "100%", height: "100%" }}
       gl={{ antialias: true, alpha: true }}
     >
       <ambientLight intensity={0.55} />
       <directionalLight position={[10, 16, 8]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
       <Suspense fallback={null}>
-        {product.kind === "cube" ? <HoledCube /> : <DovetailSlide />}
-        <ContactShadows position={[0, -7, 0]} opacity={0.45} scale={40} blur={2.5} />
+        {product.kind === "cube" ? (
+          <CubeMesh color={product.color} scale={scale} />
+        ) : (
+          <SheetMesh color={product.color} />
+        )}
+        <ContactShadows position={[0, -2.2, 0]} opacity={0.45} scale={20} blur={2.4} />
         <Environment preset="city" />
       </Suspense>
       <OrbitControls

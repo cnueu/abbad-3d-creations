@@ -1,81 +1,68 @@
 import { Suspense, useMemo } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useLoader } from "@react-three/fiber";
 import { OrbitControls, ContactShadows, Environment } from "@react-three/drei";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import * as THREE from "three";
 
-interface Slide {
+export interface PlacedCube {
+  x: number; y: number; z: number; // meters (center)
+  size: number; // cm — 10/20/30
+  color: string; // hex
+}
+export interface Slide {
   ax: 0 | 1 | 2;
   mid: { x: number; y: number; z: number };
 }
-
 interface SceneProps {
-  positions: { x: number; y: number; z: number }[]; // meters
+  cubes: PlacedCube[];
   slides?: Slide[];
-  cubeSize: number; // cm
 }
 
-// Dovetail cross-section as a 2D shape (in cm), then scaled to meters at render.
-function useDovetailGeometry(lengthM: number) {
+function useObjPieces() {
+  const obj = useLoader(OBJLoader, "/models/Cube_and_sheet.obj");
   return useMemo(() => {
-    const sh = new THREE.Shape();
-    // 2.3cm × 2.3cm dovetail T-profile (in cm)
-    sh.moveTo(-1.15, 1.15);
-    sh.lineTo(1.15, 1.15);
-    sh.lineTo(1.15, 0.2);
-    sh.lineTo(0.45, -0.2);
-    sh.lineTo(0.45, -1.15);
-    sh.lineTo(-0.45, -1.15);
-    sh.lineTo(-0.45, -0.2);
-    sh.lineTo(-1.15, 0.2);
-    sh.lineTo(-1.15, 1.15);
-    const g = new THREE.ExtrudeGeometry(sh, {
-      depth: lengthM * 100, // back to cm during build
-      bevelEnabled: false,
-      curveSegments: 1,
+    const out: { kind: "cube" | "sheet"; geom: THREE.BufferGeometry; sizeCm: number } = {
+      kind: "cube", geom: new THREE.BoxGeometry(0.1, 0.1, 0.1), sizeCm: 10,
+    };
+    const pieces: { kind: "cube" | "sheet"; geom: THREE.BufferGeometry }[] = [];
+    obj.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const m = child as THREE.Mesh;
+        const g = (m.geometry as THREE.BufferGeometry).clone();
+        g.computeBoundingBox();
+        const bb = g.boundingBox!;
+        const sz = new THREE.Vector3();
+        bb.getSize(sz);
+        const maxDim = Math.max(sz.x, sz.y, sz.z);
+        const minDim = Math.min(sz.x, sz.y, sz.z);
+        const isSheet = maxDim / Math.max(minDim, 0.001) > 3;
+        const c = new THREE.Vector3();
+        bb.getCenter(c);
+        g.translate(-c.x, -c.y, -c.z);
+        // .obj is in cm — convert to meters: scale by 0.01
+        g.scale(0.01, 0.01, 0.01);
+        pieces.push({ kind: isSheet ? "sheet" : "cube", geom: g });
+      }
     });
-    g.translate(0, 0, -(lengthM * 100) / 2);
-    g.scale(0.01, 0.01, 0.01); // cm → m
-    return g;
-  }, [lengthM]);
+    void out;
+    return pieces;
+  }, [obj]);
 }
 
-export function GeneratedScene({ positions, slides = [], cubeSize }: SceneProps) {
-  const s = cubeSize / 100; // meter
-  const slideLen = 0.20; // 20 cm in meters
-  const slideGeo = useDovetailGeometry(slideLen);
+export function GeneratedScene({ cubes, slides = [] }: SceneProps) {
+  const span = Math.max(
+    ...cubes.map((c) => Math.max(Math.abs(c.x), Math.abs(c.y), Math.abs(c.z)) + c.size / 200),
+    0.3
+  );
+  const cam = span * 3.2;
 
   return (
-    <Canvas shadows camera={{ position: [s * 6, s * 5, s * 8], fov: 38 }} gl={{ antialias: true, alpha: true }}>
+    <Canvas shadows camera={{ position: [cam, cam * 0.85, cam * 1.1], fov: 38 }} gl={{ antialias: true, alpha: true }}>
       <ambientLight intensity={0.55} />
       <directionalLight position={[8, 12, 6]} intensity={1.2} castShadow />
       <Suspense fallback={null}>
-        {/* Cubes */}
-        {positions.map((p, i) => (
-          <mesh key={`c${i}`} position={[p.x, p.y, p.z]} castShadow receiveShadow>
-            <boxGeometry args={[s * 0.985, s * 0.985, s * 0.985]} />
-            <meshStandardMaterial color="#6db8ac" metalness={0.18} roughness={0.45} />
-          </mesh>
-        ))}
-
-        {/* Dovetail slides — orient by axis */}
-        {slides.map((sl, i) => {
-          // Default extrude is along Z; rotate so length aligns to chosen axis.
-          const rot: [number, number, number] =
-            sl.ax === 0 ? [0, Math.PI / 2, 0] : sl.ax === 1 ? [Math.PI / 2, 0, 0] : [0, 0, 0];
-          return (
-            <mesh
-              key={`s${i}`}
-              position={[sl.mid.x, sl.mid.y, sl.mid.z]}
-              rotation={rot}
-              geometry={slideGeo}
-              castShadow
-            >
-              <meshStandardMaterial color="#a8d5cc" metalness={0.3} roughness={0.35} />
-            </mesh>
-          );
-        })}
-
-        <ContactShadows position={[0, -s * 1.5, 0]} opacity={0.45} scale={20} blur={3} />
+        <Pieces cubes={cubes} slides={slides} />
+        <ContactShadows position={[0, -span, 0]} opacity={0.45} scale={span * 8} blur={3} />
         <Environment preset="city" />
       </Suspense>
       <OrbitControls autoRotate autoRotateSpeed={0.6} enablePan />
@@ -83,68 +70,65 @@ export function GeneratedScene({ positions, slides = [], cubeSize }: SceneProps)
   );
 }
 
-// Build a downloadable .obj file from positions + slides
-export function buildObj(
-  positions: { x: number; y: number; z: number }[],
-  cubeSizeCm: number,
-  slides: Slide[] = []
-): string {
-  const s = cubeSizeCm / 100 / 2;
+function Pieces({ cubes, slides }: { cubes: PlacedCube[]; slides: Slide[] }) {
+  const pieces = useObjPieces();
+  const cubeGeo = pieces.find((p) => p.kind === "cube")?.geom;
+  const sheetGeo = pieces.find((p) => p.kind === "sheet")?.geom;
+
+  return (
+    <>
+      {cubeGeo && cubes.map((c, i) => (
+        <mesh
+          key={`c${i}`}
+          geometry={cubeGeo}
+          position={[c.x, c.y, c.z]}
+          scale={c.size / 10} // base cube is 10 cm
+          castShadow
+          receiveShadow
+        >
+          <meshStandardMaterial color={c.color} metalness={0.18} roughness={0.42} />
+        </mesh>
+      ))}
+      {sheetGeo && slides.map((sl, i) => {
+        const rot: [number, number, number] =
+          sl.ax === 0 ? [0, Math.PI / 2, 0] : sl.ax === 1 ? [Math.PI / 2, 0, 0] : [0, 0, 0];
+        return (
+          <mesh key={`s${i}`} geometry={sheetGeo} position={[sl.mid.x, sl.mid.y, sl.mid.z]} rotation={rot} castShadow>
+            <meshStandardMaterial color="#a8d5cc" metalness={0.3} roughness={0.32} />
+          </mesh>
+        );
+      })}
+    </>
+  );
+}
+
+// Simple .obj exporter from cube list + slides (axis-aligned boxes)
+export function buildObj(cubes: PlacedCube[], slides: Slide[] = []): string {
   const lines: string[] = ["# ABBAD AI Studio — generated assembly", "# units: meters"];
-  let vCount = 0;
+  let v = 0;
+  const faces = [[1,2,3,4],[5,8,7,6],[1,5,6,2],[2,6,7,3],[3,7,8,4],[4,8,5,1]];
 
-  const cubeFaces = [
-    [1, 2, 3, 4],
-    [5, 8, 7, 6],
-    [1, 5, 6, 2],
-    [2, 6, 7, 3],
-    [3, 7, 8, 4],
-    [4, 8, 5, 1],
-  ];
-
-  positions.forEach((p, idx) => {
+  function box(name: string, cx: number, cy: number, cz: number, dx: number, dy: number, dz: number) {
     const verts = [
-      [p.x - s, p.y - s, p.z - s],
-      [p.x + s, p.y - s, p.z - s],
-      [p.x + s, p.y + s, p.z - s],
-      [p.x - s, p.y + s, p.z - s],
-      [p.x - s, p.y - s, p.z + s],
-      [p.x + s, p.y - s, p.z + s],
-      [p.x + s, p.y + s, p.z + s],
-      [p.x - s, p.y + s, p.z + s],
+      [cx-dx,cy-dy,cz-dz],[cx+dx,cy-dy,cz-dz],[cx+dx,cy+dy,cz-dz],[cx-dx,cy+dy,cz-dz],
+      [cx-dx,cy-dy,cz+dz],[cx+dx,cy-dy,cz+dz],[cx+dx,cy+dy,cz+dz],[cx-dx,cy+dy,cz+dz],
     ];
-    lines.push(`o Cube_${idx + 1}`);
-    verts.forEach((v) => lines.push(`v ${v[0].toFixed(4)} ${v[1].toFixed(4)} ${v[2].toFixed(4)}`));
-    const o = vCount;
-    cubeFaces.forEach((f) => lines.push(`f ${f.map((n) => n + o).join(" ")}`));
-    vCount += 8;
-  });
+    lines.push(`o ${name}`);
+    verts.forEach((p) => lines.push(`v ${p[0].toFixed(4)} ${p[1].toFixed(4)} ${p[2].toFixed(4)}`));
+    faces.forEach((f) => lines.push(`f ${f.map((n) => n + v).join(" ")}`));
+    v += 8;
+  }
 
-  // Slides: simplified bounding box 2.3×2.3×20 cm → 0.023×0.023×0.20 m
-  const sw = 0.023 / 2;
-  const sl = 0.20 / 2;
-  slides.forEach((sd, idx) => {
-    const { x, y, z } = sd.mid;
-    let dx = sw, dy = sw, dz = sw;
-    if (sd.ax === 0) dx = sl;
-    if (sd.ax === 1) dy = sl;
-    if (sd.ax === 2) dz = sl;
-    const verts = [
-      [x - dx, y - dy, z - dz],
-      [x + dx, y - dy, z - dz],
-      [x + dx, y + dy, z - dz],
-      [x - dx, y + dy, z - dz],
-      [x - dx, y - dy, z + dz],
-      [x + dx, y - dy, z + dz],
-      [x + dx, y + dy, z + dz],
-      [x - dx, y + dy, z + dz],
-    ];
-    lines.push(`o Slide_${idx + 1}`);
-    verts.forEach((v) => lines.push(`v ${v[0].toFixed(4)} ${v[1].toFixed(4)} ${v[2].toFixed(4)}`));
-    const o = vCount;
-    cubeFaces.forEach((f) => lines.push(`f ${f.map((n) => n + o).join(" ")}`));
-    vCount += 8;
+  cubes.forEach((c, i) => {
+    const h = c.size / 100 / 2;
+    box(`Cube_${c.size}cm_${i + 1}`, c.x, c.y, c.z, h, h, h);
   });
-
+  slides.forEach((s, i) => {
+    const sw = 0.023 / 2, sl = 0.20 / 2;
+    const dx = s.ax === 0 ? sl : sw;
+    const dy = s.ax === 1 ? sl : sw;
+    const dz = s.ax === 2 ? sl : sw;
+    box(`Slide_${i + 1}`, s.mid.x, s.mid.y, s.mid.z, dx, dy, dz);
+  });
   return lines.join("\n");
 }

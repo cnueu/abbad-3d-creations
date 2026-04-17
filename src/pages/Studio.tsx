@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
 import { motion } from "framer-motion";
-import { Sparkles, Download, Loader2 } from "lucide-react";
+import { Sparkles, Download, Loader2, ImagePlus, X } from "lucide-react";
 import { GeneratedScene, buildObj, PlacedCube, Slide } from "@/components/GeneratedScene";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";
@@ -31,16 +31,30 @@ export default function Studio() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [selected, setSelected] = useState<Product | null>(null);
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 4 * 1024 * 1024) {
+      toast.error(lang === "ar" ? "الصورة أكبر من 4 ميغا" : "Image must be < 4MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setImageDataUrl(reader.result as string);
+    reader.readAsDataURL(f);
+  }
 
   async function generate() {
-    if (!shapeName.trim()) {
-      toast.error(lang === "ar" ? "أدخل اسم الشكل" : "Enter a shape name");
+    if (!shapeName.trim() && !imageDataUrl) {
+      toast.error(lang === "ar" ? "أدخل اسم الشكل أو ارفع صورة" : "Enter a shape name or upload a photo");
       return;
     }
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-design", {
-        body: { shapeName, width, height, depth, purpose, lang },
+        body: { shapeName: shapeName || "reference", width, height, depth, purpose, lang, imageDataUrl },
       });
       if (error) throw error;
       setResult(data as Result);

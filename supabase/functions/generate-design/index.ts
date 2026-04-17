@@ -24,6 +24,7 @@ interface Body {
   depth: number;
   purpose: string;
   lang: "en" | "ar";
+  imageDataUrl?: string; // optional reference photo (data URL)
 }
 
 type Size = 10 | 20 | 30;
@@ -232,61 +233,108 @@ Deno.serve(async (req) => {
 
   try {
     const body = (await req.json()) as Body;
-    const { shapeName, width, height, depth, purpose, lang } = body;
+    const { shapeName, width, height, depth, purpose, lang, imageDataUrl } = body;
 
-    // 1. Procedural baseline (always good)
-    const tpl = pickTemplate(shapeName, width, height, depth);
-    let cubes: PlannedCube[] = tpl.cubes;
-    let aiNotes = "";
+    const lovableKey = Deno.env.get("LOVABLE_API_KEY");
 
-    // 2. Try AI for descriptive notes only (assembly story).
-    //    We do NOT trust the AI to lay out the geometry — it consistently fails.
-    const key = Deno.env.get("OPENROUTER_API_KEY");
-    if (key) {
+    // ─── Stage 1: VISION (optional) — analyze user photo with Gemini 2.5 Flash
+    let visionDescription = "";
+    let templateHintFromImage = "";
+    if (imageDataUrl && lovableKey) {
       try {
-        const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        const v = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${key}`,
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://abbad.app",
-            "X-Title": "ABBAD AI Studio",
-          },
+          headers: { Authorization: `Bearer ${lovableKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "openai/gpt-oss-120b",
+            model: "google/gemini-2.5-flash",
             messages: [
               {
                 role: "system",
-                content: `You are an assembly guide for ABBAD modular blocks. The shape has already been planned as a pixel-art voxel grid using cubes of 30cm (walls), 20cm (transitions), and 10cm (details). Each cube engages dovetail slides on its faces. Real-life ordering uses ~2 sheets per cube. Write a short, concrete assembly note (3-5 sentences) in ${lang === "ar" ? "Arabic" : "English"}. Focus on order: foundation → walls → towers → details. Mention the part counts you receive.`,
+                content: "You analyze reference images for a pixel-art voxel builder. Reply with EXACTLY two short lines:\nLINE 1: one of [castle, house, tree, tower, pyramid, arch, throne]\nLINE 2: a 1-sentence description of the structure (style, distinctive features, colors).",
               },
               {
                 role: "user",
-                content: `Shape: "${shapeName}" (template: ${tpl.tag})
-Purpose: ${purpose || "general"}
-Bounding box: ${width}m × ${height}m × ${depth}m
-Total cubes: ${cubes.length}
-Counts by size: 30cm=${cubes.filter(c => c.size === 30).length}, 20cm=${cubes.filter(c => c.size === 20).length}, 10cm=${cubes.filter(c => c.size === 10).length}
-Write the assembly note now.`,
+                content: [
+                  { type: "text", text: "Classify this reference image and describe it." },
+                  { type: "image_url", image_url: { url: imageDataUrl } },
+                ],
               },
             ],
-            max_tokens: 400,
-            temperature: 0.8,
+            max_tokens: 120,
+            temperature: 0.3,
           }),
         });
-        if (r.ok) {
-          const j = await r.json();
-          aiNotes = j.choices?.[0]?.message?.content?.trim() ?? "";
+        if (v.ok) {
+          const j = await v.json();
+          const txt: string = j.choices?.[0]?.message?.content?.trim() ?? "";
+          const [l1, ...rest] = txt.split("\n").map((s) => s.trim()).filter(Boolean);
+          templateHintFromImage = (l1 || "").toLowerCase();
+          visionDescription = rest.join(" ").trim();
         } else {
-          console.error("OpenRouter", r.status, await r.text());
+          console.error("Vision stage failed", v.status, await v.text());
         }
       } catch (e) {
-        console.error("AI fetch failed", e);
+        console.error("Vision exception", e);
       }
+    }
+
+    // ─── Stage 2: PLANNER — pick template (image hint > shape name)
+    const tpl = pickTemplate(templateHintFromImage || shapeName, width, height, depth);
+    const cubes: PlannedCube[] = tpl.cubes;
+
+    // ─── Stage 3: NOTES — assembly instructions
+    let aiNotes = "";
+    const orKey = Deno.env.get("OPENROUTER_API_KEY");
+    const counts30 = cubes.filter(c => c.size === 30).length;
+    const counts20 = cubes.filter(c => c.size === 20).length;
+    const counts10 = cubes.filter(c => c.size === 10).length;
+
+    const notesSystem = `You are an assembly guide for ABBAD modular blocks. Shape is already planned as voxels using cubes of 30cm (walls), 20cm (transitions), and 10cm (details). Each cube engages dovetail slides on its faces; ~2 sheets per cube in real life. Write 3-5 concrete sentences in ${lang === "ar" ? "Arabic" : "English"}, ordered: foundation → walls → towers → details. Mention the part counts.`;
+    const notesUser = `Shape: "${shapeName}" (template: ${tpl.tag})
+${visionDescription ? `Reference photo says: ${visionDescription}\n` : ""}Purpose: ${purpose || "general"}
+Bounding box: ${width}m × ${height}m × ${depth}m
+Total cubes: ${cubes.length} — 30cm=${counts30}, 20cm=${counts20}, 10cm=${counts10}
+Write the assembly note now.`;
+
+    async function tryNotes(url: string, key: string, model: string) {
+      const r = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+          ...(url.includes("openrouter") ? { "HTTP-Referer": "https://abbad.app", "X-Title": "ABBAD AI Studio" } : {}),
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: notesSystem },
+            { role: "user", content: notesUser },
+          ],
+          max_tokens: 400,
+          temperature: 0.8,
+        }),
+      });
+      if (!r.ok) {
+        console.error("Notes stage", model, r.status, await r.text());
+        return "";
+      }
+      const j = await r.json();
+      return j.choices?.[0]?.message?.content?.trim() ?? "";
+    }
+
+    if (orKey) {
+      aiNotes = await tryNotes("https://openrouter.ai/api/v1/chat/completions", orKey, "openai/gpt-oss-120b");
+    }
+    if (!aiNotes && lovableKey) {
+      aiNotes = await tryNotes("https://ai.gateway.lovable.dev/v1/chat/completions", lovableKey, "google/gemini-3-flash-preview");
     }
     if (!aiNotes) {
       aiNotes = lang === "ar"
         ? `ابدأ بتثبيت الأساس من مكعبات 30 سم، ثم ارفع الجدران المحيطة. ركّب أبراج 20 سم في الزوايا، ثم أضف تفاصيل 10 سم (شرفات، نوافذ، زخارف). كل مكعب يحتاج تقريبًا قطعتي صفيحة في التركيب الفعلي.`
         : `Start by laying the 30cm foundation, then raise the perimeter walls. Add 20cm corner towers, then finish with 10cm pixel details (battlements, windows, trim). Each cube engages roughly 2 dovetail slides in the real-life build.`;
+    }
+    if (visionDescription) {
+      aiNotes = (lang === "ar" ? `📷 من الصورة: ${visionDescription}\n\n` : `📷 From your photo: ${visionDescription}\n\n`) + aiNotes;
     }
 
     // 3. Counts, slides, pricing

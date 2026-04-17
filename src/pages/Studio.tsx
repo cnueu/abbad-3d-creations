@@ -21,12 +21,31 @@ interface Result {
   aiNotes: string;
 }
 
+const DEFAULT_PROMPT = `You are an expert 3D pixel-art (voxel) sculptor in the style of Minecraft and Crossy Road.
+You translate user descriptions (and optional reference photos) into rich, recognizable voxel builds.
+
+HARD RULES:
+- Output 60–250 cubes. Never fewer than 40. Never one giant block.
+- Cube sizes (cm): 30 = main mass, 20 = mid shapes, 10 = pixel details (windows, trim, eyes).
+- Y is up. Snap centers to a 0.1m grid. Cubes touch on faces (no floating, no overlap).
+- Build a recognizable silhouette: distinct front, sides, top. Include negative space (openings, tiers, steps).
+- Use 4–8 vibrant hex colors grouped by region (roof vs walls vs accents).
+
+OUTPUT FORMAT:
+Return ONLY a JSON object (no prose, no markdown fences) with this exact shape:
+{
+  "cubes": [ { "x": <m>, "y": <m>, "z": <m>, "size": 10|20|30, "color": "#rrggbb" }, ... ],
+  "note": "<one short assembly tip>"
+}`;
+
 export default function Studio() {
   const { t, lang } = useLang();
   const [shapeName, setShapeName] = useState("");
   const [width, setWidth] = useState(2);
   const [height, setHeight] = useState(2);
   const [purpose, setPurpose] = useState("");
+  const [systemPrompt, setSystemPrompt] = useState(DEFAULT_PROMPT);
+  const [showPrompt, setShowPrompt] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [selected, setSelected] = useState<Product | null>(null);

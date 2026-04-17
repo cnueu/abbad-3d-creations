@@ -1,8 +1,5 @@
-// ABBAD generate-design — single AI call, pixel-art voxel output.
-//
-// One model (Lovable AI / google/gemini-2.5-flash) returns a JSON list of
-// voxel cubes (size 10/20/30 cm) on a grid. Server validates, computes
-// piece counts, sheets (real-life rule: 2 × cubes), and price.
+// ABBAD generate-design — GPT-OSS-120B via OpenRouter, pixel-art voxel output.
+// User controls the system prompt from the UI.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,11 +9,12 @@ const corsHeaders = {
 
 interface Body {
   shapeName: string;
-  width: number;   // meters
+  width: number;
   height: number;
   purpose: string;
   lang: "en" | "ar";
   imageDataUrl?: string;
+  systemPrompt?: string;
 }
 
 type Size = 10 | 20 | 30;
@@ -29,7 +27,6 @@ const PALETTE: Record<Size, string[]> = {
 };
 const colorFor = (s: Size, i: number) => PALETTE[s][i % PALETTE[s].length];
 
-// Fallback procedural shape if AI fails — simple stepped pyramid so it's never empty.
 function fallbackShape(w: number, h: number): PlannedCube[] {
   const out: PlannedCube[] = [];
   const layers = Math.max(2, Math.min(6, Math.round(h / 0.3)));
@@ -88,91 +85,89 @@ function adjacentFaceSlides(cubes: PlannedCube[]) {
   return slides;
 }
 
+function extractJson(text: string): any | null {
+  if (!text) return null;
+  // Strip ```json fences
+  const fence = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+  const candidate = fence ? fence[1] : text;
+  // Try direct parse
+  try { return JSON.parse(candidate); } catch { /* fall through */ }
+  // Find first { ... last }
+  const s = candidate.indexOf("{");
+  const e = candidate.lastIndexOf("}");
+  if (s >= 0 && e > s) {
+    try { return JSON.parse(candidate.slice(s, e + 1)); } catch { /* ignore */ }
+  }
+  return null;
+}
+
+const DEFAULT_SYSTEM_PROMPT = `You are an expert 3D pixel-art (voxel) sculptor in the style of Minecraft and Crossy Road.
+You translate user descriptions (and optional reference photos) into rich, recognizable voxel builds.
+
+HARD RULES:
+- Output 60–250 cubes. Never fewer than 40. Never one giant block.
+- Cube sizes (cm): 30 = main mass, 20 = mid shapes, 10 = pixel details (windows, trim, eyes).
+- Y is up. Snap centers to a 0.1m grid. Cubes touch on faces (no floating, no overlap).
+- Build a recognizable silhouette: distinct front, sides, top. Include negative space (openings, tiers, steps).
+- Use 4–8 vibrant hex colors grouped by region (roof vs walls vs accents).
+
+OUTPUT FORMAT:
+Return ONLY a JSON object (no prose, no markdown fences) with this exact shape:
+{
+  "cubes": [ { "x": <m>, "y": <m>, "z": <m>, "size": 10|20|30, "color": "#rrggbb" }, ... ],
+  "note": "<one short assembly tip>"
+}`;
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
     const body = (await req.json()) as Body;
-    const { shapeName, width, height, purpose, lang, imageDataUrl } = body;
-    const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+    const { shapeName, width, height, purpose, lang, imageDataUrl, systemPrompt } = body;
+    const orKey = Deno.env.get("OPENROUTER_API_KEY");
 
     let cubes: PlannedCube[] = [];
     let aiNotes = "";
 
-    if (lovableKey) {
-      const userContent: any[] = [
-        {
-          type: "text",
-          text: `Build "${shapeName}" as a 3D PIXEL-ART sculpture made of axis-aligned cubes.
-Approx footprint: ${width}m wide × ${height}m tall (Y is up, centered at origin).
+    if (orKey) {
+      const sys = (systemPrompt && systemPrompt.trim().length > 20)
+        ? systemPrompt
+        : DEFAULT_SYSTEM_PROMPT;
+
+      const userText = `Build "${shapeName}" as a 3D pixel-art voxel sculpture.
+Approx footprint: ${width}m wide × ${height}m tall (Y up, centered at origin).
 ${purpose ? `Purpose: ${purpose}` : ""}
+Note language: ${lang === "ar" ? "Arabic" : "English"}.
 
-Hard rules:
-- Output 60–250 cubes. Never fewer than 40. Never one giant block.
-- Cube sizes (cm): 30 = main mass, 20 = mid shapes, 10 = pixel details (windows, trim, antenna, eyes).
-- Snap centers to a 0.1m grid. Cubes must touch on faces (no floating, no overlap).
-- Build a recognizable silhouette like classic Minecraft / voxel art: distinct front, sides, top.
-- Use 4–8 colors total, grouped by region (roof vs walls vs accents). Vibrant, saturated hex colors.
-- Include negative space: openings, steps, layered tiers — not a solid box.
+Think layer by layer from the ground up, then output the JSON.`;
 
-Think layer by layer from the ground up. Then call build_voxel.`,
-        },
-      ];
-      if (imageDataUrl) {
-        userContent.push({ type: "image_url", image_url: { url: imageDataUrl } });
-      }
+      // GPT-OSS-120B is text-only on most OpenRouter providers; only attach image if present and ignore otherwise.
+      const userContent: any = imageDataUrl
+        ? [
+            { type: "text", text: userText },
+            { type: "image_url", image_url: { url: imageDataUrl } },
+          ]
+        : userText;
 
       try {
-        const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
-          headers: { Authorization: `Bearer ${lovableKey}`, "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${orKey}`,
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://abbad.lovable.app",
+            "X-Title": "ABBAD Studio",
+          },
           body: JSON.stringify({
-            model: "google/gemini-2.5-pro",
+            model: "openai/gpt-oss-120b",
             messages: [
-              {
-                role: "system",
-                content: "You are an expert 3D pixel-art (voxel) sculptor in the style of Minecraft and Crossy Road. You translate descriptions and reference photos into rich, recognizable voxel builds with 60–250 cubes. You always call build_voxel — never reply with prose. You never return a single big cube; you always sculpt detail.",
-              },
+              { role: "system", content: sys },
               { role: "user", content: userContent },
             ],
-            tools: [
-              {
-                type: "function",
-                function: {
-                  name: "build_voxel",
-                  description: "Return the voxel build as cubes plus a short assembly note.",
-                  parameters: {
-                    type: "object",
-                    properties: {
-                      cubes: {
-                        type: "array",
-                        description: "Pixel-art cubes that compose the shape.",
-                        items: {
-                          type: "object",
-                          properties: {
-                            x: { type: "number", description: "x center in meters" },
-                            y: { type: "number", description: "y center in meters" },
-                            z: { type: "number", description: "z center in meters" },
-                            size: { type: "number", enum: [10, 20, 30], description: "cube edge in cm" },
-                            color: { type: "string", description: "hex color like #5b7fc7" },
-                          },
-                          required: ["x", "y", "z", "size"],
-                          additionalProperties: false,
-                        },
-                      },
-                      note: {
-                        type: "string",
-                        description: `One short assembly tip in ${lang === "ar" ? "Arabic" : "English"}.`,
-                      },
-                    },
-                    required: ["cubes", "note"],
-                    additionalProperties: false,
-                  },
-                },
-              },
-            ],
-            tool_choice: { type: "function", function: { name: "build_voxel" } },
-            temperature: 0.7,
+            temperature: 0.9,
+            top_p: 0.95,
+            max_tokens: 8000,
+            response_format: { type: "json_object" },
           }),
         });
 
@@ -184,21 +179,19 @@ Think layer by layer from the ground up. Then call build_voxel.`,
         }
         if (r.status === 402) {
           return new Response(
-            JSON.stringify({ error: lang === "ar" ? "الرصيد غير كافٍ، أضف رصيدًا للذكاء." : "AI credits exhausted." }),
+            JSON.stringify({ error: lang === "ar" ? "الرصيد غير كافٍ." : "AI credits exhausted." }),
             { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
         if (r.ok) {
           const j = await r.json();
-          const call = j.choices?.[0]?.message?.tool_calls?.[0];
-          if (call?.function?.arguments) {
-            try {
-              const parsed = JSON.parse(call.function.arguments);
-              cubes = validateCubes(parsed.cubes);
-              aiNotes = typeof parsed.note === "string" ? parsed.note.trim() : "";
-            } catch (e) {
-              console.error("Failed to parse tool args", e);
-            }
+          const text = j.choices?.[0]?.message?.content ?? "";
+          const parsed = extractJson(typeof text === "string" ? text : JSON.stringify(text));
+          if (parsed) {
+            cubes = validateCubes(parsed.cubes);
+            aiNotes = typeof parsed.note === "string" ? parsed.note.trim() : "";
+          } else {
+            console.error("Could not parse model output:", text?.slice?.(0, 400));
           }
         } else {
           console.error("AI call failed", r.status, await r.text());
@@ -208,16 +201,17 @@ Think layer by layer from the ground up. Then call build_voxel.`,
       }
     }
 
+    let usedFallback = false;
     if (cubes.length === 0) {
+      usedFallback = true;
       cubes = fallbackShape(width, height);
       if (!aiNotes) {
         aiNotes = lang === "ar"
-          ? "ابدأ بالأساس من 30 سم، ثم ارفع الجدران، ثم أضف تفاصيل 10 سم. كل مكعب يحتاج تقريبًا قطعتي صفيحة."
-          : "Start with the 30cm base, raise the walls, then add 10cm pixel details. Each cube needs ~2 sheets in real life.";
+          ? "تعذّر توليد نموذج من الذكاء — تم استخدام شكل احتياطي. جرّب وصفًا أوضح."
+          : "AI generation failed — used a fallback shape. Try a clearer description.";
       }
     }
 
-    // Counts, slides, pricing
     const bySize: Record<10 | 20 | 30, number> = { 10: 0, 20: 0, 30: 0 };
     cubes.forEach((c) => { bySize[c.size] = (bySize[c.size] || 0) + 1; });
     const totalCubes = cubes.length;
@@ -240,6 +234,7 @@ Think layer by layer from the ground up. Then call build_voxel.`,
         sheetsRealLife,
         total,
         aiNotes,
+        usedFallback,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );

@@ -170,6 +170,41 @@ export default function Studio() {
               )}
             </div>
 
+            {/* Editable system prompt */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[11px] tracking-[0.18em] uppercase text-foreground/55">
+                  {lang === "ar" ? "تعليمات النموذج (نظام)" : "AI System Prompt"}
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setSystemPrompt(DEFAULT_PROMPT)}
+                    className="text-[10px] uppercase tracking-wider text-foreground/55 hover:text-foreground/90 inline-flex items-center gap-1"
+                    title="Reset"
+                  >
+                    <RotateCcw className="w-3 h-3" /> {lang === "ar" ? "إعادة" : "Reset"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowPrompt((v) => !v)}
+                    className="text-[10px] uppercase tracking-wider text-foreground/55 hover:text-foreground/90"
+                  >
+                    {showPrompt ? (lang === "ar" ? "إخفاء" : "Hide") : (lang === "ar" ? "عرض" : "Show")}
+                  </button>
+                </div>
+              </div>
+              {showPrompt && (
+                <textarea
+                  value={systemPrompt}
+                  onChange={(e) => setSystemPrompt(e.target.value)}
+                  rows={10}
+                  spellCheck={false}
+                  className="input-field w-full font-mono text-[11px] leading-relaxed resize-y min-h-[160px]"
+                />
+              )}
+            </div>
+
             <button onClick={generate} disabled={loading} className="btn-primary w-full disabled:opacity-60">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {loading ? t.studio.generating : t.studio.generate}

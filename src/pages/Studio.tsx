@@ -125,6 +125,36 @@ export default function Studio() {
                 : "AI uses 30cm cubes for the body, 20cm for shoulders, 10cm for details."}
             </div>
 
+            {/* Reference photo (optional) → vision pass guides the template */}
+            <div>
+              <span className="block text-[11px] tracking-[0.18em] uppercase text-foreground/55 mb-1.5">
+                {lang === "ar" ? "صورة مرجعية (اختياري)" : "Reference photo (optional)"}
+              </span>
+              <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickImage} />
+              {imageDataUrl ? (
+                <div className="relative rounded-xl overflow-hidden border border-[color:var(--card-border)]">
+                  <img src={imageDataUrl} alt="reference" className="w-full h-32 object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setImageDataUrl(null)}
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80"
+                    aria-label="remove"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-[color:var(--card-border)] text-foreground/65 hover:bg-white/[0.04] transition-colors text-sm"
+                >
+                  <ImagePlus className="w-4 h-4" />
+                  {lang === "ar" ? "ارفع صورة لما تريد بناءه" : "Upload a photo of what to build"}
+                </button>
+              )}
+            </div>
+
             <button onClick={generate} disabled={loading} className="btn-primary w-full disabled:opacity-60">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {loading ? t.studio.generating : t.studio.generate}

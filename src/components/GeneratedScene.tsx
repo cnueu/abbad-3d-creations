@@ -1,13 +1,14 @@
 import { Suspense, useMemo } from "react";
-import { Canvas, useLoader } from "@react-three/fiber";
-import { OrbitControls, ContactShadows, Environment } from "@react-three/drei";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
-import * as THREE from "three";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, ContactShadows, Environment, Bounds, Edges } from "@react-three/drei";
 
+// Pixel-art / voxel style preview: simple colored boxes with crisp edges.
+// We intentionally do NOT use the dovetail OBJ here — that geometry is reserved
+// for the math/report layer. The preview is a clean voxel rendering.
 export interface PlacedCube {
   x: number; y: number; z: number; // meters (center)
   size: number; // cm — 10/20/30
-  color: string; // hex
+  color: string;
 }
 export interface Slide {
   ax: 0 | 1 | 2;
@@ -18,51 +19,30 @@ interface SceneProps {
   slides?: Slide[];
 }
 
-function useObjPieces() {
-  const obj = useLoader(OBJLoader, "/models/Cube_and_sheet.obj");
-  return useMemo(() => {
-    const out: { kind: "cube" | "sheet"; geom: THREE.BufferGeometry; sizeCm: number } = {
-      kind: "cube", geom: new THREE.BoxGeometry(0.1, 0.1, 0.1), sizeCm: 10,
-    };
-    const pieces: { kind: "cube" | "sheet"; geom: THREE.BufferGeometry }[] = [];
-    obj.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const m = child as THREE.Mesh;
-        const g = (m.geometry as THREE.BufferGeometry).clone();
-        g.computeBoundingBox();
-        const bb = g.boundingBox!;
-        const sz = new THREE.Vector3();
-        bb.getSize(sz);
-        const maxDim = Math.max(sz.x, sz.y, sz.z);
-        const minDim = Math.min(sz.x, sz.y, sz.z);
-        const isSheet = maxDim / Math.max(minDim, 0.001) > 3;
-        const c = new THREE.Vector3();
-        bb.getCenter(c);
-        g.translate(-c.x, -c.y, -c.z);
-        // .obj is in cm — convert to meters: scale by 0.01
-        g.scale(0.01, 0.01, 0.01);
-        pieces.push({ kind: isSheet ? "sheet" : "cube", geom: g });
-      }
-    });
-    void out;
-    return pieces;
-  }, [obj]);
+function VoxelCube({ c }: { c: PlacedCube }) {
+  const s = c.size / 100; // cm → m
+  return (
+    <mesh position={[c.x, c.y, c.z]} castShadow receiveShadow>
+      <boxGeometry args={[s, s, s]} />
+      <meshStandardMaterial color={c.color} metalness={0.05} roughness={0.65} flatShading />
+      <Edges threshold={15} color="#0b0d10" />
+    </mesh>
+  );
 }
 
-export function GeneratedScene({ cubes, slides = [] }: SceneProps) {
-  const span = Math.max(
-    ...cubes.map((c) => Math.max(Math.abs(c.x), Math.abs(c.y), Math.abs(c.z)) + c.size / 200),
-    0.3
-  );
-  const cam = span * 3.2;
-
+export function GeneratedScene({ cubes }: SceneProps) {
+  const items = useMemo(() => cubes, [cubes]);
   return (
-    <Canvas shadows camera={{ position: [cam, cam * 0.85, cam * 1.1], fov: 38 }} gl={{ antialias: true, alpha: true }}>
+    <Canvas shadows camera={{ position: [3, 2.4, 3.2], fov: 36 }} gl={{ antialias: true, alpha: true }}>
       <ambientLight intensity={0.55} />
-      <directionalLight position={[8, 12, 6]} intensity={1.2} castShadow />
+      <directionalLight position={[8, 12, 6]} intensity={1.2} castShadow shadow-mapSize={[1024, 1024]} />
       <Suspense fallback={null}>
-        <Pieces cubes={cubes} slides={slides} />
-        <ContactShadows position={[0, -span, 0]} opacity={0.45} scale={span * 8} blur={3} />
+        <Bounds fit clip observe margin={1.5}>
+          <group>
+            {items.map((c, i) => <VoxelCube key={i} c={c} />)}
+          </group>
+        </Bounds>
+        <ContactShadows position={[0, -0.05, 0]} opacity={0.4} scale={6} blur={2.4} />
         <Environment preset="city" />
       </Suspense>
       <OrbitControls autoRotate autoRotateSpeed={0.6} enablePan />
@@ -70,39 +50,7 @@ export function GeneratedScene({ cubes, slides = [] }: SceneProps) {
   );
 }
 
-function Pieces({ cubes, slides }: { cubes: PlacedCube[]; slides: Slide[] }) {
-  const pieces = useObjPieces();
-  const cubeGeo = pieces.find((p) => p.kind === "cube")?.geom;
-  const sheetGeo = pieces.find((p) => p.kind === "sheet")?.geom;
-
-  return (
-    <>
-      {cubeGeo && cubes.map((c, i) => (
-        <mesh
-          key={`c${i}`}
-          geometry={cubeGeo}
-          position={[c.x, c.y, c.z]}
-          scale={c.size / 10} // base cube is 10 cm
-          castShadow
-          receiveShadow
-        >
-          <meshStandardMaterial color={c.color} metalness={0.18} roughness={0.42} />
-        </mesh>
-      ))}
-      {sheetGeo && slides.map((sl, i) => {
-        const rot: [number, number, number] =
-          sl.ax === 0 ? [0, Math.PI / 2, 0] : sl.ax === 1 ? [Math.PI / 2, 0, 0] : [0, 0, 0];
-        return (
-          <mesh key={`s${i}`} geometry={sheetGeo} position={[sl.mid.x, sl.mid.y, sl.mid.z]} rotation={rot} castShadow>
-            <meshStandardMaterial color="#a8d5cc" metalness={0.3} roughness={0.32} />
-          </mesh>
-        );
-      })}
-    </>
-  );
-}
-
-// Simple .obj exporter from cube list + slides (axis-aligned boxes)
+// Simple .obj exporter (axis-aligned boxes).
 export function buildObj(cubes: PlacedCube[], slides: Slide[] = []): string {
   const lines: string[] = ["# ABBAD AI Studio — generated assembly", "# units: meters"];
   let v = 0;

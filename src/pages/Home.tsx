@@ -44,7 +44,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 2.2, duration: 1 }}
-            className="aspect-square rounded-3xl glass-panel overflow-hidden animate-float"
+            className="mx-auto w-full max-w-sm aspect-square rounded-3xl glass-panel overflow-hidden animate-float"
           >
             <Product3D product={PRODUCTS[0]} />
           </motion.div>
@@ -87,23 +87,26 @@ export default function Home() {
             {t.store.viewAll} <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {PRODUCTS.map((p, i) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {PRODUCTS.slice(0, 8).map((p, i) => (
             <Link
               key={p.id}
               to="/store"
               className="glass-card rounded-2xl overflow-hidden group block"
               style={{ animationDelay: `${i * 0.08}s` }}
             >
-              <div className="aspect-[4/3]" style={{ background: "rgba(106,125,122,0.18)" }}>
+              <div className="aspect-square" style={{ background: "rgba(106,125,122,0.14)" }}>
                 <Product3D product={p} autoRotate />
               </div>
-              <div className="p-4">
-                <h3 className="font-display text-base font-semibold">
+              <div className="p-3">
+                <h3 className="font-display text-sm font-semibold">
                   {p.kind === "cube" ? (lang === "ar" ? "مكعب" : "Cube") : t.store.sheetTitle}
                 </h3>
-                <p className="text-xs text-foreground/55">
+                <p className="text-[11px] text-foreground/55">
                   {p.kind === "cube" ? `${p.size}³ ${t.common.cm}` : t.store.sheetSize}
+                </p>
+                <p className="text-[10px] text-foreground/45 mt-0.5">
+                  {lang === "ar" ? p.colorName.ar : p.colorName.en}
                 </p>
               </div>
             </Link>

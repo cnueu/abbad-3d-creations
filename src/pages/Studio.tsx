@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
 import { motion } from "framer-motion";
-import { Sparkles, Download, Loader2, ImagePlus, X } from "lucide-react";
+import { Sparkles, Download, Loader2, ImagePlus, X, RotateCcw } from "lucide-react";
 import { GeneratedScene, buildObj, PlacedCube, Slide } from "@/components/GeneratedScene";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";

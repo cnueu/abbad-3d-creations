@@ -105,7 +105,7 @@ export default function Studio() {
       <div className="container mx-auto px-6 py-14 max-w-6xl">
         <header className="mb-10">
           <span className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-green-100 mb-3 px-3 py-1 rounded-full border border-[color:var(--card-border)]">
-            <Sparkles className="w-3 h-3" /> Gemini 2.5 Pro · Pixel-Art 3D
+            <Sparkles className="w-3 h-3" /> GPT-OSS-120B · Pixel-Art 3D
           </span>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">
             <span className="text-gradient">{t.studio.title}</span>

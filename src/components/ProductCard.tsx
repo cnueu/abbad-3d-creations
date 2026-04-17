@@ -34,8 +34,14 @@ export function ProductCard({ product, onClick, index = 0 }: Props) {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
       </div>
       <div className="px-4 pt-4 pb-5">
-        <h3 className="font-display text-lg font-semibold mb-0.5">{title}</h3>
-        <p className="text-xs text-foreground/60 mb-3">{subtitle}</p>
+        <div className="flex items-center gap-2 mb-1">
+          <span className="w-3 h-3 rounded-full ring-2 ring-white/10" style={{ background: product.color }} />
+          <h3 className="font-display text-lg font-semibold">{title}</h3>
+        </div>
+        <p className="text-xs text-foreground/60 mb-1">{subtitle}</p>
+        <p className="text-[11px] text-foreground/45 mb-3">
+          {lang === "ar" ? product.colorName.ar : product.colorName.en}
+        </p>
         <div className="flex items-center justify-between">
           <span className="text-[11px] tracking-wider uppercase text-foreground/50">
             {t.store.material}: {product.materials.join(" , ")}

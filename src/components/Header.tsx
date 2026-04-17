@@ -58,10 +58,10 @@ export function Header() {
       </AnimatePresence>
 
       <header
-        className="fixed top-0 left-0 right-0 z-[100] transition-all duration-500"
+        className="fixed top-0 left-0 right-0 z-[100] transition-all duration-500 abbad-header"
         style={{
           backdropFilter: introDone ? "blur(20px) saturate(1.4)" : "none",
-          background: introDone ? "rgba(14, 16, 18, 0.55)" : "transparent",
+          background: introDone ? "hsl(var(--bg-root) / 0.72)" : "transparent",
           borderBottom: introDone ? "1px solid var(--card-border)" : "1px solid transparent",
           height: introDone ? (scrolled ? "60px" : "84px") : "100vh",
         }}

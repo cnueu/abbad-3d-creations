@@ -11,6 +11,7 @@ interface Body {
   shapeName: string;
   width: number;
   height: number;
+  depth: number;
   purpose: string;
   lang: "en" | "ar";
   imageDataUrl?: string;
@@ -27,18 +28,20 @@ const PALETTE: Record<Size, string[]> = {
 };
 const colorFor = (s: Size, i: number) => PALETTE[s][i % PALETTE[s].length];
 
-function fallbackShape(w: number, h: number): PlannedCube[] {
+function fallbackShape(w: number, h: number, d: number): PlannedCube[] {
   const out: PlannedCube[] = [];
   const layers = Math.max(2, Math.min(6, Math.round(h / 0.3)));
+  const spanX = Math.max(1, Math.round(w / 0.6));
+  const spanZ = Math.max(1, Math.round(d / 0.6));
   for (let j = 0; j < layers; j++) {
-    const span = layers - j;
-    for (let i = -span; i <= span; i++)
-      for (let k = -span; k <= span; k++) {
-        if (Math.abs(i) !== span && Math.abs(k) !== span && j !== 0) continue;
+    const sx = Math.max(1, spanX - j);
+    const sz = Math.max(1, spanZ - j);
+    for (let i = -sx; i <= sx; i++)
+      for (let k = -sz; k <= sz; k++) {
+        if (Math.abs(i) !== sx && Math.abs(k) !== sz && j !== 0) continue;
         out.push({ x: i * 0.3, y: j * 0.3, z: k * 0.3, size: 30, color: colorFor(30, i + k + j) });
       }
   }
-  void w;
   return out;
 }
 
@@ -123,7 +126,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = (await req.json()) as Body;
-    const { shapeName, width, height, purpose, lang, imageDataUrl, systemPrompt } = body;
+    const { shapeName, width, height, depth, purpose, lang, imageDataUrl, systemPrompt } = body;
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
 
     let cubes: PlannedCube[] = [];
@@ -135,7 +138,7 @@ Deno.serve(async (req) => {
         : DEFAULT_SYSTEM_PROMPT;
 
       const userText = `Build "${shapeName}" as a 3D pixel-art voxel sculpture.
-Approx footprint: ${width}m wide × ${height}m tall (Y up, centered at origin).
+Approx bounds: ${width}m wide (X) × ${height}m tall (Y) × ${depth}m deep (Z), centered at origin.
 ${purpose ? `Purpose: ${purpose}` : ""}
 Note language: ${lang === "ar" ? "Arabic" : "English"}.
 
@@ -198,7 +201,7 @@ Think layer by layer from the ground up, then output the JSON.`;
     let usedFallback = false;
     if (cubes.length === 0) {
       usedFallback = true;
-      cubes = fallbackShape(width, height);
+      cubes = fallbackShape(width, height, depth);
       if (!aiNotes) {
         aiNotes = lang === "ar"
           ? "تعذّر توليد نموذج من الذكاء — تم استخدام شكل احتياطي. جرّب وصفًا أوضح."

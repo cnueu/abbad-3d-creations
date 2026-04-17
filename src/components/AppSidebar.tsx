@@ -45,7 +45,7 @@ export function AppSidebar({
   const items: NavItem[] = [
     {
       id: "blocks",
-      label: lang === "ar" ? "وحدات البناء" : "Game Jams",
+      label: lang === "ar" ? "أدوات البناء" : "Build Tools",
       icon: LayoutGrid,
       children: [
         { id: "store", label: lang === "ar" ? "المتجر" : "Building Blocks", to: "/store" },
@@ -78,8 +78,8 @@ export function AppSidebar({
         borderColor: "var(--card-border)",
       }}
     >
-      {/* Header / user */}
-      <div className="relative flex items-center gap-2.5 px-4 pt-5 pb-4 min-h-[72px] overflow-hidden">
+      {/* Header / user — pushed below the fixed page header (84px) */}
+      <div className="relative flex items-center gap-2.5 px-4 pt-[100px] pb-4 min-h-[160px] overflow-hidden">
         <div
           className="w-9 h-9 rounded-full shrink-0 shadow-[0_0_0_2px_rgba(255,255,255,0.15),0_4px_12px_rgba(0,0,0,0.4)]"
           style={{

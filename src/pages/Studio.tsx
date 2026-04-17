@@ -26,7 +26,6 @@ export default function Studio() {
   const [shapeName, setShapeName] = useState("");
   const [width, setWidth] = useState(2);
   const [height, setHeight] = useState(2);
-  const [depth, setDepth] = useState(0.6);
   const [purpose, setPurpose] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
@@ -54,7 +53,7 @@ export default function Studio() {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-design", {
-        body: { shapeName: shapeName || "reference", width, height, depth, purpose, lang, imageDataUrl },
+        body: { shapeName: shapeName || "reference", width, height, purpose, lang, imageDataUrl },
       });
       if (error) throw error;
       setResult(data as Result);
@@ -87,7 +86,7 @@ export default function Studio() {
       <div className="container mx-auto px-6 py-14 max-w-6xl">
         <header className="mb-10">
           <span className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-green-100 mb-3 px-3 py-1 rounded-full border border-[color:var(--card-border)]">
-            <Sparkles className="w-3 h-3" /> GPT-OSS-120B
+            <Sparkles className="w-3 h-3" /> Gemini 2.5 Pro · Pixel-Art 3D
           </span>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">
             <span className="text-gradient">{t.studio.title}</span>
@@ -108,15 +107,12 @@ export default function Studio() {
             <Field label={t.studio.purpose}>
               <input className="input-field" value={purpose} onChange={(e) => setPurpose(e.target.value)} placeholder={t.studio.purposePh} />
             </Field>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <Field label={t.studio.width}>
                 <input type="number" min={0.1} step={0.1} className="input-field" value={width} onChange={(e) => setWidth(+e.target.value)} />
               </Field>
               <Field label={t.studio.height}>
                 <input type="number" min={0.1} step={0.1} className="input-field" value={height} onChange={(e) => setHeight(+e.target.value)} />
-              </Field>
-              <Field label={t.studio.depth}>
-                <input type="number" min={0.1} step={0.1} className="input-field" value={depth} onChange={(e) => setDepth(+e.target.value)} />
               </Field>
             </div>
             <div className="rounded-xl border border-[color:var(--card-border)] px-4 py-3 text-xs bg-white/[0.02] text-foreground/65 leading-relaxed">

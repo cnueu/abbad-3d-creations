@@ -14,7 +14,6 @@ interface Body {
   shapeName: string;
   width: number;   // meters
   height: number;
-  depth: number;
   purpose: string;
   lang: "en" | "ar";
   imageDataUrl?: string;
@@ -31,7 +30,7 @@ const PALETTE: Record<Size, string[]> = {
 const colorFor = (s: Size, i: number) => PALETTE[s][i % PALETTE[s].length];
 
 // Fallback procedural shape if AI fails — simple stepped pyramid so it's never empty.
-function fallbackShape(w: number, h: number, d: number): PlannedCube[] {
+function fallbackShape(w: number, h: number): PlannedCube[] {
   const out: PlannedCube[] = [];
   const layers = Math.max(2, Math.min(6, Math.round(h / 0.3)));
   for (let j = 0; j < layers; j++) {
@@ -42,7 +41,7 @@ function fallbackShape(w: number, h: number, d: number): PlannedCube[] {
         out.push({ x: i * 0.3, y: j * 0.3, z: k * 0.3, size: 30, color: colorFor(30, i + k + j) });
       }
   }
-  void w; void d;
+  void w;
   return out;
 }
 
@@ -94,7 +93,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = (await req.json()) as Body;
-    const { shapeName, width, height, depth, purpose, lang, imageDataUrl } = body;
+    const { shapeName, width, height, purpose, lang, imageDataUrl } = body;
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
 
     let cubes: PlannedCube[] = [];
@@ -104,12 +103,19 @@ Deno.serve(async (req) => {
       const userContent: any[] = [
         {
           type: "text",
-          text: `Design "${shapeName}" in pixel-art voxel style.
-Bounding box: ${width}m wide × ${height}m tall × ${depth}m deep (centered at origin, Y up).
+          text: `Build "${shapeName}" as a 3D PIXEL-ART sculpture made of axis-aligned cubes.
+Approx footprint: ${width}m wide × ${height}m tall (Y is up, centered at origin).
 ${purpose ? `Purpose: ${purpose}` : ""}
-Use a recognizable silhouette. Mix sizes: 30cm cubes for mass/walls, 20cm for transitions, 10cm for pixel details (battlements, windows, trim).
-Place cubes on a 0.1m grid, coordinates in meters.
-Return 30-200 cubes. Vary colors by size and zone for visual interest.`,
+
+Hard rules:
+- Output 60–250 cubes. Never fewer than 40. Never one giant block.
+- Cube sizes (cm): 30 = main mass, 20 = mid shapes, 10 = pixel details (windows, trim, antenna, eyes).
+- Snap centers to a 0.1m grid. Cubes must touch on faces (no floating, no overlap).
+- Build a recognizable silhouette like classic Minecraft / voxel art: distinct front, sides, top.
+- Use 4–8 colors total, grouped by region (roof vs walls vs accents). Vibrant, saturated hex colors.
+- Include negative space: openings, steps, layered tiers — not a solid box.
+
+Think layer by layer from the ground up. Then call build_voxel.`,
         },
       ];
       if (imageDataUrl) {
@@ -121,11 +127,11 @@ Return 30-200 cubes. Vary colors by size and zone for visual interest.`,
           method: "POST",
           headers: { Authorization: `Bearer ${lovableKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash",
+            model: "google/gemini-2.5-pro",
             messages: [
               {
                 role: "system",
-                content: "You are a pixel-art voxel designer. You translate descriptions and reference photos into a list of axis-aligned cubes. Always call the build_voxel function — never reply with prose.",
+                content: "You are an expert 3D pixel-art (voxel) sculptor in the style of Minecraft and Crossy Road. You translate descriptions and reference photos into rich, recognizable voxel builds with 60–250 cubes. You always call build_voxel — never reply with prose. You never return a single big cube; you always sculpt detail.",
               },
               { role: "user", content: userContent },
             ],
@@ -203,7 +209,7 @@ Return 30-200 cubes. Vary colors by size and zone for visual interest.`,
     }
 
     if (cubes.length === 0) {
-      cubes = fallbackShape(width, height, depth);
+      cubes = fallbackShape(width, height);
       if (!aiNotes) {
         aiNotes = lang === "ar"
           ? "ابدأ بالأساس من 30 سم، ثم ارفع الجدران، ثم أضف تفاصيل 10 سم. كل مكعب يحتاج تقريبًا قطعتي صفيحة."

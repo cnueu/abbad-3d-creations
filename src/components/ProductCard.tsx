@@ -29,7 +29,7 @@ export function ProductCard({ product, onClick, index = 0 }: Props) {
       whileHover={{ y: -6 }}
       className="glass-card rounded-2xl overflow-hidden text-start group"
     >
-      <div className="aspect-[4/3] w-full relative overflow-hidden" style={{ background: "rgba(106,125,122,0.18)" }}>
+      <div className="aspect-square w-full relative overflow-hidden" style={{ background: "rgba(106,125,122,0.14)" }}>
         <Product3D product={product} />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
       </div>

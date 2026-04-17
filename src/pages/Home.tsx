@@ -44,7 +44,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 2.2, duration: 1 }}
-            className="aspect-square rounded-3xl glass-panel overflow-hidden animate-float"
+            className="mx-auto w-full max-w-sm aspect-square rounded-3xl glass-panel overflow-hidden animate-float"
           >
             <Product3D product={PRODUCTS[0]} />
           </motion.div>

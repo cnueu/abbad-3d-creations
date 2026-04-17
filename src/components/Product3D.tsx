@@ -44,18 +44,28 @@ function Piece({ product }: { product: Product }) {
   );
 }
 
-export function Product3D({ product, autoRotate = true }: { product: Product; autoRotate?: boolean }) {
+export function Product3D({
+  product,
+  autoRotate = true,
+  interactive = true,
+}: {
+  product: Product;
+  autoRotate?: boolean;
+  interactive?: boolean;
+}) {
+  // frameloop="demand" pauses the render loop when not hovering — fixes Store lag.
   return (
     <Canvas
       shadows
       camera={{ position: [4, 3.4, 4.4], fov: 28 }}
       style={{ width: "100%", height: "100%" }}
-      gl={{ antialias: true, alpha: true }}
+      gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
+      frameloop={interactive ? "always" : "demand"}
+      dpr={[1, 1.5]}
     >
       <ambientLight intensity={0.6} />
       <directionalLight position={[10, 16, 8]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
       <Suspense fallback={null}>
-        {/* Bounds auto-frames the piece so it always fits with breathing room. */}
         <Bounds fit clip observe margin={1.7}>
           <Piece product={product} />
         </Bounds>
@@ -65,7 +75,8 @@ export function Product3D({ product, autoRotate = true }: { product: Product; au
       <OrbitControls
         enablePan={false}
         enableZoom={false}
-        autoRotate={autoRotate}
+        enableRotate={interactive}
+        autoRotate={autoRotate && interactive}
         autoRotateSpeed={1.2}
         minPolarAngle={Math.PI / 3.5}
         maxPolarAngle={Math.PI / 1.7}

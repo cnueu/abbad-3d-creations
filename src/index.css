@@ -67,18 +67,47 @@
   }
 
   [data-theme="light"] {
-    --bg-root: 0 0% 47%;
-    --bg-sidebar: 216 14% 6%;
-    --bg-main: 0 0% 95%;
-    --background: 0 0% 95%;
-    --foreground: 213 13% 9%;
+    /* Light mode — same gradient shape as dark, but warm paper tones */
+    --bg-root: 40 25% 96%;
+    --bg-sidebar: 153 12% 14%;
+    --bg-main: 40 25% 96%;
+    --bg-section-alt: 40 18% 92%;
+    --background: 40 25% 96%;
+    --foreground: 213 20% 14%;
     --card: 0 0% 100%;
-    --card-foreground: 213 13% 9%;
-    --text-primary: 213 13% 9%;
-    --text-secondary: 168 7% 30%;
-    --text-muted: 168 7% 45%;
-    --card-bg: rgba(255, 255, 255, 0.65);
-    --card-bg-hover: rgba(255, 255, 255, 0.9);
+    --card-foreground: 213 20% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 213 20% 14%;
+    --primary: 170 44% 35%;
+    --primary-foreground: 40 25% 96%;
+    --secondary: 169 39% 45%;
+    --secondary-foreground: 40 25% 96%;
+    --muted: 40 18% 90%;
+    --muted-foreground: 168 10% 35%;
+    --accent: 169 32% 47%;
+    --accent-foreground: 40 25% 96%;
+    --border: 169 30% 70%;
+    --input: 40 18% 90%;
+    --ring: 170 44% 35%;
+    --text-primary: 213 20% 14%;
+    --text-secondary: 168 10% 25%;
+    --text-muted: 168 8% 40%;
+    --card-bg: rgba(255, 255, 255, 0.72);
+    --card-bg-hover: rgba(255, 255, 255, 0.92);
+    --card-border: rgba(45, 125, 111, 0.22);
+    --card-border-hover: rgba(45, 125, 111, 0.45);
+    --card-shadow: 0 8px 24px rgba(45, 125, 111, 0.10), 0 2px 8px rgba(0, 0, 0, 0.04);
+    --card-shadow-hover: 0 16px 40px rgba(45, 125, 111, 0.18), 0 4px 12px rgba(0, 0, 0, 0.06);
+    --glass-border: rgba(45, 125, 111, 0.18);
+    --green-glass: rgba(45, 125, 111, 0.10);
+    --gradient-text: linear-gradient(135deg, #2d7d6f 0%, #3d9e8f 50%, #6db8ac 100%);
+  }
+  [data-theme="light"] body {
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 10%, rgba(45, 125, 111, 0.12), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 10% 90%, rgba(109, 184, 172, 0.10), transparent 60%),
+      hsl(var(--bg-root));
+    background-attachment: fixed;
   }
 }
 

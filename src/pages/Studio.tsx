@@ -10,6 +10,7 @@ import { suggestProducts, Product } from "@/data/products";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+interface Slide { ax: 0 | 1 | 2; mid: { x: number; y: number; z: number } }
 interface Result {
   grid: { nx: number; ny: number; nz: number };
   cubes: number;
@@ -19,6 +20,7 @@ interface Result {
   sheetUnit: number;
   total: number;
   positions: { x: number; y: number; z: number }[];
+  slides: Slide[];
   aiNotes: string;
 }
 
@@ -28,7 +30,6 @@ export default function Studio() {
   const [width, setWidth] = useState(2);
   const [height, setHeight] = useState(2);
   const [depth, setDepth] = useState(0.5);
-  const [cubeSize, setCubeSize] = useState(20);
   const [purpose, setPurpose] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
@@ -42,7 +43,7 @@ export default function Studio() {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-design", {
-        body: { shapeName, width, height, depth, cubeSize, purpose, lang },
+        body: { shapeName, width, height, depth, purpose, lang },
       });
       if (error) throw error;
       setResult(data as Result);
@@ -55,7 +56,7 @@ export default function Studio() {
 
   function downloadObj() {
     if (!result) return;
-    const obj = buildObj(result.positions, result.cubeSize);
+    const obj = buildObj(result.positions, result.cubeSize, result.slides);
     const blob = new Blob([obj], { type: "text/plain" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -65,7 +66,7 @@ export default function Studio() {
     URL.revokeObjectURL(url);
   }
 
-  const suggested = result ? suggestProducts(result.cubeSize) : [];
+  const suggested = result ? suggestProducts(10) : [];
 
   return (
     <Layout>
@@ -105,20 +106,11 @@ export default function Studio() {
               </Field>
             </div>
             <Field label={t.studio.cubeSize}>
-              <div className="flex gap-2">
-                {[10, 20, 30].map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setCubeSize(s)}
-                    className={`flex-1 py-2.5 rounded-xl border text-sm font-medium transition ${
-                      cubeSize === s
-                        ? "bg-green-300 text-[hsl(var(--bg-root))] border-green-200"
-                        : "border-[color:var(--card-border)] hover:bg-green-500/15"
-                    }`}
-                  >
-                    {s} {t.common.cm}
-                  </button>
-                ))}
+              <div className="rounded-xl border border-[color:var(--card-border)] px-4 py-3 text-sm bg-white/[0.02]">
+                <span className="text-green-100 font-semibold">10 {t.common.cm}</span>
+                <span className="text-foreground/50 ms-2 text-xs">
+                  {lang === "ar" ? "(القطعة الأساسية)" : "(standard module)"}
+                </span>
               </div>
             </Field>
 
@@ -132,7 +124,7 @@ export default function Studio() {
           <div className="lg:col-span-3 space-y-4">
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-green-500/20 to-transparent">
               {result ? (
-                <GeneratedScene positions={result.positions} cubeSize={result.cubeSize} />
+                <GeneratedScene positions={result.positions} slides={result.slides} cubeSize={result.cubeSize} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-foreground/40 text-sm">
                   {t.studio.result}

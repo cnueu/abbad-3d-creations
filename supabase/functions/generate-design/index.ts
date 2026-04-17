@@ -1,3 +1,7 @@
+// ABBAD generate-design — deterministic geometry + GPT-OSS narrative.
+// Geometry source of truth: holedCube.blend (10cm cube) + Dovetail_slide.blend (2.3×2.3×20cm).
+// Connection rule (per user spec): "each 2 adjacent cubes share 1 dovetail slide".
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -9,46 +13,71 @@ interface Body {
   width: number;   // meters
   height: number;
   depth: number;
-  cubeSize: number; // cm: 10/20/30
   purpose: string;
   lang: "en" | "ar";
 }
+
+// --- Code context handed to GPT-OSS so it can "translate code → 3D" ---
+const SIMPLEST_EXAMPLE_PSEUDOCODE = `
+# Reference assembly inspected from simplest_example.blend
+# Two 10cm cubes stacked along -Y, joined by 2 vertical dovetail slides
+# (one slide engages 2 cubes — slide length 20cm = 2 × cube edge).
+Cube      at (0,  0.000, 0)   size = 10x10x10
+Cube.001  at (-2, -4.407, 0)  size = 2.3 x 2.3 x 10  # slide column A
+Cube.002  at ( 2, -4.407, 0)  size = 2.3 x 2.3 x 10  # slide column B
+Cube.003  at (0, -10.003, 0)  size = 10x10x10
+# Logic: each pair of adjacent cubes shares ONE dovetail slide.
+`.trim();
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
     const body = (await req.json()) as Body;
-    const { shapeName, width, height, depth, cubeSize, purpose, lang } = body;
+    const { shapeName, width, height, depth, purpose, lang } = body;
 
     // ── Deterministic geometry math (truth source) ─────────────────
-    const sizeM = cubeSize / 100;
+    const cubeSize = 10;          // cm — only one cube size exists
+    const sizeM = cubeSize / 100; // 0.1 m
     const nx = Math.max(1, Math.ceil(width / sizeM));
     const ny = Math.max(1, Math.ceil(height / sizeM));
     const nz = Math.max(1, Math.ceil(depth / sizeM));
     const cubes = nx * ny * nz;
-    // adjacent-cube faces (each pair sharing a face = 1 sheet)
-    const sheets = (nx - 1) * ny * nz + nx * (ny - 1) * nz + nx * ny * (nz - 1);
+    // Each pair of adjacent cubes (sharing a face) → 1 dovetail slide
+    const sheets =
+      (nx - 1) * ny * nz + nx * (ny - 1) * nz + nx * ny * (nz - 1);
 
     // Pricing
-    const cubePriceMap: Record<number, number> = { 10: 35, 20: 95, 30: 180 };
-    const cubeUnit = cubePriceMap[cubeSize] ?? 35;
+    const cubeUnit = 35;
     const sheetUnit = 12;
     const total = cubes * cubeUnit + sheets * sheetUnit;
 
-    // ── Ask GPT-OSS for narrative notes (optional, falls back gracefully) ──
+    // ── Ask GPT-OSS for narrative notes (with reference example) ──
     let aiNotes = "";
     const key = Deno.env.get("OPENROUTER_API_KEY");
     if (key) {
       const sys =
         lang === "ar"
-          ? "أنت مهندس تصميم في شركة أبعاد. أعطِ ملاحظات قصيرة (٣-٥ نقاط) حول كيفية تجميع الشكل المطلوب باستخدام مكعبات وصفائح ربط فقط. كن دقيقاً وعملياً."
-          : "You are a design engineer at ABBAD. Give 3-5 short bullet notes on how to assemble the requested shape using ONLY cubes and connector sheets. Be precise and practical.";
+          ? `أنت مهندس تصميم في "أبعاد". لديك قطعتان فقط:
+- مكعب 10×10×10 سم (مع شقوق رأس سهم على الأوجه الأربعة العمودية)
+- شريحة ربط رأس سهم 2.3×2.3×20 سم (تربط مكعبين متجاورين)
+استخدم المثال المرجعي كـ"شيفرة → ثلاثي الأبعاد" لفهم آلية الربط، ثم أعطِ ٣-٥ نقاط عملية لتجميع الشكل.
+
+المرجع:
+${SIMPLEST_EXAMPLE_PSEUDOCODE}`
+          : `You are a design engineer at ABBAD. You have ONLY two parts:
+- Cube  10×10×10 cm (with dovetail slots on the 4 vertical faces)
+- Dovetail slide  2.3×2.3×20 cm (joins TWO adjacent cubes)
+Use the reference example as a "code → 3D" template to understand the joinery, then give 3-5 practical bullets on how to assemble the requested shape.
+
+REFERENCE:
+${SIMPLEST_EXAMPLE_PSEUDOCODE}`;
+
       const user = `Shape: ${shapeName}
 Purpose: ${purpose}
 Target dimensions: ${width}m × ${height}m × ${depth}m
-Cube size: ${cubeSize}cm
-Computed grid: ${nx} × ${ny} × ${nz} cubes (${cubes} total), ${sheets} connector sheets.`;
+Computed grid: ${nx} × ${ny} × ${nz} cubes (${cubes} total), ${sheets} dovetail slides.
+Cube edge: ${cubeSize}cm.`;
 
       try {
         const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -65,7 +94,7 @@ Computed grid: ${nx} × ${ny} × ${nz} cubes (${cubes} total), ${sheets} connect
               { role: "system", content: sys },
               { role: "user", content: user },
             ],
-            max_tokens: 400,
+            max_tokens: 500,
             temperature: 0.4,
           }),
         });
@@ -85,7 +114,7 @@ Computed grid: ${nx} × ${ny} × ${nz} cubes (${cubes} total), ${sheets} connect
       }
     }
 
-    // ── Build positions for the 3D scene ───────────────────────────
+    // ── Build cube positions (centered grid, units = meters) ───────
     const positions: { x: number; y: number; z: number }[] = [];
     for (let i = 0; i < nx; i++)
       for (let j = 0; j < ny; j++)
@@ -95,6 +124,20 @@ Computed grid: ${nx} × ${ny} × ${nz} cubes (${cubes} total), ${sheets} connect
             y: (j - (ny - 1) / 2) * sizeM,
             z: (k - (nz - 1) / 2) * sizeM,
           });
+
+    // ── Build dovetail-slide segments (one per shared face) ────────
+    // axis 0=x,1=y,2=z; each slide sits between two neighboring cubes.
+    const slides: { ax: 0 | 1 | 2; mid: { x: number; y: number; z: number } }[] = [];
+    for (let i = 0; i < nx; i++)
+      for (let j = 0; j < ny; j++)
+        for (let k = 0; k < nz; k++) {
+          const cx = (i - (nx - 1) / 2) * sizeM;
+          const cy = (j - (ny - 1) / 2) * sizeM;
+          const cz = (k - (nz - 1) / 2) * sizeM;
+          if (i + 1 < nx) slides.push({ ax: 0, mid: { x: cx + sizeM / 2, y: cy, z: cz } });
+          if (j + 1 < ny) slides.push({ ax: 1, mid: { x: cx, y: cy + sizeM / 2, z: cz } });
+          if (k + 1 < nz) slides.push({ ax: 2, mid: { x: cx, y: cy, z: cz + sizeM / 2 } });
+        }
 
     return new Response(
       JSON.stringify({
@@ -106,15 +149,16 @@ Computed grid: ${nx} × ${ny} × ${nz} cubes (${cubes} total), ${sheets} connect
         sheetUnit,
         total,
         positions,
+        slides,
         aiNotes,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (e) {
     console.error("generate-design error", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   }
 });

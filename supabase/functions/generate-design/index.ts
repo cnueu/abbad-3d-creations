@@ -124,12 +124,12 @@ Deno.serve(async (req) => {
   try {
     const body = (await req.json()) as Body;
     const { shapeName, width, height, purpose, lang, imageDataUrl, systemPrompt } = body;
-    const orKey = Deno.env.get("OPENROUTER_API_KEY");
+    const lovableKey = Deno.env.get("LOVABLE_API_KEY");
 
     let cubes: PlannedCube[] = [];
     let aiNotes = "";
 
-    if (orKey) {
+    if (lovableKey) {
       const sys = (systemPrompt && systemPrompt.trim().length > 20)
         ? systemPrompt
         : DEFAULT_SYSTEM_PROMPT;
@@ -141,7 +141,6 @@ Note language: ${lang === "ar" ? "Arabic" : "English"}.
 
 Think layer by layer from the ground up, then output the JSON.`;
 
-      // GPT-OSS-120B is text-only on most OpenRouter providers; only attach image if present and ignore otherwise.
       const userContent: any = imageDataUrl
         ? [
             { type: "text", text: userText },
@@ -150,24 +149,19 @@ Think layer by layer from the ground up, then output the JSON.`;
         : userText;
 
       try {
-        const r = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        const r = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${orKey}`,
+            Authorization: `Bearer ${lovableKey}`,
             "Content-Type": "application/json",
-            "HTTP-Referer": "https://abbad.lovable.app",
-            "X-Title": "ABBAD Studio",
           },
           body: JSON.stringify({
-            model: "openai/gpt-oss-120b",
+            model: "google/gemini-2.5-pro",
             messages: [
               { role: "system", content: sys },
               { role: "user", content: userContent },
             ],
             temperature: 0.9,
-            top_p: 0.95,
-            max_tokens: 8000,
-            response_format: { type: "json_object" },
           }),
         });
 

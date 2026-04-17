@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
 import { motion } from "framer-motion";
-import { Sparkles, Download, Loader2 } from "lucide-react";
+import { Sparkles, Download, Loader2, ImagePlus, X } from "lucide-react";
 import { GeneratedScene, buildObj, PlacedCube, Slide } from "@/components/GeneratedScene";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";
@@ -31,16 +31,30 @@ export default function Studio() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
   const [selected, setSelected] = useState<Product | null>(null);
+  const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  function onPickImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    if (f.size > 4 * 1024 * 1024) {
+      toast.error(lang === "ar" ? "الصورة أكبر من 4 ميغا" : "Image must be < 4MB");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setImageDataUrl(reader.result as string);
+    reader.readAsDataURL(f);
+  }
 
   async function generate() {
-    if (!shapeName.trim()) {
-      toast.error(lang === "ar" ? "أدخل اسم الشكل" : "Enter a shape name");
+    if (!shapeName.trim() && !imageDataUrl) {
+      toast.error(lang === "ar" ? "أدخل اسم الشكل أو ارفع صورة" : "Enter a shape name or upload a photo");
       return;
     }
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-design", {
-        body: { shapeName, width, height, depth, purpose, lang },
+        body: { shapeName: shapeName || "reference", width, height, depth, purpose, lang, imageDataUrl },
       });
       if (error) throw error;
       setResult(data as Result);
@@ -109,6 +123,36 @@ export default function Studio() {
               {lang === "ar"
                 ? "النموذج يستخدم 30سم للجسم، 20سم للأكتاف، 10سم للتفاصيل."
                 : "AI uses 30cm cubes for the body, 20cm for shoulders, 10cm for details."}
+            </div>
+
+            {/* Reference photo (optional) → vision pass guides the template */}
+            <div>
+              <span className="block text-[11px] tracking-[0.18em] uppercase text-foreground/55 mb-1.5">
+                {lang === "ar" ? "صورة مرجعية (اختياري)" : "Reference photo (optional)"}
+              </span>
+              <input ref={fileRef} type="file" accept="image/*" hidden onChange={onPickImage} />
+              {imageDataUrl ? (
+                <div className="relative rounded-xl overflow-hidden border border-[color:var(--card-border)]">
+                  <img src={imageDataUrl} alt="reference" className="w-full h-32 object-cover" />
+                  <button
+                    type="button"
+                    onClick={() => setImageDataUrl(null)}
+                    className="absolute top-2 right-2 w-7 h-7 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80"
+                    aria-label="remove"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl border border-dashed border-[color:var(--card-border)] text-foreground/65 hover:bg-white/[0.04] transition-colors text-sm"
+                >
+                  <ImagePlus className="w-4 h-4" />
+                  {lang === "ar" ? "ارفع صورة لما تريد بناءه" : "Upload a photo of what to build"}
+                </button>
+              )}
             </div>
 
             <button onClick={generate} disabled={loading} className="btn-primary w-full disabled:opacity-60">

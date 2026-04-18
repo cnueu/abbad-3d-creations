@@ -10,25 +10,24 @@ interface Props {
   index?: number;
 }
 
-// Lightweight static SVG preview — no WebGL until the user hovers the card.
-// Fixes Store page lag from running many Canvases at once.
+// Flat color tile preview — no cube illustration, no WebGL until hover.
+// Real 3D model loads on hover/focus only (keeps Store snappy).
 function StaticPreview({ product }: { product: Product }) {
-  const c = product.color;
-  if (product.kind === "sheet") {
-    return (
-      <svg viewBox="0 0 100 100" className="w-2/3 h-2/3 drop-shadow-lg">
-        <polygon points="20,35 80,35 90,55 10,55" fill={c} stroke="#0b0d10" strokeWidth="1.5" />
-        <polygon points="80,35 90,55 90,75 80,55" fill={c} stroke="#0b0d10" strokeWidth="1.5" opacity="0.85" />
-        <polygon points="20,35 10,55 10,75 20,55" fill={c} stroke="#0b0d10" strokeWidth="1.5" opacity="0.7" />
-      </svg>
-    );
-  }
   return (
-    <svg viewBox="0 0 100 100" className="w-2/3 h-2/3 drop-shadow-lg">
-      <polygon points="20,30 50,15 80,30 50,45" fill={c} stroke="#0b0d10" strokeWidth="1.5" />
-      <polygon points="20,30 20,75 50,90 50,45" fill={c} stroke="#0b0d10" strokeWidth="1.5" opacity="0.78" />
-      <polygon points="80,30 80,75 50,90 50,45" fill={c} stroke="#0b0d10" strokeWidth="1.5" opacity="0.62" />
-    </svg>
+    <div
+      className="w-full h-full flex items-center justify-center"
+      style={{
+        background: `radial-gradient(circle at 35% 30%, ${product.color}, ${product.color}cc 55%, ${product.color}88 100%)`,
+      }}
+    >
+      <div
+        className="w-20 h-20 rounded-full"
+        style={{
+          background: product.color,
+          boxShadow: `0 12px 32px ${product.color}66, inset 0 -8px 24px rgba(0,0,0,0.18), inset 0 8px 20px rgba(255,255,255,0.18)`,
+        }}
+      />
+    </div>
   );
 }
 
@@ -57,28 +56,27 @@ export function ProductCard({ product, onClick, index = 0 }: Props) {
       onBlur={() => setHover(false)}
       className="glass-card rounded-2xl overflow-hidden text-start group"
     >
-      <div className="aspect-square w-full relative overflow-hidden flex items-center justify-center" style={{ background: "rgba(106,125,122,0.14)" }}>
+      <div className="aspect-square w-full relative overflow-hidden flex items-center justify-center">
         {hover ? (
           <Product3D product={product} autoRotate interactive />
         ) : (
           <StaticPreview product={product} />
         )}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
       </div>
       <div className="px-4 pt-4 pb-5">
         <div className="flex items-center gap-2 mb-1">
-          <span className="w-3 h-3 rounded-full ring-2 ring-white/10" style={{ background: product.color }} />
-          <h3 className="font-display text-lg font-semibold">{title}</h3>
+          <span className="w-3 h-3 rounded-full ring-2 ring-foreground/15" style={{ background: product.color }} />
+          <h3 className="font-display text-lg font-semibold text-foreground">{title}</h3>
         </div>
-        <p className="text-xs text-foreground/60 mb-1">{subtitle}</p>
-        <p className="text-[11px] text-foreground/45 mb-3">
+        <p className="text-xs text-foreground/65 mb-1">{subtitle}</p>
+        <p className="text-[11px] text-foreground/50 mb-3">
           {lang === "ar" ? product.colorName.ar : product.colorName.en}
         </p>
         <div className="flex items-center justify-between">
-          <span className="text-[11px] tracking-wider uppercase text-foreground/50">
+          <span className="text-[11px] tracking-wider uppercase text-foreground/55">
             {t.store.material}: {product.materials.join(" , ")}
           </span>
-          <span className="text-sm font-semibold text-green-100">
+          <span className="text-sm font-semibold text-[hsl(var(--accent))]">
             {product.price} {t.common.sar}
           </span>
         </div>

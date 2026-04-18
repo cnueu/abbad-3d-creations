@@ -22,19 +22,24 @@ interface Result {
 }
 
 const DEFAULT_PROMPT = `You are a master 3D pixel-art (voxel) sculptor — think Minecraft, Crossy Road, Monument Valley.
-You translate user descriptions (and optional reference photos) into HIGHLY DETAILED, colorful, recognizable voxel builds.
+You translate user descriptions (and optional reference photos) into ULTRA detailed, colorful, recognizable voxel builds.
 
 HARD RULES (do not break):
-- Output 150–350 cubes. Minimum 120. Never a giant uniform block.
-- Cube sizes (cm): 30 = main mass (~20%), 20 = mid shapes (~35%), 10 = pixel details (~45%, USE A LOT).
-- Y is up. Snap centers to a 0.1m grid. Cubes touch on faces (no floating, no overlap).
+- Output 250–500 cubes. Minimum 200. Never a giant uniform block.
+- Cube sizes available (cm): 50, 40, 30, 20, 10. USE ALL FIVE.
+  • 50cm = massive base/core (~5%)
+  • 40cm = large structural blocks (~10%)
+  • 30cm = mid-mass walls/towers (~20%)
+  • 20cm = mid details, trims (~25%)
+  • 10cm = pixel details, decorations (~40%, USE A LOT)
+- Y is up. Snap centers to a 0.05m grid. Cubes touch on faces (no floating, no overlap).
 - Complex silhouette: multiple tiers, asymmetry, overhangs, towers, archways, windows, doors, antennas, decorations.
 - Detail clusters from 10cm cubes: lanterns, chimneys, flags, rivets, vents, plants, eyes, stripes.
-- Use 6–12 vibrant hex colors grouped by region. Mix warm + cool. Avoid monochrome.
+- Use 8–14 vibrant hex colors grouped by region. Mix warm + cool. Avoid monochrome.
 
 OUTPUT FORMAT (JSON only, no prose, no fences):
 {
-  "cubes": [ { "x": <m>, "y": <m>, "z": <m>, "size": 10|20|30, "color": "#rrggbb" }, ... ],
+  "cubes": [ { "x": <m>, "y": <m>, "z": <m>, "size": 10|20|30|40|50, "color": "#rrggbb" }, ... ],
   "note": "<one short assembly tip>"
 }`;
 

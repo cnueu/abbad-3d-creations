@@ -92,14 +92,14 @@
     --text-primary: 216 14% 14%;
     --text-secondary: 216 10% 26%;
     --text-muted: 216 8% 42%;
-    --card-bg: rgba(255, 255, 255, 0.72);
-    --card-bg-hover: rgba(255, 255, 255, 0.92);
-    --card-border: rgba(60, 70, 80, 0.18);
-    --card-border-hover: rgba(60, 70, 80, 0.32);
-    --card-shadow: 0 8px 24px rgba(20, 24, 28, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-    --card-shadow-hover: 0 16px 40px rgba(20, 24, 28, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06);
-    --glass-border: rgba(60, 70, 80, 0.16);
-    --green-glass: rgba(45, 125, 111, 0.10);
+    --card-bg: rgba(225, 232, 230, 0.78);
+    --card-bg-hover: rgba(232, 240, 237, 0.92);
+    --card-border: rgba(60, 90, 85, 0.22);
+    --card-border-hover: rgba(45, 125, 111, 0.45);
+    --card-shadow: 0 8px 24px rgba(20, 30, 28, 0.10), 0 2px 8px rgba(0, 0, 0, 0.05);
+    --card-shadow-hover: 0 16px 40px rgba(20, 30, 28, 0.16), 0 4px 12px rgba(0, 0, 0, 0.08);
+    --glass-border: rgba(45, 90, 85, 0.18);
+    --green-glass: rgba(45, 125, 111, 0.14);
     --gradient-text: linear-gradient(135deg, #2d7d6f 0%, #3d9e8f 50%, #6db8ac 100%);
   }
   [data-theme="light"] body {

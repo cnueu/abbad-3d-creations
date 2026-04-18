@@ -101,9 +101,9 @@ export default function Studio() {
     URL.revokeObjectURL(url);
   }
 
-  const sizesUsed = result ? (Object.keys(result.breakdown) as Array<"10"|"20"|"30">)
-    .filter((k) => result.breakdown[Number(k) as 10|20|30] > 0)
-    .map((k) => Number(k)) : [];
+  const sizesUsed = result ? ([10, 20, 30, 40, 50] as const)
+    .filter((k) => (result.breakdown[k] || 0) > 0)
+    .map((k) => k as number) : [];
   const suggested = result ? suggestProducts(sizesUsed) : [];
 
   return (

@@ -234,8 +234,10 @@ export default function Studio() {
               >
                 <div>
                   <div className="text-[10px] tracking-[0.2em] uppercase text-foreground/45 mb-2">{t.studio.pieces}</div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <Stat label={`${t.studio.cubes} 30${t.common.cm}`} value={result.breakdown[30] || 0} swatch="#5b7fc7" />
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <Stat label={`${t.studio.cubes} 50${t.common.cm}`} value={result.breakdown[50] || 0} swatch="#3a4a6b" />
+                    <Stat label={`${t.studio.cubes} 40${t.common.cm}`} value={result.breakdown[40] || 0} swatch="#5b7fc7" />
+                    <Stat label={`${t.studio.cubes} 30${t.common.cm}`} value={result.breakdown[30] || 0} swatch="#9b6ec7" />
                     <Stat label={`${t.studio.cubes} 20${t.common.cm}`} value={result.breakdown[20] || 0} swatch="#e08a5b" />
                     <Stat label={`${t.studio.cubes} 10${t.common.cm}`} value={result.breakdown[10] || 0} swatch="#6db8ac" />
                     <Stat label={t.studio.sheets} value={result.sheetsRealLife} sub={lang === "ar" ? "حقيقية" : "real-life"} swatch="#a8d5cc" />

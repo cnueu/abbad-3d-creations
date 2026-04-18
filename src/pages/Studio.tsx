@@ -13,7 +13,7 @@ import { toast } from "sonner";
 interface Result {
   cubes: PlacedCube[];
   slides: Slide[];
-  breakdown: Record<10 | 20 | 30, number>;
+  breakdown: Record<10 | 20 | 30 | 40 | 50, number>;
   totalCubes: number;
   sheetsVisible: number;
   sheetsRealLife: number;

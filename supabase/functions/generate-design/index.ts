@@ -1,5 +1,5 @@
 // ABBAD generate-design — voxel pixel-art generator.
-// Model: openai/gpt-oss-120b via Lovable AI Gateway (with safe fallback chain).
+// Model: google/gemini-2.5-pro via Lovable AI Gateway (with safe fallback chain).
 // Post-process enforces: snap-to-grid, no overlaps, no floating cubes (every
 // non-ground cube must touch another cube on a face — gravity-style flood fill).
 
@@ -20,28 +20,33 @@ interface Body {
   systemPrompt?: string;
 }
 
-type Size = 10 | 20 | 30;
+type Size = 10 | 20 | 30 | 40 | 50;
 interface PlannedCube { x: number; y: number; z: number; size: Size; color: string }
 
 const PALETTE: Record<Size, string[]> = {
-  30: ["#5b7fc7", "#2f3640", "#9b6ec7", "#d4546b", "#e08a5b"],
-  20: ["#e08a5b", "#f2c94c", "#6db8ac", "#9b6ec7", "#d4546b"],
-  10: ["#6db8ac", "#f4f1ea", "#f2c94c", "#d4546b", "#a8d5cc", "#5b7fc7"],
+  50: ["#3a4a6b", "#2f3640", "#5b3a5e", "#6b3a3a"],
+  40: ["#5b7fc7", "#4a6b8a", "#7a5ea8", "#a8505f"],
+  30: ["#5b7fc7", "#9b6ec7", "#d4546b", "#e08a5b", "#3a8f7a"],
+  20: ["#e08a5b", "#f2c94c", "#6db8ac", "#9b6ec7", "#d4546b", "#5b7fc7"],
+  10: ["#6db8ac", "#f4f1ea", "#f2c94c", "#d4546b", "#a8d5cc", "#5b7fc7", "#ff7a59", "#7ed957"],
 };
 const colorFor = (s: Size, i: number) => PALETTE[s][i % PALETTE[s].length];
 
 function fallbackShape(w: number, h: number, d: number): PlannedCube[] {
   const out: PlannedCube[] = [];
-  const layers = Math.max(2, Math.min(6, Math.round(h / 0.3)));
-  const spanX = Math.max(1, Math.round(w / 0.6));
-  const spanZ = Math.max(1, Math.round(d / 0.6));
+  const layers = Math.max(3, Math.min(8, Math.round(h / 0.2)));
+  const spanX = Math.max(2, Math.round(w / 0.4));
+  const spanZ = Math.max(2, Math.round(d / 0.4));
   for (let j = 0; j < layers; j++) {
-    const sx = Math.max(1, spanX - j);
-    const sz = Math.max(1, spanZ - j);
+    const sx = Math.max(1, spanX - Math.floor(j / 2));
+    const sz = Math.max(1, spanZ - Math.floor(j / 2));
     for (let i = -sx; i <= sx; i++)
       for (let k = -sz; k <= sz; k++) {
-        if (Math.abs(i) !== sx && Math.abs(k) !== sz && j !== 0) continue;
-        out.push({ x: i * 0.3, y: j * 0.3, z: k * 0.3, size: 30, color: colorFor(30, i + k + j) });
+        const isShell = Math.abs(i) === sx || Math.abs(k) === sz || j === 0;
+        if (!isShell && j !== 0) continue;
+        const size: Size = (j === 0 && Math.abs(i) === sx && Math.abs(k) === sz) ? 30 : (j > layers - 2 ? 10 : 20);
+        const step = size / 100;
+        out.push({ x: i * step, y: j * 0.2, z: k * step, size, color: colorFor(size, i + k + j) });
       }
   }
   return out;
@@ -51,7 +56,9 @@ function snapSize(n: unknown): Size {
   const v = Number(n);
   if (v <= 12) return 10;
   if (v <= 24) return 20;
-  return 30;
+  if (v <= 34) return 30;
+  if (v <= 44) return 40;
+  return 50;
 }
 
 function validateCubes(raw: unknown): PlannedCube[] {
@@ -61,28 +68,24 @@ function validateCubes(raw: unknown): PlannedCube[] {
     if (!r || typeof r !== "object") continue;
     const x = Number(r.x), y = Number(r.y), z = Number(r.z);
     if (!isFinite(x) || !isFinite(y) || !isFinite(z)) continue;
-    if (Math.abs(x) > 5 || Math.abs(y) > 5 || Math.abs(z) > 5) continue;
+    if (Math.abs(x) > 6 || Math.abs(y) > 6 || Math.abs(z) > 6) continue;
     const size = snapSize(r.size);
     const color = typeof r.color === "string" && /^#[0-9a-f]{6}$/i.test(r.color)
       ? r.color : colorFor(size, out.length);
     out.push({ x, y, z, size, color });
-    if (out.length > 600) break;
+    if (out.length > 800) break;
   }
   return out;
 }
 
 // ---------- Connectivity enforcement (no floating cubes) ----------
-// Snap every cube center to a 0.05m grid, drop overlaps, then keep only the
-// connected component that contains the lowest cube. Cubes that aren't touching
-// any other cube on at least one full face are removed.
 function snap(n: number) { return Math.round(n / 0.05) * 0.05; }
 function key(c: PlannedCube) { return `${snap(c.x)}|${snap(c.y)}|${snap(c.z)}`; }
 
 function touches(a: PlannedCube, b: PlannedCube) {
-  const tol = 0.02;
-  const halfSum = (a.size + b.size) / 200; // sizes in cm → m halves
+  const tol = 0.025;
+  const halfSum = (a.size + b.size) / 200;
   const dx = Math.abs(a.x - b.x), dy = Math.abs(a.y - b.y), dz = Math.abs(a.z - b.z);
-  // face-touch on one axis, near-aligned on the other two
   const xTouch = Math.abs(dx - halfSum) < tol && dy < halfSum - tol && dz < halfSum - tol;
   const yTouch = Math.abs(dy - halfSum) < tol && dx < halfSum - tol && dz < halfSum - tol;
   const zTouch = Math.abs(dz - halfSum) < tol && dx < halfSum - tol && dy < halfSum - tol;
@@ -91,7 +94,6 @@ function touches(a: PlannedCube, b: PlannedCube) {
 
 function enforceConnectivity(cubes: PlannedCube[]): PlannedCube[] {
   if (cubes.length === 0) return cubes;
-  // 1) Snap to grid + dedupe by center
   const seen = new Map<string, PlannedCube>();
   for (const c of cubes) {
     const sc: PlannedCube = { x: snap(c.x), y: snap(c.y), z: snap(c.z), size: c.size, color: c.color };
@@ -99,12 +101,10 @@ function enforceConnectivity(cubes: PlannedCube[]): PlannedCube[] {
   }
   let arr = [...seen.values()];
 
-  // 2) Drop the lowest layer down to y = halfSize (sit on ground)
   const minBottom = Math.min(...arr.map((c) => c.y - c.size / 200));
   const dy = -minBottom;
   arr = arr.map((c) => ({ ...c, y: snap(c.y + dy) }));
 
-  // 3) Build adjacency via face-touch
   const adj: number[][] = arr.map(() => []);
   for (let i = 0; i < arr.length; i++) {
     for (let j = i + 1; j < arr.length; j++) {
@@ -115,7 +115,6 @@ function enforceConnectivity(cubes: PlannedCube[]): PlannedCube[] {
     }
   }
 
-  // 4) Find connected components; keep the largest (the main body)
   const comp = new Array(arr.length).fill(-1);
   let cid = 0;
   const sizes: number[] = [];
@@ -166,29 +165,33 @@ function extractJson(text: string): any | null {
   return null;
 }
 
-const DEFAULT_SYSTEM_PROMPT = `You are a master 3D pixel-art (voxel) sculptor — Minecraft / Crossy Road style.
+const DEFAULT_SYSTEM_PROMPT = `You are a master 3D pixel-art (voxel) sculptor — Minecraft / Crossy Road style, but ULTRA detailed.
 
 HARD RULES:
-- Output 150–350 cubes. Minimum 120.
-- Cube sizes (cm): 30 = main mass (~20%), 20 = mid shapes (~35%), 10 = pixel details (~45%).
-- Y is up. Snap centers to a 0.1m grid. Sit the build on the ground (lowest cube bottom at y=0).
-- EVERY cube MUST share at least one full face with another cube (or sit on the ground). NO floating cubes, NO gaps inside surfaces, NO overlaps.
-- Build complex silhouettes: tiers, asymmetry, towers, archways, doors, windows, decorations.
-- Use 6–12 vibrant hex colors grouped by region. Mix warm + cool. No monochrome.
+- Output 250–500 cubes. Minimum 200. More detail = better.
+- Cube sizes available (cm): 50, 40, 30, 20, 10.
+  • 50cm = massive base / core mass (~5%)
+  • 40cm = large structural blocks (~10%)
+  • 30cm = mid-mass walls / towers (~20%)
+  • 20cm = mid details, trims, edges (~25%)
+  • 10cm = pixel details, decorations, accents (~40%)
+- Y is up. Snap centers to a 0.05m grid. Sit the build on the ground (lowest cube bottom at y=0).
+- EVERY cube MUST share at least one full face with another cube (or sit on the ground). NO floating cubes, NO gaps inside surfaces, NO overlaps (centers must differ).
+- Build COMPLEX silhouettes: tiers, asymmetry, towers, archways, doors, windows, flags, antennas, ornamental crowns, balconies, stairs, overhangs.
+- Use 8–14 vibrant hex colors grouped by region (roof, walls, windows, accents). Mix warm + cool. No monochrome. Smaller cubes carry the boldest accent colors.
 
 OUTPUT (JSON only — no prose, no fences):
-{ "cubes": [ { "x": <m>, "y": <m>, "z": <m>, "size": 10|20|30, "color": "#rrggbb" } ], "note": "<one short tip>" }`;
+{ "cubes": [ { "x": <m>, "y": <m>, "z": <m>, "size": 10|20|30|40|50, "color": "#rrggbb" } ], "note": "<one short tip>" }`;
 
-// Try a chain of models — first available wins.
 async function callModel(
   lovableKey: string,
   sys: string,
   userContent: any,
 ): Promise<{ text: string; modelUsed: string } | null> {
   const candidates = [
-    "openai/gpt-oss-120b",          // user-requested
+    "google/gemini-2.5-pro",        // primary — best reasoning for complex voxel art
     "openai/gpt-5",                 // strong fallback
-    "google/gemini-2.5-pro",        // last resort
+    "google/gemini-2.5-flash",      // last resort
   ];
   for (const model of candidates) {
     try {
@@ -201,11 +204,10 @@ async function callModel(
             { role: "system", content: sys },
             { role: "user", content: userContent },
           ],
-          temperature: 0.85,
+          temperature: 0.9,
         }),
       });
       if (r.status === 429 || r.status === 402) {
-        // surface to caller
         return { text: `__STATUS__${r.status}`, modelUsed: model };
       }
       if (!r.ok) {
@@ -240,12 +242,12 @@ Deno.serve(async (req) => {
         ? systemPrompt
         : DEFAULT_SYSTEM_PROMPT;
 
-      const userText = `Build "${shapeName}" as a 3D pixel-art voxel sculpture.
+      const userText = `Build "${shapeName}" as a 3D pixel-art voxel sculpture — make it INTRICATE.
 Approx bounds: ${width}m wide (X) × ${height}m tall (Y) × ${depth}m deep (Z), centered at origin (X,Z), sitting on the ground (Y starts at 0).
 ${purpose ? `Purpose: ${purpose}` : ""}
 Note language: ${lang === "ar" ? "Arabic" : "English"}.
 
-Reason layer by layer from the ground up. Make sure every cube touches another. Output JSON only.`;
+Reason layer by layer from the ground up. Use ALL five sizes (10, 20, 30, 40, 50 cm). Pack at least 250 cubes. Make sure every cube touches another. Output JSON only.`;
 
       const userContent: any = imageDataUrl
         ? [{ type: "text", text: userText }, { type: "image_url", image_url: { url: imageDataUrl } }]
@@ -286,19 +288,18 @@ Reason layer by layer from the ground up. Make sure every cube touches another. 
       }
     }
 
-    // Enforce: snap, dedupe, sit on ground, drop floating clusters.
     cubes = enforceConnectivity(cubes);
 
-    const bySize: Record<10 | 20 | 30, number> = { 10: 0, 20: 0, 30: 0 };
+    const bySize: Record<Size, number> = { 10: 0, 20: 0, 30: 0, 40: 0, 50: 0 };
     cubes.forEach((c) => { bySize[c.size] = (bySize[c.size] || 0) + 1; });
     const totalCubes = cubes.length;
     const slides = adjacentFaceSlides(cubes);
     const sheetsRealLife = Math.max(slides.length, totalCubes * 2);
 
-    const cubePrices: Record<10 | 20 | 30, number> = { 10: 2, 20: 4, 30: 6 };
+    const cubePrices: Record<Size, number> = { 10: 2, 20: 4, 30: 6, 40: 9, 50: 12 };
     const sheetPrice = 2;
-    const cubesCost = (Object.keys(bySize) as Array<"10"|"20"|"30">)
-      .reduce((sum, k) => sum + bySize[Number(k) as 10|20|30] * cubePrices[Number(k) as 10|20|30], 0);
+    const cubesCost = ([10, 20, 30, 40, 50] as Size[])
+      .reduce((sum, k) => sum + bySize[k] * cubePrices[k], 0);
     const total = cubesCost + sheetsRealLife * sheetPrice;
 
     return new Response(

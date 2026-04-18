@@ -13,7 +13,7 @@ import { toast } from "sonner";
 interface Result {
   cubes: PlacedCube[];
   slides: Slide[];
-  breakdown: Record<10 | 20 | 30, number>;
+  breakdown: Record<10 | 20 | 30 | 40 | 50, number>;
   totalCubes: number;
   sheetsVisible: number;
   sheetsRealLife: number;
@@ -22,19 +22,24 @@ interface Result {
 }
 
 const DEFAULT_PROMPT = `You are a master 3D pixel-art (voxel) sculptor — think Minecraft, Crossy Road, Monument Valley.
-You translate user descriptions (and optional reference photos) into HIGHLY DETAILED, colorful, recognizable voxel builds.
+You translate user descriptions (and optional reference photos) into ULTRA detailed, colorful, recognizable voxel builds.
 
 HARD RULES (do not break):
-- Output 150–350 cubes. Minimum 120. Never a giant uniform block.
-- Cube sizes (cm): 30 = main mass (~20%), 20 = mid shapes (~35%), 10 = pixel details (~45%, USE A LOT).
-- Y is up. Snap centers to a 0.1m grid. Cubes touch on faces (no floating, no overlap).
+- Output 250–500 cubes. Minimum 200. Never a giant uniform block.
+- Cube sizes available (cm): 50, 40, 30, 20, 10. USE ALL FIVE.
+  • 50cm = massive base/core (~5%)
+  • 40cm = large structural blocks (~10%)
+  • 30cm = mid-mass walls/towers (~20%)
+  • 20cm = mid details, trims (~25%)
+  • 10cm = pixel details, decorations (~40%, USE A LOT)
+- Y is up. Snap centers to a 0.05m grid. Cubes touch on faces (no floating, no overlap).
 - Complex silhouette: multiple tiers, asymmetry, overhangs, towers, archways, windows, doors, antennas, decorations.
 - Detail clusters from 10cm cubes: lanterns, chimneys, flags, rivets, vents, plants, eyes, stripes.
-- Use 6–12 vibrant hex colors grouped by region. Mix warm + cool. Avoid monochrome.
+- Use 8–14 vibrant hex colors grouped by region. Mix warm + cool. Avoid monochrome.
 
 OUTPUT FORMAT (JSON only, no prose, no fences):
 {
-  "cubes": [ { "x": <m>, "y": <m>, "z": <m>, "size": 10|20|30, "color": "#rrggbb" }, ... ],
+  "cubes": [ { "x": <m>, "y": <m>, "z": <m>, "size": 10|20|30|40|50, "color": "#rrggbb" }, ... ],
   "note": "<one short assembly tip>"
 }`;
 
@@ -96,9 +101,9 @@ export default function Studio() {
     URL.revokeObjectURL(url);
   }
 
-  const sizesUsed = result ? (Object.keys(result.breakdown) as Array<"10"|"20"|"30">)
-    .filter((k) => result.breakdown[Number(k) as 10|20|30] > 0)
-    .map((k) => Number(k)) : [];
+  const sizesUsed = result ? ([10, 20, 30, 40, 50] as const)
+    .filter((k) => (result.breakdown[k] || 0) > 0)
+    .map((k) => k as number) : [];
   const suggested = result ? suggestProducts(sizesUsed) : [];
 
   return (
@@ -106,7 +111,7 @@ export default function Studio() {
       <div className="container mx-auto px-6 py-14 max-w-6xl">
         <header className="mb-10">
           <span className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-[hsl(var(--accent))] mb-3 px-3 py-1 rounded-full border border-[color:var(--card-border)]">
-            <Sparkles className="w-3 h-3" /> GPT-OSS 120B · Pixel-Art 3D
+            <Sparkles className="w-3 h-3" /> Gemini 2.5 Pro · Pixel-Art 3D
           </span>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">
             <span className="text-gradient">{t.studio.title}</span>
@@ -229,8 +234,10 @@ export default function Studio() {
               >
                 <div>
                   <div className="text-[10px] tracking-[0.2em] uppercase text-foreground/45 mb-2">{t.studio.pieces}</div>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <Stat label={`${t.studio.cubes} 30${t.common.cm}`} value={result.breakdown[30] || 0} swatch="#5b7fc7" />
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                    <Stat label={`${t.studio.cubes} 50${t.common.cm}`} value={result.breakdown[50] || 0} swatch="#3a4a6b" />
+                    <Stat label={`${t.studio.cubes} 40${t.common.cm}`} value={result.breakdown[40] || 0} swatch="#5b7fc7" />
+                    <Stat label={`${t.studio.cubes} 30${t.common.cm}`} value={result.breakdown[30] || 0} swatch="#9b6ec7" />
                     <Stat label={`${t.studio.cubes} 20${t.common.cm}`} value={result.breakdown[20] || 0} swatch="#e08a5b" />
                     <Stat label={`${t.studio.cubes} 10${t.common.cm}`} value={result.breakdown[10] || 0} swatch="#6db8ac" />
                     <Stat label={t.studio.sheets} value={result.sheetsRealLife} sub={lang === "ar" ? "حقيقية" : "real-life"} swatch="#a8d5cc" />

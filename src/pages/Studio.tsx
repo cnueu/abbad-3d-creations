@@ -21,18 +21,18 @@ interface Result {
   aiNotes: string;
 }
 
-const DEFAULT_PROMPT = `You are an expert 3D pixel-art (voxel) sculptor in the style of Minecraft and Crossy Road.
-You translate user descriptions (and optional reference photos) into rich, recognizable voxel builds.
+const DEFAULT_PROMPT = `You are a master 3D pixel-art (voxel) sculptor — think Minecraft, Crossy Road, Monument Valley.
+You translate user descriptions (and optional reference photos) into HIGHLY DETAILED, colorful, recognizable voxel builds.
 
-HARD RULES:
-- Output 60–250 cubes. Never fewer than 40. Never one giant block.
-- Cube sizes (cm): 30 = main mass, 20 = mid shapes, 10 = pixel details (windows, trim, eyes).
+HARD RULES (do not break):
+- Output 150–350 cubes. Minimum 120. Never a giant uniform block.
+- Cube sizes (cm): 30 = main mass (~20%), 20 = mid shapes (~35%), 10 = pixel details (~45%, USE A LOT).
 - Y is up. Snap centers to a 0.1m grid. Cubes touch on faces (no floating, no overlap).
-- Build a recognizable silhouette: distinct front, sides, top. Include negative space (openings, tiers, steps).
-- Use 4–8 vibrant hex colors grouped by region (roof vs walls vs accents).
+- Complex silhouette: multiple tiers, asymmetry, overhangs, towers, archways, windows, doors, antennas, decorations.
+- Detail clusters from 10cm cubes: lanterns, chimneys, flags, rivets, vents, plants, eyes, stripes.
+- Use 6–12 vibrant hex colors grouped by region. Mix warm + cool. Avoid monochrome.
 
-OUTPUT FORMAT:
-Return ONLY a JSON object (no prose, no markdown fences) with this exact shape:
+OUTPUT FORMAT (JSON only, no prose, no fences):
 {
   "cubes": [ { "x": <m>, "y": <m>, "z": <m>, "size": 10|20|30, "color": "#rrggbb" }, ... ],
   "note": "<one short assembly tip>"
@@ -105,7 +105,7 @@ export default function Studio() {
     <Layout>
       <div className="container mx-auto px-6 py-14 max-w-6xl">
         <header className="mb-10">
-          <span className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-green-100 mb-3 px-3 py-1 rounded-full border border-[color:var(--card-border)]">
+          <span className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-[hsl(var(--accent))] mb-3 px-3 py-1 rounded-full border border-[color:var(--card-border)]">
             <Sparkles className="w-3 h-3" /> Gemini 2.5 Pro · Pixel-Art 3D
           </span>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">
@@ -138,12 +138,6 @@ export default function Studio() {
                 <input type="number" min={0.1} step={0.1} className="input-field" value={depth} onChange={(e) => setDepth(+e.target.value)} />
               </Field>
             </div>
-            <div className="rounded-xl border border-[color:var(--card-border)] px-4 py-3 text-xs bg-white/[0.02] text-foreground/65 leading-relaxed">
-              {lang === "ar"
-                ? "النموذج يستخدم 30سم للجسم، 20سم للأكتاف، 10سم للتفاصيل."
-                : "AI uses 30cm cubes for the body, 20cm for shoulders, 10cm for details."}
-            </div>
-
             {/* Reference photo (optional) → vision pass guides the template */}
             <div>
               <span className="block text-[11px] tracking-[0.18em] uppercase text-foreground/55 mb-1.5">
@@ -243,7 +237,7 @@ export default function Studio() {
                   </div>
                   <div className="mt-3 text-sm text-foreground/70 flex items-center justify-between">
                     <span>{t.studio.total}</span>
-                    <span className="font-display text-2xl font-bold text-green-100">{result.total} {t.common.sar}</span>
+                    <span className="font-display text-2xl font-bold text-[hsl(var(--accent))]">{result.total} {t.common.sar}</span>
                   </div>
                 </div>
 
@@ -291,13 +285,13 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 function Stat({ label, value, sub, swatch }: { label: string; value: string | number; sub?: string; swatch?: string }) {
   return (
-    <div className="rounded-2xl p-4 border border-[color:var(--card-border)] bg-white/[0.03]">
+    <div className="rounded-2xl p-4 border border-[color:var(--card-border)]" style={{ background: "var(--card-bg)" }}>
       <div className="flex items-center gap-2 mb-1">
         {swatch && <span className="w-2.5 h-2.5 rounded-full" style={{ background: swatch }} />}
-        <div className="text-[10px] tracking-wider uppercase text-foreground/55">{label}</div>
+        <div className="text-[10px] tracking-wider uppercase text-foreground/65">{label}</div>
       </div>
-      <div className="font-display text-2xl font-bold">{value}</div>
-      {sub && <div className="text-[11px] text-foreground/50 mt-0.5">{sub}</div>}
+      <div className="font-display text-2xl font-bold text-foreground">{value}</div>
+      {sub && <div className="text-[11px] text-foreground/60 mt-0.5">{sub}</div>}
     </div>
   );
 }

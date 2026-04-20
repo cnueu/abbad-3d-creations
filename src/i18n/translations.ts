@@ -77,10 +77,24 @@ export const translations: { en: Dict; ar: Dict } = {
       backToStore: "Browse the store",
     },
     about: {
-      title: "About ABBAD",
-      body: "ABBAD (أبعاد — \"dimensions\") makes precision modular building blocks. Two parts — a cube and a connector sheet — assemble into anything you can imagine, from a coffee-table sculpture to a full theater set. Designed in Saudi Arabia, made for builders worldwide.",
+      title: "Who we are",
+      body: "ABBAD (أبعاد — \"dimensions\") is a Saudi maker of precision modular building blocks. Two parts — a cube and a connector sheet — assemble into anything you can imagine, from a coffee-table sculpture to a full theater set.",
+      incubatorLabel: "Incubated by",
+      incubator: "Falak Business & Investment Company",
       mission: "Our mission",
       missionBody: "Give every maker, designer, and dreamer the smallest possible vocabulary for the largest possible idea.",
+      goalsTitle: "Our goals",
+      goals: [
+        "Make 3D construction accessible to anyone, regardless of skill.",
+        "Empower designers with an AI-assisted, physical building system.",
+        "Build a Saudi-born product that ships to makers worldwide.",
+      ],
+      teamTitle: "The team",
+      team: [
+        { name: "Hessa Al-Thuwaib", role: "Co-founder" },
+        { name: "Yumna Al-Jasem", role: "Co-founder" },
+        { name: "Maryam Farouk", role: "Co-founder" },
+      ],
     },
     footer: {
       rights: "All rights reserved.",
@@ -168,10 +182,24 @@ export const translations: { en: Dict; ar: Dict } = {
       backToStore: "تصفّح المتجر",
     },
     about: {
-      title: "عن أبعاد",
-      body: "أبعاد تصنع وحدات بناء معيارية دقيقة. قطعتان — مكعب وصفيحة ربط — تتجمّع لتصبح أي شيء تتخيّله، من منحوتة طاولة إلى ديكور مسرح كامل. صُمِّمت في السعودية، وصُنعت للبنّائين حول العالم.",
+      title: "من نحن",
+      body: "أبعاد شركة سعودية تصنع وحدات بناء معيارية دقيقة. قطعتان فقط — مكعب وصفيحة ربط — تتجمّع لتصبح أي شيء تتخيّله، من منحوتة على طاولة إلى ديكور مسرح كامل.",
+      incubatorLabel: "حاضنة",
+      incubator: "حاضنة من شركة فلك للأعمال والاستثمار",
       mission: "مهمتنا",
       missionBody: "أن نمنح كل صانع ومصمم وحالم أصغر مفردات ممكنة لأكبر فكرة ممكنة.",
+      goalsTitle: "أهدافنا",
+      goals: [
+        "جعل البناء ثلاثي الأبعاد متاحاً للجميع بغضّ النظر عن الخبرة.",
+        "تمكين المصممين بنظام بناء فيزيائي مدعوم بالذكاء الاصطناعي.",
+        "بناء منتج سعودي يصل إلى صنّاع المحتوى حول العالم.",
+      ],
+      teamTitle: "الفريق",
+      team: [
+        { name: "حصة الذويب", role: "شريكة مؤسِّسة" },
+        { name: "يُمنى الجاسم", role: "شريكة مؤسِّسة" },
+        { name: "مريم فاروق", role: "شريكة مؤسِّسة" },
+      ],
     },
     footer: {
       rights: "جميع الحقوق محفوظة.",

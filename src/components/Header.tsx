@@ -54,7 +54,11 @@ export function Header() {
             layout
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             style={{ width: logoSize, height: logoSize }}
-            className="flex items-center justify-center"
+            className={
+              introDone
+                ? "flex items-center justify-center px-4 py-1.5 rounded-full border border-[color:var(--card-border)] bg-background/55 backdrop-blur-md shadow-[0_4px_18px_rgba(0,0,0,0.18)]"
+                : "flex items-center justify-center"
+            }
           >
             <Logo className="w-full h-full object-contain" />
           </motion.div>

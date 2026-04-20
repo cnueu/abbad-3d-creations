@@ -99,30 +99,55 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {PRODUCTS.slice(0, 8).map((p, i) => (
-            <Link
-              key={p.id}
-              to="/store"
-              className="glass-card rounded-2xl overflow-hidden group block"
-              style={{ animationDelay: `${i * 0.08}s` }}
-            >
-              <div className="aspect-square" style={{ background: "rgba(106,125,122,0.14)" }}>
-                <Product3D product={p} autoRotate />
-              </div>
-              <div className="p-3">
-                <h3 className="font-display text-sm font-semibold">
-                  {p.kind === "cube" ? (lang === "ar" ? "مكعب" : "Cube") : t.store.sheetTitle}
-                </h3>
-                <p className="text-[11px] text-foreground/55">
-                  {p.kind === "cube" ? `${p.size}³ ${t.common.cm}` : t.store.sheetSize}
-                </p>
-                <p className="text-[10px] text-foreground/45 mt-0.5">
-                  {lang === "ar" ? p.colorName.ar : p.colorName.en}
-                </p>
-              </div>
-            </Link>
+            <HomeProductCard key={p.id} product={p} index={i} lang={lang} t={t} />
           ))}
         </div>
       </section>
     </Layout>
+  );
+}
+
+function HomeProductCard({ product: p, index: i, lang, t }: { product: typeof PRODUCTS[number]; index: number; lang: string; t: any }) {
+  const [hover, setHover] = useState(false);
+  return (
+    <Link
+      to="/store"
+      className="glass-card rounded-2xl overflow-hidden group block"
+      style={{ animationDelay: `${i * 0.08}s` }}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onFocus={() => setHover(true)}
+      onBlur={() => setHover(false)}
+    >
+      <div className="aspect-square relative overflow-hidden flex items-center justify-center" style={{ background: "rgba(106,125,122,0.14)" }}>
+        {hover ? (
+          <Product3D product={p} autoRotate />
+        ) : (
+          <div
+            className="w-full h-full flex items-center justify-center"
+            style={{ background: `radial-gradient(circle at 35% 30%, ${p.color}, ${p.color}cc 55%, ${p.color}88 100%)` }}
+          >
+            <div
+              className="w-16 h-16 rounded-full"
+              style={{
+                background: p.color,
+                boxShadow: `0 12px 32px ${p.color}66, inset 0 -8px 24px rgba(0,0,0,0.18), inset 0 8px 20px rgba(255,255,255,0.18)`,
+              }}
+            />
+          </div>
+        )}
+      </div>
+      <div className="p-3">
+        <h3 className="font-display text-sm font-semibold">
+          {p.kind === "cube" ? (lang === "ar" ? "مكعب" : "Cube") : t.store.sheetTitle}
+        </h3>
+        <p className="text-[11px] text-foreground/55">
+          {p.kind === "cube" ? `${p.size}³ ${t.common.cm}` : t.store.sheetSize}
+        </p>
+        <p className="text-[10px] text-foreground/45 mt-0.5">
+          {lang === "ar" ? p.colorName.ar : p.colorName.en}
+        </p>
+      </div>
+    </Link>
   );
 }

@@ -109,7 +109,7 @@ export default function Studio() {
   return (
     <Layout>
       <div className="container mx-auto px-6 py-14 max-w-6xl">
-        <header className="mb-10">
+        <header className="mb-8">
           <span className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-[hsl(var(--accent))] mb-3 px-3 py-1 rounded-full border border-[color:var(--card-border)]">
             <Sparkles className="w-3 h-3" /> Gemini 2.5 Pro · Pixel-Art 3D
           </span>
@@ -118,6 +118,39 @@ export default function Studio() {
           </h1>
           <p className="text-foreground/65 max-w-2xl">{t.studio.subtitle}</p>
         </header>
+
+        {/* Instructions */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-card rounded-2xl p-5 mb-8 border border-[color:var(--card-border)]"
+        >
+          <div className="text-[10px] tracking-[0.22em] uppercase text-[hsl(var(--accent))] mb-3">
+            {lang === "ar" ? "كيف يعمل" : "How it works"}
+          </div>
+          <ol className="grid md:grid-cols-2 gap-x-6 gap-y-2 text-sm text-foreground/80 list-decimal ps-5 marker:text-[hsl(var(--accent))]">
+            {(lang === "ar"
+              ? [
+                  "اكتب اسم الشكل الذي تريد بناءه (مثال: قلعة قديمة).",
+                  "حدّد الأبعاد بالمتر (العرض × الارتفاع × العمق).",
+                  "اختياري: ارفع صورة مرجعية لتوجيه التصميم.",
+                  "اختياري: عدّل تعليمات النموذج للتحكم بالتفاصيل.",
+                  "اضغط ولّد التصميم وانتظر بضع ثوانٍ.",
+                  "حمّل ملف .obj واطلب القطع المقترحة من المتجر.",
+                ]
+              : [
+                  "Type the shape name you want to build (e.g. old castle).",
+                  "Set the dimensions in meters (width × height × depth).",
+                  "Optional: upload a reference photo to guide the design.",
+                  "Optional: tweak the AI system prompt for more control.",
+                  "Click Generate and wait a few seconds.",
+                  "Download the .obj and order the suggested pieces from the store.",
+                ]
+            ).map((step, i) => (
+              <li key={i}>{step}</li>
+            ))}
+          </ol>
+        </motion.div>
 
         <div className="grid lg:grid-cols-5 gap-6">
           {/* Form */}

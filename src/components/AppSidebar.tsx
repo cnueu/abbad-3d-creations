@@ -6,6 +6,7 @@ import {
   Wallet,
   Bell,
   Info,
+  Handshake,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -66,6 +67,7 @@ export function AppSidebar({
     { id: "ai", label: lang === "ar" ? "الذكاء" : "AI", icon: Cpu, to: "/studio" },
     { id: "pay", label: lang === "ar" ? "الدفع" : "Pay", icon: Wallet, to: "/checkout" },
     { id: "about", label: lang === "ar" ? "من نحن" : "About", icon: Info, to: "/about" },
+    { id: "partners", label: lang === "ar" ? "الشراكات" : "Partners", icon: Handshake, to: "/partners" },
     { id: "notif", label: lang === "ar" ? "الإشعارات" : "Notifications", icon: Bell, to: "/notifications" },
   ];
 

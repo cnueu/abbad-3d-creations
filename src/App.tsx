@@ -10,6 +10,7 @@ import Studio from "./pages/Studio";
 import Auth from "./pages/Auth";
 import Checkout from "./pages/Checkout";
 import About from "./pages/About";
+import Partners from "./pages/Partners";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/about" element={<About />} />
+            <Route path="/partners" element={<Partners />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

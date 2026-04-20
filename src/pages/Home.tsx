@@ -4,7 +4,8 @@ import { useLang } from "@/i18n/LanguageContext";
 import { Layout } from "@/components/Layout";
 import { Product3D } from "@/components/Product3D";
 import { PRODUCTS } from "@/data/products";
-import { ArrowRight, Box, Sparkles, ShoppingBag } from "lucide-react";
+import { ArrowRight, Box, Sparkles, ShoppingBag, MapPin } from "lucide-react";
+import { useState } from "react";
 
 export default function Home() {
   const { t, lang } = useLang();
@@ -69,7 +70,7 @@ export default function Home() {
         {[
           { Icon: Box, title: lang === "ar" ? "هندسة دقيقة" : "Precision geometry", body: lang === "ar" ? "كل قطعة مُختبرة ميكانيكياً" : "Every piece mechanically tested" },
           { Icon: Sparkles, title: lang === "ar" ? "ذكاء توليدي" : "Generative AI", body: lang === "ar" ? "صِف الفكرة، نولّد التصميم" : "Describe the idea, get a design" },
-          { Icon: ShoppingBag, title: lang === "ar" ? "شحن عالمي" : "Global shipping", body: lang === "ar" ? "من السعودية إلى العالم" : "From Saudi to the world" },
+          { Icon: MapPin, title: lang === "ar" ? "شحن داخل السعودية" : "Ships within Saudi Arabia", body: lang === "ar" ? "نشحن حصرياً داخل المملكة" : "We currently ship inside KSA only" },
         ].map(({ Icon, title, body }, i) => (
           <motion.div
             key={i}

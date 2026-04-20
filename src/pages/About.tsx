@@ -4,6 +4,7 @@ import { Logo } from "@/components/Logo";
 import { motion } from "framer-motion";
 import { Building2, Target, Users } from "lucide-react";
 import falakLogo from "@/assets/falak-logo.png";
+import falakLogo from "@/assets/falak-logo.png";
 
 export default function About() {
   const { t } = useLang();

@@ -30,6 +30,7 @@ export function Footer() {
           <ul className="space-y-2 text-sm text-foreground/70">
             <li><a href="mailto:hello@abbad.studio" className="flex items-center gap-2 hover:text-green-100"><Mail className="w-4 h-4" />hello@abbad.studio</a></li>
             <li><a href="mailto:support@abbad.studio" className="flex items-center gap-2 hover:text-green-100"><Mail className="w-4 h-4" />support@abbad.studio</a></li>
+            <li className="text-foreground/60">{lang === "ar" ? "نشحن داخل المملكة العربية السعودية فقط" : "Shipping within Saudi Arabia only"}</li>
             <li><Link to="/about" className="hover:text-green-100">{t.about.title}</Link></li>
           </ul>
         </div>

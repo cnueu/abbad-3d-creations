@@ -10,24 +10,46 @@ export default function Home() {
   const { t, lang } = useLang();
   return (
     <Layout>
-      {/* Welcome / hero */}
-      <section className="relative overflow-hidden">
-        <div className="container mx-auto px-6 pt-16 md:pt-28 pb-20 grid md:grid-cols-2 gap-10 items-center">
+      {/* Welcome / hero with rotating 3D background */}
+      <section className="relative overflow-hidden min-h-[100vh] flex items-center">
+        {/* Rotating 3D background — centered, fills the section */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2.0, duration: 1.2 }}
+          className="absolute inset-0 pointer-events-none"
+          aria-hidden
+        >
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(90vw,820px)] h-[min(90vw,820px)] opacity-70">
+            <Product3D product={PRODUCTS[0]} autoRotate />
+          </div>
+          {/* Soft vignette so text reads */}
+          <div
+            className="absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, transparent 0%, hsl(var(--bg-root) / 0.55) 60%, hsl(var(--bg-root) / 0.92) 100%)",
+            }}
+          />
+        </motion.div>
+
+        <div className="container relative z-10 mx-auto px-6 pt-32 md:pt-40 pb-24 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2.0, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="max-w-3xl mx-auto"
           >
-            <span className="inline-block text-[11px] tracking-[0.22em] uppercase text-green-100 mb-5 px-3 py-1 rounded-full border border-[color:var(--card-border)]">
+            <span className="inline-block text-[11px] tracking-[0.22em] uppercase text-[hsl(var(--accent))] mb-5 px-3 py-1 rounded-full border border-[color:var(--card-border)] bg-background/40 backdrop-blur-md">
               {lang === "ar" ? "أبعاد · صُنع في السعودية" : "ABBAD · Made in Saudi"}
             </span>
             <h1 className="font-display text-4xl md:text-6xl font-bold leading-[1.05] mb-6">
               <span className="text-gradient">{t.hero.title}</span>
             </h1>
-            <p className="text-base md:text-lg text-foreground/70 mb-8 max-w-xl leading-relaxed">
+            <p className="text-base md:text-lg text-foreground/75 mb-8 max-w-xl mx-auto leading-relaxed">
               {t.hero.subtitle}
             </p>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3 justify-center">
               <Link to="/store" className="btn-primary">
                 <ShoppingBag className="w-4 h-4" />
                 {t.hero.cta}
@@ -39,20 +61,7 @@ export default function Home() {
               </Link>
             </div>
           </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 2.2, duration: 1 }}
-            className="mx-auto w-full max-w-sm aspect-square rounded-3xl glass-panel overflow-hidden animate-float"
-          >
-            <Product3D product={PRODUCTS[0]} />
-          </motion.div>
         </div>
-
-        {/* Decorative orbs */}
-        <div className="pointer-events-none absolute -top-40 -end-40 w-[500px] h-[500px] rounded-full opacity-30 blur-3xl"
-             style={{ background: "radial-gradient(circle, rgba(109,184,172,0.5), transparent 70%)" }} />
       </section>
 
       {/* Feature strip */}

@@ -29,8 +29,7 @@ export function Header() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Logo size: full intro → header med → tiny when scrolled
-  const logoSize = !introDone ? "min(60vw, 380px)" : scrolled ? "32px" : "56px";
+  const logoSize = !introDone ? "min(60vw, 380px)" : scrolled ? "36px" : "60px";
 
   const links = [
     { to: "/", label: t.nav.home },
@@ -58,37 +57,18 @@ export function Header() {
       </AnimatePresence>
 
       <header
-        className="fixed top-0 left-0 right-0 z-[100] transition-all duration-500 abbad-header"
+        className="fixed top-0 left-0 right-0 z-[100] transition-all duration-500"
         style={{
-          backdropFilter: introDone ? "blur(20px) saturate(1.4)" : "none",
-          background: introDone ? "hsl(var(--bg-root) / 0.72)" : "transparent",
-          borderBottom: introDone ? "1px solid var(--card-border)" : "1px solid transparent",
+          background: "transparent",
           height: introDone ? (scrolled ? "60px" : "84px") : "100vh",
+          pointerEvents: introDone ? "auto" : "none",
         }}
       >
         <div className="container h-full mx-auto px-6 flex items-center justify-between relative">
-          {/* Left nav */}
-          <nav
-            className="hidden md:flex items-center gap-6 text-sm font-medium transition-opacity duration-500"
-            style={{ opacity: introDone ? 1 : 0 }}
-          >
-            {links.slice(0, 2).map((l) => (
-              <NavLink
-                key={l.to}
-                to={l.to}
-                className={({ isActive }) =>
-                  `transition-colors hover:text-green-100 ${isActive ? "text-green-100" : "text-foreground/70"}`
-                }
-              >
-                {l.label}
-              </NavLink>
-            ))}
-          </nav>
-
           {/* Center logo (animated) */}
           <Link
             to="/"
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center gap-3"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center"
             style={{ pointerEvents: introDone ? "auto" : "none" }}
           >
             <motion.div
@@ -99,28 +79,21 @@ export function Header() {
             >
               <Logo className="w-full h-full object-contain drop-shadow-[0_0_24px_rgba(109,184,172,0.45)]" />
             </motion.div>
-            {introDone && !scrolled && (
-              <motion.span
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="font-display font-bold text-xl tracking-wide hidden sm:inline"
-              >
-                {t.brand}
-              </motion.span>
-            )}
           </Link>
 
-          {/* Right nav */}
-          <nav
-            className="hidden md:flex items-center gap-6 text-sm font-medium transition-opacity duration-500"
+          {/* Right utilities (lang only — keep header minimal as requested) */}
+          <div
+            className="ml-auto hidden md:flex items-center gap-3 transition-opacity duration-500"
             style={{ opacity: introDone ? 1 : 0 }}
           >
-            {links.slice(2).map((l) => (
+            {links.map((l) => (
               <NavLink
                 key={l.to}
                 to={l.to}
                 className={({ isActive }) =>
-                  `transition-colors hover:text-green-100 ${isActive ? "text-green-100" : "text-foreground/70"}`
+                  `text-sm font-medium px-2 py-1 transition-colors hover:text-[hsl(var(--accent))] ${
+                    isActive ? "text-[hsl(var(--accent))]" : "text-foreground/80"
+                  }`
                 }
               >
                 {l.label}
@@ -128,21 +101,18 @@ export function Header() {
             ))}
             <button
               onClick={() => setLang(lang === "en" ? "ar" : "en")}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[color:var(--card-border)] hover:bg-green-500/20 transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[color:var(--card-border)] bg-background/40 backdrop-blur-md hover:bg-[hsl(var(--accent))]/15 transition"
               aria-label="Toggle language"
             >
               <Globe className="w-3.5 h-3.5" />
               <span className="text-xs">{lang === "en" ? "العربية" : "EN"}</span>
             </button>
-            <Link to="/auth" className="btn-primary !py-2 !px-4 !text-sm">
-              {t.nav.auth}
-            </Link>
-          </nav>
+          </div>
 
           {/* Mobile lang toggle */}
           <button
             onClick={() => setLang(lang === "en" ? "ar" : "en")}
-            className="md:hidden flex items-center gap-1 px-2.5 py-1 rounded-full border border-[color:var(--card-border)] text-xs"
+            className="md:hidden ml-auto flex items-center gap-1 px-2.5 py-1 rounded-full border border-[color:var(--card-border)] bg-background/40 backdrop-blur-md text-xs"
             style={{ opacity: introDone ? 1 : 0 }}
           >
             <Globe className="w-3 h-3" /> {lang === "en" ? "ع" : "EN"}

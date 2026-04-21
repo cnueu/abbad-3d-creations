@@ -69,9 +69,14 @@ export function ProductCard({ product, onClick, index = 0 }: Props) {
           <h3 className="font-display text-lg font-semibold text-foreground">{title}</h3>
         </div>
         <p className="text-xs text-foreground/65 mb-1">{subtitle}</p>
-        <p className="text-[11px] text-foreground/50 mb-3">
+        <p className="text-[11px] text-foreground/50 mb-2">
           {lang === "ar" ? product.colorName.ar : product.colorName.en}
         </p>
+        {product.kind === "cube" && (
+          <p className="text-[10px] text-[hsl(var(--accent))]/90 mb-3">
+            {lang === "ar" ? "✓ صفائح ربط مجاناً مع كل مكعب" : "✓ Free connector sheets included"}
+          </p>
+        )}
         <div className="flex items-center justify-between">
           <span className="text-[11px] tracking-wider uppercase text-foreground/55">
             {t.store.material}: {product.materials.join(" , ")}

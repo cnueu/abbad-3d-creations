@@ -21,15 +21,15 @@ export default function Home() {
           className="absolute inset-0 pointer-events-none"
           aria-hidden
         >
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(90vw,820px)] h-[min(90vw,820px)] opacity-80">
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(92vw,860px)] h-[min(92vw,860px)] opacity-100">
             <Product3D product={PRODUCTS[0]} autoRotate shinyWood />
           </div>
-          {/* Soft vignette so text reads */}
+          {/* Neutral vignette so text reads — no green tint */}
           <div
             className="absolute inset-0"
             style={{
               background:
-                "radial-gradient(ellipse at center, transparent 0%, hsl(var(--bg-root) / 0.55) 60%, hsl(var(--bg-root) / 0.92) 100%)",
+                "radial-gradient(ellipse at center, transparent 0%, hsl(var(--bg-root) / 0.45) 60%, hsl(var(--bg-root) / 0.92) 100%)",
             }}
           />
         </motion.div>

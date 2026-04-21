@@ -29,20 +29,33 @@ function useObjPieces() {
   }, [obj]);
 }
 
-function Piece({ product, shinyWood = false }: { product: Product; shinyWood?: boolean }) {
+function Piece({ product, shinyWood = false, colorOverride }: { product: Product; shinyWood?: boolean; colorOverride?: string }) {
   const pieces = useObjPieces();
   const kind = product.kind === "custom-cube" ? "cube" : product.kind === "custom-sheet" ? "sheet" : product.kind;
   const target = pieces.find((p) => p.kind === kind);
   if (!target) return null;
   const scale = kind === "cube" ? product.size / 10 : 1;
-  // Shiny wood = warm walnut with a polished finish (used for the home hero).
-  const color = shinyWood ? "#a47148" : product.color;
-  const metalness = shinyWood ? 0.35 : 0.18;
-  const roughness = shinyWood ? 0.22 : 0.42;
+  // Glassy dark wood: deep walnut with a polished, near-mirror finish.
+  const color = colorOverride ?? (shinyWood ? "#5a3a1f" : product.color);
+  const metalness = shinyWood ? 0.65 : 0.18;
+  const roughness = shinyWood ? 0.12 : 0.42;
+  const clearcoat = shinyWood ? 1 : 0;
   return (
     <Center>
       <mesh geometry={target.geom} scale={scale} castShadow receiveShadow>
-        <meshStandardMaterial color={color} metalness={metalness} roughness={roughness} />
+        {shinyWood ? (
+          // @ts-ignore - drei/three types
+          <meshPhysicalMaterial
+            color={color}
+            metalness={metalness}
+            roughness={roughness}
+            clearcoat={clearcoat}
+            clearcoatRoughness={0.08}
+            reflectivity={0.6}
+          />
+        ) : (
+          <meshStandardMaterial color={color} metalness={metalness} roughness={roughness} />
+        )}
       </mesh>
     </Center>
   );
@@ -53,11 +66,13 @@ export function Product3D({
   autoRotate = true,
   interactive = true,
   shinyWood = false,
+  colorOverride,
 }: {
   product: Product;
   autoRotate?: boolean;
   interactive?: boolean;
   shinyWood?: boolean;
+  colorOverride?: string;
 }) {
   // frameloop="demand" pauses the render loop when not hovering — fixes Store lag.
   return (
@@ -73,7 +88,7 @@ export function Product3D({
       <directionalLight position={[10, 16, 8]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
       <Suspense fallback={null}>
         <Bounds fit clip observe margin={1.7}>
-          <Piece product={product} shinyWood={shinyWood} />
+          <Piece product={product} shinyWood={shinyWood} colorOverride={colorOverride} />
         </Bounds>
         <ContactShadows position={[0, -1.6, 0]} opacity={0.4} scale={14} blur={2.4} />
         <Environment preset="city" />

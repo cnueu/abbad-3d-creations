@@ -4,6 +4,7 @@ import { Product } from "@/data/products";
 export interface CartItem {
   product: Product;
   qty: number;
+  customColor?: string;
 }
 
 const KEY = "abbad_cart_v1";
@@ -34,11 +35,14 @@ export function useCart() {
     };
   }, []);
 
-  const add = (product: Product, qty = 1) => {
+  const add = (product: Product, qty = 1, opts?: { customColor?: string }) => {
     const next = [...read()];
-    const existing = next.find((i) => i.product.id === product.id);
+    // Custom-color cubes with different hex are tracked as distinct lines.
+    const matchKey = (i: CartItem) =>
+      i.product.id === product.id && (i.customColor || "") === (opts?.customColor || "");
+    const existing = next.find(matchKey);
     if (existing) existing.qty += qty;
-    else next.push({ product, qty });
+    else next.push({ product, qty, customColor: opts?.customColor });
     write(next);
   };
 

@@ -67,63 +67,64 @@
   }
 
   [data-theme="light"] {
-    /* Light mode — clean neutral gray with sage-green accents.
+    /* Light mode — soft warm gray, not harsh white. Subtle shadows for depth.
        All text/icon tokens are dark so navigation, headings and body copy
        are fully legible on the light background. */
-    --bg-root: 220 14% 90%;
-    --bg-sidebar: 220 10% 96%;
-    --bg-main: 220 14% 92%;
-    --bg-section-alt: 220 12% 86%;
+    --bg-root: 220 10% 82%;
+    --bg-sidebar: 220 8% 88%;
+    --bg-main: 220 10% 84%;
+    --bg-section-alt: 220 10% 78%;
 
-    --background: 220 14% 90%;
-    --foreground: 220 18% 14%;
-    --card: 220 16% 96%;
-    --card-foreground: 220 18% 14%;
-    --popover: 220 16% 96%;
-    --popover-foreground: 220 18% 14%;
+    --background: 220 10% 82%;
+    --foreground: 220 20% 12%;
+    --card: 220 12% 90%;
+    --card-foreground: 220 20% 12%;
+    --popover: 220 12% 92%;
+    --popover-foreground: 220 20% 12%;
 
-    --primary: 170 50% 30%;
+    --primary: 170 50% 28%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 169 32% 40%;
+    --secondary: 169 32% 38%;
     --secondary-foreground: 0 0% 100%;
-    --muted: 220 10% 84%;
-    --muted-foreground: 220 12% 30%;
-    --accent: 170 45% 32%;
+    --muted: 220 8% 78%;
+    --muted-foreground: 220 12% 28%;
+    --accent: 170 45% 30%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 70% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 10% 72%;
-    --input: 220 10% 84%;
-    --ring: 170 50% 30%;
+    --border: 220 8% 64%;
+    --input: 220 8% 80%;
+    --ring: 170 50% 28%;
 
     /* Greens used by gradient buttons + accents — darker for legibility on light bg */
-    --green-100: 170 45% 28%;
-    --green-200: 170 50% 34%;
-    --green-300: 170 55% 30%;
-    --green-400: 170 55% 26%;
-    --green-500: 170 60% 22%;
+    --green-100: 170 45% 26%;
+    --green-200: 170 50% 32%;
+    --green-300: 170 55% 28%;
+    --green-400: 170 55% 24%;
+    --green-500: 170 60% 20%;
 
-    --text-primary: 220 18% 14%;
-    --text-secondary: 220 14% 24%;
-    --text-muted: 220 10% 38%;
-    --text-accent: 170 45% 28%;
-    --divider: 220 10% 60%;
+    --text-primary: 220 20% 12%;
+    --text-secondary: 220 14% 22%;
+    --text-muted: 220 10% 36%;
+    --text-accent: 170 45% 26%;
+    --divider: 220 10% 54%;
 
-    --card-bg: rgba(228, 232, 234, 0.85);
-    --card-bg-hover: rgba(236, 240, 240, 0.95);
-    --card-border: rgba(40, 60, 70, 0.18);
-    --card-border-hover: rgba(40, 90, 80, 0.40);
-    --card-shadow: 0 8px 24px rgba(20, 30, 40, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
-    --card-shadow-hover: 0 18px 44px rgba(20, 30, 40, 0.14), 0 4px 12px rgba(0, 0, 0, 0.06);
-    --glass-border: rgba(40, 60, 70, 0.16);
-    --green-glass: rgba(45, 125, 111, 0.16);
+    --card-bg: rgba(218, 222, 226, 0.78);
+    --card-bg-hover: rgba(228, 232, 234, 0.92);
+    --card-border: rgba(40, 60, 70, 0.20);
+    --card-border-hover: rgba(40, 90, 80, 0.42);
+    --card-shadow: 0 10px 28px rgba(20, 30, 40, 0.14), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --card-shadow-hover: 0 22px 52px rgba(20, 30, 40, 0.20), 0 6px 16px rgba(0, 0, 0, 0.12);
+    --glass-border: rgba(40, 60, 70, 0.18);
+    --green-glass: rgba(45, 125, 111, 0.18);
 
     --gradient-text: linear-gradient(135deg, #1f5e54 0%, #2d7d6f 50%, #3d9e8f 100%);
   }
   [data-theme="light"] body {
     background:
-      radial-gradient(ellipse 80% 60% at 70% 10%, rgba(140, 150, 160, 0.22), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 10% 90%, rgba(90, 100, 110, 0.14), transparent 60%),
+      radial-gradient(ellipse 80% 60% at 70% 10%, rgba(120, 130, 140, 0.28), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 10% 90%, rgba(70, 80, 90, 0.22), transparent 60%),
+      radial-gradient(ellipse 100% 80% at 50% 50%, rgba(180, 186, 192, 0.35), transparent 70%),
       hsl(var(--bg-root));
     background-attachment: fixed;
   }

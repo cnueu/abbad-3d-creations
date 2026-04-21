@@ -11,6 +11,7 @@ interface TeamMember {
   email: string;
   linkedin: string;
   bio: string;
+  achievements?: string[];
 }
 
 export default function About() {
@@ -115,8 +116,18 @@ export default function About() {
                     {m.role}
                   </div>
                   <h2 className="font-display text-2xl md:text-3xl font-semibold mb-3">{m.name}</h2>
-                  <p className="text-base text-foreground/75 leading-relaxed mb-5">{m.bio}</p>
+                  <p className="text-base text-foreground/75 leading-relaxed mb-4">{m.bio}</p>
 
+                  {m.achievements && m.achievements.length > 0 && (
+                    <ul className="space-y-2 mb-5">
+                      {m.achievements.map((a, ai) => (
+                        <li key={ai} className="flex gap-3 text-sm md:text-base text-foreground/80">
+                          <span className="mt-2 w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] shrink-0" />
+                          <span>{a}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                   <div className="flex flex-wrap gap-3">
                     <a
                       href={`mailto:${m.email}`}

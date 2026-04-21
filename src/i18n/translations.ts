@@ -102,9 +102,37 @@ export const translations: { en: Dict; ar: Dict } = {
       ],
       teamTitle: "The team",
       team: [
-        { name: "Hessa Althuwaib", role: "Founder", email: "hessaibrahim129@gmail.com", linkedin: "https://www.linkedin.com/in/hessa-althuwaib-870742325/", bio: "Founder of ABBAD. Leads product vision and the modular building system. Winning team member at the AI League for the Best AI Solution for 2034." },
-        { name: "Yumna Aljasem", role: "CEO", email: "uaaljasem@gmail.com", linkedin: "https://www.linkedin.com/in/yumna-aljasem/", bio: "Chief Executive Officer. Drives strategy, operations, and partnerships. Second-place team leader and winner at the AI League for the Best AI Solution for 2034, and a finalist team leader in the Materials Discovery Competition under the supervision of Nobel Laureate in Chemistry Prof. Omar Yaghi." },
-        { name: "Maryam Farouk", role: "CFO", email: "maryamfarouk59@gmail.com", linkedin: "https://www.linkedin.com/in/maryam-farouk-b14340386/", bio: "Chief Financial Officer. Oversees finance, planning, and growth. Finalist team member in the Materials Discovery Competition under the supervision of Nobel Laureate in Chemistry Prof. Omar Yaghi." },
+        {
+          name: "Hessa Althuwaib",
+          role: "Founder",
+          email: "hessaibrahim129@gmail.com",
+          linkedin: "https://www.linkedin.com/in/hessa-althuwaib-870742325/",
+          bio: "Founder of ABBAD. Leads the product vision and the modular building system.",
+          achievements: [
+            "Winning team member at the AI League — Best AI Solution for 2034.",
+          ],
+        },
+        {
+          name: "Yumna Aljasem",
+          role: "CEO",
+          email: "uaaljasem@gmail.com",
+          linkedin: "https://www.linkedin.com/in/yumna-aljasem/",
+          bio: "Chief Executive Officer. Drives strategy, operations, and partnerships.",
+          achievements: [
+            "Second-place team leader and winner at the AI League — Best AI Solution for 2034.",
+            "Finalist team leader in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",
+          ],
+        },
+        {
+          name: "Maryam Farouk",
+          role: "CFO",
+          email: "maryamfarouk59@gmail.com",
+          linkedin: "https://www.linkedin.com/in/maryam-farouk-b14340386/",
+          bio: "Chief Financial Officer. Oversees finance, planning, and growth.",
+          achievements: [
+            "Finalist team member in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",
+          ],
+        },
       ],
     },
     partners: {

@@ -2,14 +2,14 @@ import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
 import { Logo } from "@/components/Logo";
 import { motion } from "framer-motion";
-import { Building2, Target, Users, Award, Mail, Phone } from "lucide-react";
+import { Building2, Target, Users, Award, Mail, Linkedin } from "lucide-react";
 import falakLogo from "@/assets/falak-logo.png";
 
 interface TeamMember {
   name: string;
   role: string;
   email: string;
-  phone: string;
+  linkedin: string;
   bio: string;
 }
 
@@ -121,17 +121,19 @@ export default function About() {
                     <a
                       href={`mailto:${m.email}`}
                       className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[color:var(--card-border)] text-sm hover:bg-[hsl(var(--accent))]/10 transition-colors"
+                      dir="ltr"
                     >
                       <Mail className="w-3.5 h-3.5 text-[hsl(var(--accent))]" />
                       {m.email}
                     </a>
                     <a
-                      href={`tel:${m.phone.replace(/\s/g, "")}`}
+                      href={m.linkedin}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[color:var(--card-border)] text-sm hover:bg-[hsl(var(--accent))]/10 transition-colors"
-                      dir="ltr"
                     >
-                      <Phone className="w-3.5 h-3.5 text-[hsl(var(--accent))]" />
-                      {m.phone}
+                      <Linkedin className="w-3.5 h-3.5 text-[hsl(var(--accent))]" />
+                      LinkedIn
                     </a>
                   </div>
                 </div>

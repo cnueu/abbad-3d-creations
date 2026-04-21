@@ -21,8 +21,8 @@ export default function Home() {
           className="absolute inset-0 pointer-events-none"
           aria-hidden
         >
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(90vw,820px)] h-[min(90vw,820px)] opacity-70">
-            <Product3D product={PRODUCTS[0]} autoRotate />
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(90vw,820px)] h-[min(90vw,820px)] opacity-80">
+            <Product3D product={PRODUCTS[0]} autoRotate shinyWood />
           </div>
           {/* Soft vignette so text reads */}
           <div

@@ -98,7 +98,8 @@ export default function Studio() {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-design", {
-        body: { shapeName: "reference", width: 2, height: 2, depth: 2, purpose: "", lang, imageDataUrl },
+        // `detailLevel` is read by supabase/functions/generate-design/index.ts
+        body: { shapeName: "reference", width: 2, height: 2, depth: 2, purpose: "", lang, imageDataUrl, detailLevel: detail },
       });
       if (error) throw error;
       setResult(data as Result);

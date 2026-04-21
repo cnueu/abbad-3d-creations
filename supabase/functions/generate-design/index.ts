@@ -18,6 +18,9 @@ interface Body {
   lang: "en" | "ar";
   imageDataUrl?: string;
   systemPrompt?: string;
+  // ── DETAIL LEVEL ──────────────────────────────────────────────
+  // Sent from src/pages/Studio.tsx — controls target cube count.
+  detailLevel?: "simple" | "balanced" | "intricate";
 }
 
 type Size = 10 | 20 | 30 | 40 | 50;

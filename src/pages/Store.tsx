@@ -85,9 +85,10 @@ export default function Store() {
         })}
 
         <section>
-          <h2 className="font-display text-xl mb-5 text-foreground/80">
-            {t.store.sheetTitle} · {lang === "ar" ? "0.25 ر.س" : "0.25 SAR"}
+          <h2 className="font-display text-xl mb-1 text-foreground/80">
+            {t.store.extraSheetsTitle} · {lang === "ar" ? "0.25 ر.س" : "0.25 SAR"}
           </h2>
+          <p className="text-sm text-foreground/60 mb-5 max-w-2xl">{t.store.extraSheetsBody}</p>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             {sheets.map((p, i) => (
               <ProductCard key={p.id} product={p} index={i} onClick={() => setSelected(p)} />

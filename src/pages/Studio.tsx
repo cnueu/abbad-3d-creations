@@ -47,6 +47,8 @@ export default function Studio() {
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [authed, setAuthed] = useState(false);
   const [uses, setUses] = useState(0);
+  const [theme, setTheme] = useState<ColorTheme>("original");
+  const [glassy, setGlassy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

@@ -200,9 +200,53 @@ export default function Studio() {
 
           {/* Result */}
           <div className="lg:col-span-3 space-y-4">
+            {result && (
+              <div className="flex items-center gap-2 flex-wrap rounded-2xl px-4 py-2.5 border border-[color:var(--card-border)] glass-card">
+                <Palette className="w-3.5 h-3.5 text-foreground/55" />
+                <span className="text-[10px] tracking-[0.18em] uppercase text-foreground/55 me-1">
+                  {ar ? "ثيم اللون" : "Color theme"}
+                </span>
+                {([
+                  { id: "original", label: ar ? "الأصلي" : "Original", swatches: ["#e08a5b", "#5b7fc7", "#9b6ec7"] },
+                  { id: "walnut", label: ar ? "خشب الجوز" : "Walnut", swatches: ["#5a3a1f", "#7a5230", "#3d2514"] },
+                  { id: "sand", label: ar ? "رملي" : "Sand", swatches: ["#d9c8a8", "#a89272", "#6e5a40"] },
+                  { id: "mono", label: ar ? "أحادي" : "Mono", swatches: ["#a47148", "#5a3a1f", "#c9a17a"] },
+                ] as { id: ColorTheme; label: string; swatches: string[] }[]).map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setTheme(opt.id)}
+                    className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] border transition ${
+                      theme === opt.id
+                        ? "border-[hsl(var(--accent))] bg-[hsl(var(--accent))]/15 text-foreground"
+                        : "border-[color:var(--card-border)] text-foreground/65 hover:bg-white/[0.04]"
+                    }`}
+                  >
+                    <span className="flex -space-x-1">
+                      {opt.swatches.map((s) => (
+                        <span key={s} className="w-2.5 h-2.5 rounded-full ring-1 ring-black/30" style={{ background: s }} />
+                      ))}
+                    </span>
+                    {opt.label}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setGlassy((g) => !g)}
+                  className={`ms-auto px-2.5 py-1 rounded-full text-[11px] border transition ${
+                    glassy
+                      ? "border-[hsl(var(--accent))] bg-[hsl(var(--accent))]/15 text-foreground"
+                      : "border-[color:var(--card-border)] text-foreground/65 hover:bg-white/[0.04]"
+                  }`}
+                >
+                  {ar ? "لمعان زجاجي" : "Glassy finish"}
+                </button>
+              </div>
+            )}
+
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
               {result ? (
-                <GeneratedScene cubes={result.cubes} slides={result.slides} />
+                <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-foreground/40 text-sm">
                   {t.studio.result}
@@ -230,6 +274,36 @@ export default function Studio() {
                     <span>{t.studio.total}</span>
                     <span className="font-display text-2xl font-bold text-[hsl(var(--accent))]">{result.total} {t.common.sar}</span>
                   </div>
+                </div>
+
+                {/* Assembly instructions — generated from the breakdown */}
+                <div className="rounded-2xl p-4 border border-[color:var(--card-border)] bg-[hsl(var(--accent))]/5">
+                  <div className="flex items-center gap-2 mb-2">
+                    <ListChecks className="w-4 h-4 text-[hsl(var(--accent))]" />
+                    <div className="text-[10px] tracking-[0.2em] uppercase text-foreground/55">
+                      {ar ? "تعليمات التجميع" : "Assembly instructions"}
+                    </div>
+                  </div>
+                  <ol className="text-sm text-foreground/80 leading-relaxed space-y-1.5 list-decimal ps-5 marker:text-[hsl(var(--accent))]">
+                    {(ar
+                      ? [
+                          `ابدأ بالقاعدة: ضع المكعبات الكبيرة أولاً (${(result.breakdown[50] || 0) + (result.breakdown[40] || 0)} مكعب 40-50 سم).`,
+                          `ابنِ الجدران الوسطى بمكعبات 30-20 سم (${(result.breakdown[30] || 0) + (result.breakdown[20] || 0)} مكعب).`,
+                          `أضف التفاصيل والزخارف بمكعبات 10 سم (${result.breakdown[10] || 0} مكعب).`,
+                          `استخدم ${result.sheetsRealLife} صفيحة ربط لتثبيت المكعبات معاً عبر الفتحات الجانبية.`,
+                          ar ? "حمّل ملف .obj لمعاينته في أي برنامج 3D، ثم اطلب القطع من المتجر." : "",
+                        ].filter(Boolean)
+                      : [
+                          `Start with the base: place the largest cubes first (${(result.breakdown[50] || 0) + (result.breakdown[40] || 0)} cubes at 40–50cm).`,
+                          `Build the mid walls with 30 & 20cm cubes (${(result.breakdown[30] || 0) + (result.breakdown[20] || 0)} cubes).`,
+                          `Add details and accents with 10cm cubes (${result.breakdown[10] || 0} cubes).`,
+                          `Use ${result.sheetsRealLife} connector sheets to lock the cubes together through the side channels.`,
+                          "Download the .obj to preview in any 3D tool, then order the pieces from the store.",
+                        ]
+                    ).map((step, i) => (
+                      <li key={i}>{step}</li>
+                    ))}
+                  </ol>
                 </div>
 
                 {result.aiNotes && (

@@ -3,7 +3,7 @@ export type Lang = "en" | "ar";
 type Dict = any;
 export const translations: { en: Dict; ar: Dict } = {
   en: {
-    brand: "ABBAD",
+    brand: "Abaad",
     tagline: "Build any shape. From cubes and sheets.",
     nav: { home: "Home", store: "Store", studio: "AI Studio", about: "About", partners: "Partners", checkout: "Checkout", auth: "Sign in" },
     hero: {
@@ -84,7 +84,7 @@ export const translations: { en: Dict; ar: Dict } = {
     },
     about: {
       title: "Who we are",
-      body: "ABBAD (أبعاد — \"dimensions\") is a Saudi maker of precision modular building blocks. Two parts — a cube and a connector sheet — assemble into anything you can imagine, from a coffee-table sculpture to a full theater set.",
+      body: "Abaad (أبعاد — \"dimensions\") is a Saudi maker of precision modular building blocks. Two parts — a cube and a connector sheet — assemble into anything you can imagine, from a coffee-table sculpture to a full theater set.",
       incubatorLabel: "Incubated by",
       incubator: "Falak Business & Investment Company",
       mission: "Our mission",
@@ -107,7 +107,7 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "Founder",
           email: "hessaibrahim129@gmail.com",
           linkedin: "https://www.linkedin.com/in/hessa-althuwaib-870742325/",
-          bio: "Founder of ABBAD. Leads the product vision and the modular building system.",
+          bio: "Founder of Abaad. Leads the product vision and the modular building system.",
           achievements: [
             "Winning team member at the AI League — Best AI Solution for 2034.",
           ],
@@ -138,7 +138,7 @@ export const translations: { en: Dict; ar: Dict } = {
     partners: {
       title: "Partnerships & Collaboration",
       subtitle: "We're building Saudi's most flexible modular building system. We'd love to build it with you.",
-      whyTitle: "Why partner with ABBAD",
+      whyTitle: "Why partner with Abaad",
       why: [
         "A young Saudi born product with a focused, ambitious team.",
         "Eco friendly materials that serve Vision 2030.",

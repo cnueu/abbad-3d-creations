@@ -29,16 +29,20 @@ function useObjPieces() {
   }, [obj]);
 }
 
-function Piece({ product }: { product: Product }) {
+function Piece({ product, shinyWood = false }: { product: Product; shinyWood?: boolean }) {
   const pieces = useObjPieces();
-  const target = pieces.find((p) => p.kind === product.kind);
+  const kind = product.kind === "custom-cube" ? "cube" : product.kind === "custom-sheet" ? "sheet" : product.kind;
+  const target = pieces.find((p) => p.kind === kind);
   if (!target) return null;
-  // Scale cubes by their real size (10cm baseline).
-  const scale = product.kind === "cube" ? product.size / 10 : 1;
+  const scale = kind === "cube" ? product.size / 10 : 1;
+  // Shiny wood = warm walnut with a polished finish (used for the home hero).
+  const color = shinyWood ? "#a47148" : product.color;
+  const metalness = shinyWood ? 0.35 : 0.18;
+  const roughness = shinyWood ? 0.22 : 0.42;
   return (
     <Center>
       <mesh geometry={target.geom} scale={scale} castShadow receiveShadow>
-        <meshStandardMaterial color={product.color} metalness={0.18} roughness={0.42} />
+        <meshStandardMaterial color={color} metalness={metalness} roughness={roughness} />
       </mesh>
     </Center>
   );
@@ -48,10 +52,12 @@ export function Product3D({
   product,
   autoRotate = true,
   interactive = true,
+  shinyWood = false,
 }: {
   product: Product;
   autoRotate?: boolean;
   interactive?: boolean;
+  shinyWood?: boolean;
 }) {
   // frameloop="demand" pauses the render loop when not hovering — fixes Store lag.
   return (
@@ -67,7 +73,7 @@ export function Product3D({
       <directionalLight position={[10, 16, 8]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
       <Suspense fallback={null}>
         <Bounds fit clip observe margin={1.7}>
-          <Piece product={product} />
+          <Piece product={product} shinyWood={shinyWood} />
         </Bounds>
         <ContactShadows position={[0, -1.6, 0]} opacity={0.4} scale={14} blur={2.4} />
         <Environment preset="city" />

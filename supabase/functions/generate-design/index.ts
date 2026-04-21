@@ -233,8 +233,16 @@ Deno.serve(async (req) => {
 
   try {
     const body = (await req.json()) as Body;
-    const { shapeName, width, height, depth, purpose, lang, imageDataUrl, systemPrompt } = body;
+    const { shapeName, width, height, depth, purpose, lang, imageDataUrl, systemPrompt, detailLevel } = body;
     const lovableKey = Deno.env.get("LOVABLE_API_KEY");
+
+    // ── DETAIL LEVEL → target cube count ─────────────────────────
+    const detailTargets: Record<string, { min: number; max: number }> = {
+      simple:    { min: 100, max: 200 },
+      balanced:  { min: 220, max: 380 },
+      intricate: { min: 380, max: 550 },
+    };
+    const target = detailTargets[detailLevel || "balanced"];
 
     let cubes: PlannedCube[] = [];
     let aiNotes = "";
@@ -248,9 +256,10 @@ Deno.serve(async (req) => {
       const userText = `Build "${shapeName}" as a 3D pixel-art voxel sculpture — make it INTRICATE.
 Approx bounds: ${width}m wide (X) × ${height}m tall (Y) × ${depth}m deep (Z), centered at origin (X,Z), sitting on the ground (Y starts at 0).
 ${purpose ? `Purpose: ${purpose}` : ""}
+Detail level: ${detailLevel || "balanced"} — produce between ${target.min} and ${target.max} cubes.
 Note language: ${lang === "ar" ? "Arabic" : "English"}.
 
-Reason layer by layer from the ground up. Use ALL five sizes (10, 20, 30, 40, 50 cm). Pack at least 250 cubes. Make sure every cube touches another. Output JSON only.`;
+Reason layer by layer from the ground up. Use ALL five sizes (10, 20, 30, 40, 50 cm). Pack ${target.min}+ cubes. Make sure every cube touches another. Output JSON only.`;
 
       const userContent: any = imageDataUrl
         ? [{ type: "text", text: userText }, { type: "image_url", image_url: { url: imageDataUrl } }]

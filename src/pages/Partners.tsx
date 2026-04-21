@@ -3,7 +3,6 @@ import { useLang } from "@/i18n/LanguageContext";
 import { motion } from "framer-motion";
 import { Handshake, Sparkles, Mail, Send, CheckCircle2 } from "lucide-react";
 import { useState, FormEvent } from "react";
-import falakLogo from "@/assets/falak-logo.png";
 
 export default function Partners() {
   const { t, lang } = useLang();
@@ -54,14 +53,6 @@ export default function Partners() {
             ))}
           </ul>
 
-          <div className="mt-6 inline-flex items-center gap-3 px-4 py-2.5 rounded-full border border-[color:var(--card-border)] glass-card">
-            <img src={falakLogo} alt="Falak" className="w-5 h-5 rounded-full object-cover" />
-            <span className="text-xs text-foreground/70">
-              {lang === "ar"
-                ? "بدعم من شركة فلك للأعمال والاستثمار"
-                : "Backed by Falak Business & Investment Company"}
-            </span>
-          </div>
         </section>
 
         {/* Forms of collaboration */}
@@ -114,10 +105,16 @@ export default function Partners() {
                 placeholder={p.contactEmail}
                 className="px-4 py-3 rounded-xl bg-background/50 border border-[color:var(--card-border)] text-sm focus:outline-none focus:border-[hsl(var(--accent))]"
               />
-              <input
-                placeholder={p.contactCompany}
+              <select
+                required
+                defaultValue=""
                 className="px-4 py-3 rounded-xl bg-background/50 border border-[color:var(--card-border)] text-sm focus:outline-none focus:border-[hsl(var(--accent))] sm:col-span-2"
-              />
+              >
+                <option value="" disabled>{p.contactType}</option>
+                {p.contactTypes.map((opt: { value: string; label: string }) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
               <textarea
                 required
                 placeholder={p.contactMessage}

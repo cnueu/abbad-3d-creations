@@ -23,7 +23,7 @@ export function Header() {
     return () => clearTimeout(timer);
   }, []);
 
-  const logoSize = !introDone ? "min(60vw, 360px)" : "56px";
+  const logoSize = !introDone ? "min(60vw, 360px)" : "72px";
 
   return (
     <>
@@ -60,7 +60,7 @@ export function Header() {
                 : "flex items-center justify-center"
             }
           >
-            <Logo className="w-full h-full object-contain" />
+            <Logo className={introDone ? "w-[88%] h-[88%] object-contain" : "w-full h-full object-contain"} />
           </motion.div>
         </Link>
       </div>

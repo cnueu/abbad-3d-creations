@@ -14,6 +14,7 @@ import {
   Moon,
   LogIn,
   Sparkles,
+  Languages,
 } from "lucide-react";
 import { useLang } from "@/i18n/LanguageContext";
 
@@ -50,11 +51,12 @@ export function AppSidebar({
   theme: "dark" | "light";
   toggleTheme: () => void;
 }) {
-  const { t, lang } = useLang();
+  const { t, lang, setLang } = useLang();
   const loc = useLocation();
   const nav = useNavigate();
 
   const items: NavItem[] = [
+    { id: "notif", label: lang === "ar" ? "الإشعارات" : "Notifications", icon: Bell, to: "/notifications" },
     {
       id: "blocks",
       label: lang === "ar" ? "أدوات البناء" : "Build Tools",
@@ -66,9 +68,8 @@ export function AppSidebar({
     },
     { id: "ai", label: lang === "ar" ? "الذكاء" : "AI", icon: Cpu, to: "/studio" },
     { id: "pay", label: lang === "ar" ? "الدفع" : "Pay", icon: Wallet, to: "/checkout" },
-    { id: "about", label: lang === "ar" ? "من نحن" : "About", icon: Info, to: "/about" },
     { id: "partners", label: lang === "ar" ? "الشراكات" : "Partners", icon: Handshake, to: "/partners" },
-    { id: "notif", label: lang === "ar" ? "الإشعارات" : "Notifications", icon: Bell, to: "/notifications" },
+    { id: "about", label: lang === "ar" ? "من نحن" : "About", icon: Info, to: "/about" },
   ];
 
   const initialExpanded =
@@ -240,8 +241,8 @@ export function AppSidebar({
         })}
       </nav>
 
-      {/* Footer: theme toggle */}
-      <div className="border-t p-3" style={{ borderColor: "var(--card-border)" }}>
+      {/* Footer: theme + language */}
+      <div className="border-t p-3 space-y-2" style={{ borderColor: "var(--card-border)" }}>
         <button
           onClick={toggleTheme}
           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium border border-[color:var(--card-border)] hover:bg-green-500/15 transition-colors"
@@ -258,10 +259,26 @@ export function AppSidebar({
               : lang === "ar" ? "وضع داكن" : "Dark mode"}
           </span>
         </button>
+
+        <button
+          onClick={() => setLang(lang === "ar" ? "en" : "ar")}
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium border border-[color:var(--card-border)] hover:bg-green-500/15 transition-colors"
+          aria-label="Toggle language"
+          style={{ color: "hsl(var(--foreground))" }}
+        >
+          <Languages className="w-4 h-4" />
+          <span
+            className="transition-all overflow-hidden whitespace-nowrap"
+            style={{ width: collapsed ? 0 : "auto", opacity: collapsed ? 0 : 1 }}
+          >
+            {lang === "ar" ? "English" : "العربية"}
+          </span>
+        </button>
+
         {!collapsed && (
           <Link
             to="/auth"
-            className="mt-2 w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-green-500/30 hover:bg-green-500/50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-green-500/30 hover:bg-green-500/50 transition-colors"
             style={{ color: "hsl(var(--text-accent))" }}
           >
             <LogIn className="w-3.5 h-3.5" />

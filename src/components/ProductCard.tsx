@@ -10,21 +10,38 @@ interface Props {
   index?: number;
 }
 
-// Static color preview — shows the actual product color.
-// Real 3D glassy model loads on hover/focus only.
+// Glassy shiny preview — matches the homepage rotating-cube aesthetic.
+// Uses each product's real color but gives it the polished, deep, reflective
+// look (radial highlight + colored bloom + inset shadows). Real 3D loads on hover.
 function StaticPreview({ product }: { product: Product }) {
+  const c = product.color;
   return (
     <div
-      className="w-full h-full flex items-center justify-center"
+      className="w-full h-full flex items-center justify-center relative"
       style={{
-        background: `radial-gradient(circle at 35% 30%, ${product.color}, ${product.color}cc 55%, ${product.color}88 100%)`,
+        background: `radial-gradient(ellipse at 30% 20%, ${c}ee 0%, ${c}aa 35%, ${c}66 70%, #0b0d10 100%)`,
       }}
     >
+      {/* soft top sheen */}
       <div
-        className="w-20 h-20 rounded-full"
+        aria-hidden
+        className="absolute inset-0 pointer-events-none"
         style={{
-          background: product.color,
-          boxShadow: `0 12px 32px ${product.color}66, inset 0 -8px 24px rgba(0,0,0,0.18), inset 0 8px 20px rgba(255,255,255,0.18)`,
+          background:
+            "radial-gradient(ellipse at 50% -10%, rgba(255,255,255,0.18) 0%, transparent 55%)",
+        }}
+      />
+      <div
+        className="w-24 h-24 rounded-2xl"
+        style={{
+          background: `linear-gradient(135deg, ${c} 0%, ${c}cc 50%, ${c}77 100%)`,
+          boxShadow: [
+            `0 18px 40px ${c}55`,
+            "inset 0 -10px 24px rgba(0,0,0,0.35)",
+            "inset 0 10px 22px rgba(255,255,255,0.22)",
+            "0 0 0 1px rgba(255,255,255,0.08)",
+          ].join(", "),
+          backdropFilter: "blur(2px)",
         }}
       />
     </div>
@@ -58,7 +75,7 @@ export function ProductCard({ product, onClick, index = 0 }: Props) {
     >
       <div className="aspect-square w-full relative overflow-hidden flex items-center justify-center">
         {hover ? (
-          <Product3D product={product} autoRotate interactive />
+          <Product3D product={product} autoRotate interactive shinyWood />
         ) : (
           <StaticPreview product={product} />
         )}

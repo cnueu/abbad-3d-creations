@@ -35,10 +35,11 @@ function Piece({ product, shinyWood = false, colorOverride }: { product: Product
   const target = pieces.find((p) => p.kind === kind);
   if (!target) return null;
   const scale = kind === "cube" ? product.size / 10 : 1;
-  // Glassy dark wood: deep walnut with a polished, near-mirror finish.
-  const color = colorOverride ?? (shinyWood ? "#5a3a1f" : product.color);
-  const metalness = shinyWood ? 0.65 : 0.18;
-  const roughness = shinyWood ? 0.12 : 0.42;
+  // Shiny mode: glassy polished finish (clearcoat + reflections) on the
+  // product's own color. The Home hero passes colorOverride to force walnut.
+  const color = colorOverride ?? product.color;
+  const metalness = shinyWood ? 0.55 : 0.18;
+  const roughness = shinyWood ? 0.14 : 0.42;
   const clearcoat = shinyWood ? 1 : 0;
   return (
     <Center>

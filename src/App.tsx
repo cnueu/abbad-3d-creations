@@ -11,6 +11,7 @@ import Auth from "./pages/Auth";
 import Checkout from "./pages/Checkout";
 import About from "./pages/About";
 import Partners from "./pages/Partners";
+import Notifications from "./pages/Notifications";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/about" element={<About />} />
             <Route path="/partners" element={<Partners />} />
+            <Route path="/notifications" element={<Notifications />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

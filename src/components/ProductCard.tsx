@@ -10,30 +10,21 @@ interface Props {
   index?: number;
 }
 
-// Glassy dark wood preview — matches the homepage rotating cube aesthetic.
-// Real 3D model loads on hover/focus only (keeps Store snappy).
+// Static color preview — shows the actual product color.
+// Real 3D glassy model loads on hover/focus only.
 function StaticPreview({ product }: { product: Product }) {
-  // Dark glassy wood gradient for cubes to match homepage hero
-  const isCube = product.kind === "cube";
-  const woodGradient = "radial-gradient(ellipse at 30% 20%, #7a5a3a 0%, #5a3a1f 40%, #3d2514 100%)";
-  const baseGradient = `radial-gradient(circle at 35% 30%, ${product.color}, ${product.color}cc 55%, ${product.color}88 100%)`;
-  
   return (
     <div
       className="w-full h-full flex items-center justify-center"
       style={{
-        background: isCube ? woodGradient : baseGradient,
+        background: `radial-gradient(circle at 35% 30%, ${product.color}, ${product.color}cc 55%, ${product.color}88 100%)`,
       }}
     >
       <div
         className="w-20 h-20 rounded-full"
         style={{
-          background: isCube 
-            ? "linear-gradient(135deg, #8a6a4a 0%, #5a3a1f 50%, #3d2514 100%)"
-            : product.color,
-          boxShadow: isCube
-            ? "0 12px 32px rgba(60,30,10,0.5), inset 0 -6px 20px rgba(0,0,0,0.4), inset 0 6px 16px rgba(255,255,255,0.15), 0 0 0 1px rgba(255,255,255,0.1)"
-            : `0 12px 32px ${product.color}66, inset 0 -8px 24px rgba(0,0,0,0.18), inset 0 8px 20px rgba(255,255,255,0.18)`,
+          background: product.color,
+          boxShadow: `0 12px 32px ${product.color}66, inset 0 -8px 24px rgba(0,0,0,0.18), inset 0 8px 20px rgba(255,255,255,0.18)`,
         }}
       />
     </div>

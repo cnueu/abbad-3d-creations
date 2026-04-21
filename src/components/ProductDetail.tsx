@@ -81,6 +81,19 @@ export function ProductDetail({ product, onClose }: Props) {
                   {isCube ? t.store.cubeDesc : t.store.sheetDesc}
                 </Detail>
 
+                <Detail label={lang === "ar" ? "اللون" : "Color"}>
+                  <div className="flex items-center gap-2.5">
+                    <span
+                      className="w-5 h-5 rounded-full ring-2 ring-foreground/15 shrink-0"
+                      style={{ background: isCustom ? customHex : product.color }}
+                    />
+                    <span>{lang === "ar" ? product.colorName.ar : product.colorName.en}</span>
+                    <span className="font-mono text-xs text-foreground/55 uppercase" dir="ltr">
+                      {(isCustom ? customHex : product.color)}
+                    </span>
+                  </div>
+                </Detail>
+
                 {isCube && (
                   <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[hsl(var(--accent))]/10 border border-[color:var(--card-border)]">
                     <Info className="w-4 h-4 mt-0.5 text-[hsl(var(--accent))] shrink-0" />

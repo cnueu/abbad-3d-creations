@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
 import { motion } from "framer-motion";
-import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks } from "lucide-react";
+import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks, Upload, Wand2, ShoppingCart, Gauge } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GeneratedScene, buildObj, PlacedCube, Slide, ColorTheme } from "@/components/GeneratedScene";
 import { ProductCard } from "@/components/ProductCard";
@@ -49,6 +49,10 @@ export default function Studio() {
   const [uses, setUses] = useState(0);
   const [theme, setTheme] = useState<ColorTheme>("original");
   const [glassy, setGlassy] = useState(false);
+  // ── DETAIL LEVEL ──────────────────────────────────────────────
+  // Controls how many cubes the AI is asked to produce. Sent to the
+  // edge function as `detailLevel`. Edit labels here to retune UX.
+  const [detail, setDetail] = useState<"simple" | "balanced" | "intricate">("balanced");
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -94,7 +98,8 @@ export default function Studio() {
     setLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("generate-design", {
-        body: { shapeName: "reference", width: 2, height: 2, depth: 2, purpose: "", lang, imageDataUrl },
+        // `detailLevel` is read by supabase/functions/generate-design/index.ts
+        body: { shapeName: "reference", width: 2, height: 2, depth: 2, purpose: "", lang, imageDataUrl, detailLevel: detail },
       });
       if (error) throw error;
       setResult(data as Result);
@@ -126,15 +131,72 @@ export default function Studio() {
   return (
     <Layout>
       <div className="container mx-auto px-6 py-14 max-w-6xl">
-        <header className="mb-8">
+        <header className="mb-6">
+          {/* ── HEADER (model name removed per request) ────────────────── */}
           <span className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase text-[hsl(var(--accent))] mb-3 px-3 py-1 rounded-full border border-[color:var(--card-border)]">
-            <Sparkles className="w-3 h-3" /> Gemini 2.5 Pro · Pixel-Art 3D
+            <Sparkles className="w-3 h-3" /> {ar ? "استوديو الذكاء" : "AI Studio"}
           </span>
           <h1 className="font-display text-3xl md:text-5xl font-bold mb-3">
             <span className="text-gradient">{t.studio.title}</span>
           </h1>
           <p className="text-foreground/65 max-w-2xl">{t.studio.subtitle}</p>
         </header>
+
+        {/* ─────────────────────────────────────────────────────────────
+            HOW-TO-USE GUIDE
+            Edit the `steps` / `features` arrays below to change copy.
+            Icons come from lucide-react (top of file).
+           ───────────────────────────────────────────────────────────── */}
+        <section className="mb-6 glass-panel rounded-3xl p-5 md:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <ListChecks className="w-4 h-4 text-[hsl(var(--accent))]" />
+            <h2 className="text-[11px] tracking-[0.2em] uppercase text-foreground/65">
+              {ar ? "كيف تستخدم الاستوديو" : "How to use the Studio"}
+            </h2>
+          </div>
+          <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+            {(ar
+              ? [
+                  { icon: Upload, t: "ارفع صورة", d: "صورة واضحة لما تريد بناءه (أقل من 4 ميغا)." },
+                  { icon: Gauge, t: "اختر مستوى التفاصيل", d: "بسيط أسرع، معقّد يعطي تفاصيل أكثر." },
+                  { icon: Wand2, t: "اضغط توليد", d: "ينتج تصميم مكعبات ٣D مع كشف الكميات." },
+                  { icon: ShoppingCart, t: "نزّل أو اطلب", d: "حمّل ملف .obj أو اطلب القطع من المتجر." },
+                ]
+              : [
+                  { icon: Upload, t: "Upload an image", d: "A clear photo of what you want to build (< 4MB)." },
+                  { icon: Gauge, t: "Pick a detail level", d: "Simple is faster — Intricate adds more pieces." },
+                  { icon: Wand2, t: "Hit Generate", d: "You get a 3D cube design with full piece counts." },
+                  { icon: ShoppingCart, t: "Download or order", d: "Save the .obj file or order the pieces from the store." },
+                ]
+            ).map((s, i) => (
+              <li key={i} className="rounded-2xl p-4 border border-[color:var(--card-border)] bg-[hsl(var(--accent))]/5 flex gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))] flex items-center justify-center font-display font-bold text-sm">
+                  {i + 1}
+                </div>
+                <div>
+                  <div className="flex items-center gap-1.5 text-sm font-semibold mb-0.5">
+                    <s.icon className="w-3.5 h-3.5 text-[hsl(var(--accent))]" />
+                    {s.t}
+                  </div>
+                  <div className="text-xs text-foreground/65 leading-relaxed">{s.d}</div>
+                </div>
+              </li>
+            ))}
+          </ol>
+
+          {/* Page features summary */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2 text-[11px] text-foreground/65">
+            {(ar
+              ? ["معاينة ٣D دوّارة", "ثيمات ألوان قابلة للتبديل", "تعليمات تجميع تلقائية", "تصدير ملف .obj"]
+              : ["Rotating 3D preview", "Switchable color themes", "Auto assembly instructions", "Export to .obj file"]
+            ).map((f) => (
+              <div key={f} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[color:var(--card-border)]">
+                <Sparkles className="w-3 h-3 text-[hsl(var(--accent))]" />
+                {f}
+              </div>
+            ))}
+          </div>
+        </section>
 
         {/* Quota banner */}
         <div className="mb-6 flex items-center justify-between gap-3 flex-wrap rounded-2xl px-5 py-3 border border-[color:var(--card-border)] glass-card">
@@ -190,6 +252,35 @@ export default function Studio() {
                   <span className="text-[11px] text-foreground/45">PNG · JPG · WEBP · &lt; 4MB</span>
                 </button>
               )}
+            </div>
+
+            {/* ── DETAIL LEVEL SELECTOR ────────────────────────────────
+                Sent to backend as `detailLevel` in the generate body. */}
+            <div>
+              <span className="block text-[11px] tracking-[0.18em] uppercase text-foreground/55 mb-2">
+                {ar ? "مستوى التفاصيل" : "Detail level"}
+              </span>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { id: "simple", label: ar ? "بسيط" : "Simple", hint: "~150" },
+                  { id: "balanced", label: ar ? "متوازن" : "Balanced", hint: "~300" },
+                  { id: "intricate", label: ar ? "معقّد" : "Intricate", hint: "~500" },
+                ] as const).map((opt) => (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setDetail(opt.id)}
+                    className={`px-2 py-2 rounded-xl text-xs border transition flex flex-col items-center gap-0.5 ${
+                      detail === opt.id
+                        ? "border-[hsl(var(--accent))] bg-[hsl(var(--accent))]/15 text-foreground"
+                        : "border-[color:var(--card-border)] text-foreground/65 hover:bg-white/[0.04]"
+                    }`}
+                  >
+                    <span className="font-semibold">{opt.label}</span>
+                    <span className="text-[10px] text-foreground/45">{opt.hint} {ar ? "مكعب" : "cubes"}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <button onClick={generate} disabled={loading || !imageDataUrl || remaining <= 0} className="btn-primary w-full disabled:opacity-60">

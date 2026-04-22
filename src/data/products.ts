@@ -52,12 +52,12 @@ function makeCubes(size: 10 | 20 | 30, price: number): Product[] {
 
 function makeSheets(): Product[] {
   return SHEET_COLORS.map((c) => ({
-    id: `sheet-20-${c.en.toLowerCase().replace(/\s+/g, "-")}`,
+    id: `sheet-10-${c.en.toLowerCase().replace(/\s+/g, "-")}`,
     kind: "sheet" as const,
-    size: 20,
+    size: 10,
     materials: ["PLA"],
     price: 0.25,
-    dims: { x: 2.3, y: 2.3, z: 20 },
+    dims: { x: 2.3, y: 2.3, z: 10 },
     color: c.hex,
     colorName: { en: c.en, ar: c.ar },
   }));

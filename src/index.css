@@ -70,17 +70,17 @@
     /* Light mode — soft warm gray, not harsh white. Subtle shadows for depth.
        All text/icon tokens are dark so navigation, headings and body copy
        are fully legible on the light background. */
-    --bg-root: 220 10% 82%;
-    --bg-sidebar: 220 8% 88%;
-    --bg-main: 220 10% 84%;
-    --bg-section-alt: 220 10% 78%;
+    --bg-root: 220 8% 70%;
+    --bg-sidebar: 220 7% 76%;
+    --bg-main: 220 8% 72%;
+    --bg-section-alt: 220 8% 66%;
 
-    --background: 220 10% 82%;
-    --foreground: 220 20% 12%;
-    --card: 220 12% 90%;
-    --card-foreground: 220 20% 12%;
-    --popover: 220 12% 92%;
-    --popover-foreground: 220 20% 12%;
+    --background: 220 8% 70%;
+    --foreground: 220 14% 22%;
+    --card: 220 10% 78%;
+    --card-foreground: 220 14% 22%;
+    --popover: 220 10% 80%;
+    --popover-foreground: 220 14% 22%;
 
     --primary: 170 50% 28%;
     --primary-foreground: 0 0% 100%;
@@ -103,11 +103,11 @@
     --green-400: 170 55% 24%;
     --green-500: 170 60% 20%;
 
-    --text-primary: 220 20% 12%;
-    --text-secondary: 220 14% 22%;
-    --text-muted: 220 10% 36%;
+    --text-primary: 220 14% 22%;
+    --text-secondary: 220 12% 28%;
+    --text-muted: 220 10% 38%;
     --text-accent: 170 45% 26%;
-    --divider: 220 10% 54%;
+    --divider: 220 10% 50%;
 
     --card-bg: rgba(218, 222, 226, 0.78);
     --card-bg-hover: rgba(228, 232, 234, 0.92);

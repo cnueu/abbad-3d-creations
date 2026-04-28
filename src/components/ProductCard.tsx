@@ -91,7 +91,7 @@ export function ProductCard({ product, onClick, index = 0 }: Props) {
         </p>
         {product.kind === "cube" && (
           <p className="text-[10px] text-[hsl(var(--accent))]/90 mb-3">
-            {lang === "ar" ? "✓ صفائح ربط مجاناً مع كل مكعب" : "✓ Free connector sheets included"}
+            {lang === "ar" ? "✓ موصِّلات مجاناً مع كل مكعب" : "✓ Free connecters included"}
           </p>
         )}
         <div className="flex items-center justify-between">

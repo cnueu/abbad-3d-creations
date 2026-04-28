@@ -1,12 +1,14 @@
 // Product catalog. Each cube size comes in multiple natural colors.
-// Pricing rule: 10cm = 2 SAR, 20cm = 4 SAR, 30cm = 6 SAR. Sheet = 0.25 SAR.
+// Pricing rule: 10cm = 2 SAR, 20cm = 4 SAR, 30cm = 6 SAR. Connecter = 0.25 SAR.
 // Custom-color cubes: +1 SAR (10cm = 3, 20cm = 5, 30cm = 7) with size minimums.
+// NOTE: kind "sheet" / "custom-sheet" are the legacy enum values for the connecter
+// (renamed in UI but kept as enum strings to avoid breaking saved cart/order data).
 export type ProductKind = "cube" | "sheet" | "custom-cube" | "custom-sheet";
 
 export interface Product {
   id: string;
   kind: ProductKind;
-  size: number; // cm — cube edge or sheet length
+  size: number; // cm — cube edge or connecter length
   materials: string[];
   price: number; // SAR
   dims: { x: number; y: number; z: number };
@@ -28,8 +30,8 @@ const CUBE_COLORS: { hex: string; en: string; ar: string }[] = [
   { hex: "#9aa3ad", en: "Brushed Metal", ar: "معدن مصقول" },
 ];
 
-// Sheet color combinations — match the cube palette.
-const SHEET_COLORS: { hex: string; en: string; ar: string }[] = [
+// Connecter color combinations — match the cube palette.
+const CONNECTER_COLORS: { hex: string; en: string; ar: string }[] = [
   { hex: "#d9c6a3", en: "Sand",         ar: "رملي" },
   { hex: "#8a8a8a", en: "Stone Gray",   ar: "رمادي حجري" },
   { hex: "#a47148", en: "Walnut Wood",  ar: "خشب جوز" },
@@ -50,10 +52,10 @@ function makeCubes(size: 10 | 20 | 30, price: number): Product[] {
   }));
 }
 
-function makeSheets(): Product[] {
-  return SHEET_COLORS.map((c) => ({
-    id: `sheet-10-${c.en.toLowerCase().replace(/\s+/g, "-")}`,
-    kind: "sheet" as const,
+function makeConnecters(): Product[] {
+  return CONNECTER_COLORS.map((c) => ({
+    id: `connecter-10-${c.en.toLowerCase().replace(/\s+/g, "-")}`,
+    kind: "sheet" as const, // legacy enum value — represents the connecter
     size: 10,
     materials: ["PLA"],
     price: 0.25,
@@ -67,7 +69,7 @@ export const PRODUCTS: Product[] = [
   ...makeCubes(10, 2),
   ...makeCubes(20, 4),
   ...makeCubes(30, 6),
-  ...makeSheets(),
+  ...makeConnecters(),
 ];
 
 // Custom-color cubes — one card per size. +1 SAR over standard, with min order qty.
@@ -114,7 +116,7 @@ export function findProduct(id: string) {
   return PRODUCTS.find((p) => p.id === id) || CUSTOM_CUBES.find((p) => p.id === id);
 }
 
-// Suggest one representative card per used cube size + a sheet.
+// Suggest one representative card per used cube size + a connecter.
 export function suggestProducts(usedSizes: number[] = [10]) {
   const sizes = new Set(usedSizes);
   const seen = new Set<number>();
@@ -134,4 +136,6 @@ export function suggestProducts(usedSizes: number[] = [10]) {
 }
 
 export const CUBE_PRICE: Record<10 | 20 | 30, number> = { 10: 2, 20: 4, 30: 6 };
-export const SHEET_PRICE = 0.25;
+export const CONNECTER_PRICE = 0.25;
+// Backwards-compat alias (legacy name).
+export const SHEET_PRICE = CONNECTER_PRICE;

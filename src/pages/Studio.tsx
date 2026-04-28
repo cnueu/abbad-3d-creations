@@ -381,14 +381,14 @@ export default function Studio() {
                           `ابدأ بالقاعدة: ضع المكعبات الكبيرة أولاً (${(result.breakdown[50] || 0) + (result.breakdown[40] || 0)} مكعب 40-50 سم).`,
                           `ابنِ الجدران الوسطى بمكعبات 30-20 سم (${(result.breakdown[30] || 0) + (result.breakdown[20] || 0)} مكعب).`,
                           `أضف التفاصيل والزخارف بمكعبات 10 سم (${result.breakdown[10] || 0} مكعب).`,
-                          `استخدم ${result.sheetsRealLife} صفيحة ربط لتثبيت المكعبات معاً عبر الفتحات الجانبية.`,
+                          `استخدم ${result.sheetsRealLife} موصِّل لتثبيت المكعبات معاً عبر الفتحات الجانبية.`,
                           ar ? "حمّل ملف .obj لمعاينته في أي برنامج 3D، ثم اطلب القطع من المتجر." : "",
                         ].filter(Boolean)
                       : [
                           `Start with the base: place the largest cubes first (${(result.breakdown[50] || 0) + (result.breakdown[40] || 0)} cubes at 40–50cm).`,
                           `Build the mid walls with 30 & 20cm cubes (${(result.breakdown[30] || 0) + (result.breakdown[20] || 0)} cubes).`,
                           `Add details and accents with 10cm cubes (${result.breakdown[10] || 0} cubes).`,
-                          `Use ${result.sheetsRealLife} connector sheets to lock the cubes together through the side channels.`,
+                          `Use ${result.sheetsRealLife} connecters to lock the cubes together through the side channels.`,
                           "Download the .obj to preview in any 3D tool, then order the pieces from the store.",
                         ]
                     ).map((step, i) => (

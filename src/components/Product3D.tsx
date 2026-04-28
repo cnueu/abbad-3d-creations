@@ -5,7 +5,7 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import * as THREE from "three";
 import { Product } from "@/data/products";
 
-// Two separate OBJ files: FinalCube for cubes, FinalLocker for the locker (formerly "sheet").
+// Two separate OBJ files: FinalCube for cubes, FinalConnecter for the connecter.
 // Each file is loaded once, centered on origin, and re-used for every card.
 function useCenteredGeom(url: string) {
   const obj = useLoader(OBJLoader, url);
@@ -29,12 +29,12 @@ function useCenteredGeom(url: string) {
 }
 
 function Piece({ product, shinyWood = false, colorOverride }: { product: Product; shinyWood?: boolean; colorOverride?: string }) {
-  const kind = product.kind === "custom-cube" ? "cube" : product.kind === "custom-sheet" ? "sheet" : product.kind;
+  const kind = product.kind === "custom-cube" ? "cube" : product.kind === "custom-sheet" ? "connecter" : product.kind === "sheet" ? "connecter" : product.kind;
   const cubeGeom = useCenteredGeom("/models/FinalCube.obj");
-  const lockerGeom = useCenteredGeom("/models/FinalLocker.obj");
-  const target = kind === "cube" ? cubeGeom : lockerGeom;
+  const connecterGeom = useCenteredGeom("/models/FinalConnecter.obj");
+  const target = kind === "cube" ? cubeGeom : connecterGeom;
   if (!target) return null;
-  // Cube file is authored at 10cm — scale up for 20/30. Locker stays at authored size.
+  // Cube file is authored at 10cm — scale up for 20/30. Connecter stays at authored size.
   const scale = kind === "cube" ? product.size / 10 : 1;
   // Shiny mode: glassy polished finish (clearcoat + reflections) on the
   // product's own color. The Home hero passes colorOverride to force walnut.

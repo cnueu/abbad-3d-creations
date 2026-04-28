@@ -147,8 +147,8 @@
     font-family: 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
     background:
-      radial-gradient(ellipse 80% 60% at 70% 10%, rgba(45, 125, 111, 0.18), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 10% 90%, rgba(109, 184, 172, 0.08), transparent 60%),
+      radial-gradient(ellipse 70% 55% at 50% 40%, rgba(222, 222, 222, 0.12), rgba(62, 62, 62, 0.10) 55%, transparent 80%),
+      rgba(8, 15, 16, 0.87),
       hsl(var(--bg-root));
     background-attachment: fixed;
   }

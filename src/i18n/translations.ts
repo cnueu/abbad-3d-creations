@@ -107,7 +107,11 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "Founder",
           email: "hessaibrahim129@gmail.com",
           linkedin: "https://www.linkedin.com/in/hessa-althuwaib-870742325/",
-          bio: "Founder of Abaad. Information Systems student at Imam Muhammad ibn Saud Islamic University. Leads the product vision and the modular building system.",
+          bio: "Founder of Abaad. Leads the product vision and the modular building system.",
+          studies: [
+            "Information Systems student at Imam Muhammad ibn Saud Islamic University.",
+            "Computer Science and Engineering track in high school.",
+          ],
           achievements: [
             "Winning team member at the AI League — Best AI Solution for 2034.",
           ],
@@ -117,7 +121,11 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "CEO",
           email: "uaaljasem@gmail.com",
           linkedin: "https://www.linkedin.com/in/yumna-aljasem/",
-          bio: "Chief Executive Officer. Medical student at Al-Nahda College with deep knowledge in chemistry. Drives strategy, operations, and partnerships.",
+          bio: "Chief Executive Officer. Drives strategy, operations, and partnerships, with deep knowledge in chemistry.",
+          studies: [
+            "Human Medicine student at Al-Nahda College.",
+            "Computer Science and Engineering track in high school.",
+          ],
           achievements: [
             "Second-place team leader and winner at the AI League — Best AI Solution for 2034.",
             "Finalist team leader in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",
@@ -128,7 +136,11 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "COO",
           email: "maryamfarouk59@gmail.com",
           linkedin: "https://www.linkedin.com/in/maryam-farouk-b14340386/",
-          bio: "Chief Operating Officer. Biomedical Engineering student at Al-Nahda College. Oversees operations and execution.",
+          bio: "Chief Operating Officer. Oversees operations and execution.",
+          studies: [
+            "Biomedical Engineering student at Al-Nahda College.",
+            "Computer Science and Engineering track in high school.",
+          ],
           achievements: [
             "Finalist team member in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",
           ],
@@ -138,7 +150,11 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "CFO",
           email: "ranadalotaibi9@gmail.com",
           linkedin: "https://www.linkedin.com/in/ranad-alotaibi-11092836a/",
-          bio: "Chief Financial Officer. Financial Economics student. Oversees finance, planning, and growth.",
+          bio: "Chief Financial Officer. Oversees finance, planning, and growth.",
+          studies: [
+            "Financial Economics student.",
+            "Computer Science and Engineering track in high school.",
+          ],
           achievements: [
             "Participant in the Albilad Competition.",
             "Certified by Monshaat (منشآت).",
@@ -150,7 +166,10 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "Technical Team",
           email: "noor_sh2006@outlook.com",
           linkedin: "https://www.linkedin.com/in/noor-alshabeeb-162630367/",
-          bio: "Technical team member. AI student. Supports product engineering and technical execution.",
+          bio: "Technical team member. Supports product engineering and technical execution.",
+          studies: [
+            "AI student.",
+          ],
           achievements: [
             "Finalist team member in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",
           ],
@@ -334,7 +353,11 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "المؤسِّسة",
           email: "hessaibrahim129@gmail.com",
           linkedin: "https://www.linkedin.com/in/hessa-althuwaib-870742325/",
-          bio: "مؤسِّسة أبعاد. طالبة نظم معلومات في جامعة الإمام محمد بن سعود الإسلامية. تقود رؤية المنتج ونظام البناء المعياري.",
+          bio: "مؤسِّسة أبعاد. تقود رؤية المنتج ونظام البناء المعياري.",
+          studies: [
+            "طالبة نظم معلومات في جامعة الإمام محمد بن سعود الإسلامية.",
+            "مسار علوم وهندسة الحاسب في المرحلة الثانوية.",
+          ],
           achievements: [
             "عضو الفريق الفائز في دوري الذكاء الاصطناعي — أفضل حل ذكاء اصطناعي لعام 2034.",
           ],
@@ -344,7 +367,11 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "الرئيسة التنفيذية",
           email: "uaaljasem@gmail.com",
           linkedin: "https://www.linkedin.com/in/yumna-aljasem/",
-          bio: "الرئيسة التنفيذية. طالبة طب في كلية النهضة، وذات معرفة عميقة بالكيمياء. تقود الاستراتيجية والعمليات والشراكات.",
+          bio: "الرئيسة التنفيذية. تقود الاستراتيجية والعمليات والشراكات، وذات معرفة عميقة بالكيمياء.",
+          studies: [
+            "طالبة طب بشري في كلية النهضة.",
+            "مسار علوم وهندسة الحاسب في المرحلة الثانوية.",
+          ],
           achievements: [
             "قائدة الفريق الحاصل على المركز الثاني والفائز في دوري الذكاء الاصطناعي — أفضل حل ذكاء اصطناعي لعام 2034.",
             "قائدة فريق مرشّح للمرحلة النهائية في مسابقة اكتشاف المواد، تحت إشراف الحائز على جائزة نوبل في الكيمياء البروفيسور عمر ياغي.",
@@ -355,17 +382,25 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "مديرة العمليات",
           email: "maryamfarouk59@gmail.com",
           linkedin: "https://www.linkedin.com/in/maryam-farouk-b14340386/",
-          bio: "مديرة العمليات. طالبة هندسة طبية حيوية في كلية النهضة. تشرف على العمليات والتنفيذ.",
+          bio: "مديرة العمليات. تشرف على العمليات والتنفيذ.",
+          studies: [
+            "طالبة هندسة طبية حيوية في كلية النهضة.",
+            "مسار علوم وهندسة الحاسب في المرحلة الثانوية.",
+          ],
           achievements: [
             "عضو فريق مرشّح للمرحلة النهائية في مسابقة اكتشاف المواد، تحت إشراف الحائز على جائزة نوبل في الكيمياء البروفيسور عمر ياغي.",
           ],
         },
         {
-          name: "رند العتيبي",
+          name: "رَناد العتيبي",
           role: "المديرة المالية",
           email: "ranadalotaibi9@gmail.com",
           linkedin: "https://www.linkedin.com/in/ranad-alotaibi-11092836a/",
-          bio: "المديرة المالية. طالبة اقتصاد مالي. تشرف على المالية والتخطيط والنمو.",
+          bio: "المديرة المالية. تشرف على المالية والتخطيط والنمو.",
+          studies: [
+            "طالبة اقتصاد مالي.",
+            "مسار علوم وهندسة الحاسب في المرحلة الثانوية.",
+          ],
           achievements: [
             "مشاركة في مسابقة البلاد.",
             "حاصلة على شهادة من منشآت.",
@@ -377,7 +412,10 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "الفريق التقني",
           email: "noor_sh2006@outlook.com",
           linkedin: "https://www.linkedin.com/in/noor-alshabeeb-162630367/",
-          bio: "عضو الفريق التقني. طالبة ذكاء اصطناعي. تدعم هندسة المنتج والتنفيذ التقني.",
+          bio: "عضو الفريق التقني. تدعم هندسة المنتج والتنفيذ التقني.",
+          studies: [
+            "طالبة ذكاء اصطناعي.",
+          ],
           achievements: [
             "عضو فريق مرشّح للمرحلة النهائية في مسابقة اكتشاف المواد، تحت إشراف الحائز على جائزة نوبل في الكيمياء البروفيسور عمر ياغي.",
           ],

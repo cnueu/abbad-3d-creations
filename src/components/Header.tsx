@@ -23,7 +23,8 @@ export function Header() {
     return () => clearTimeout(timer);
   }, []);
 
-  const logoSize = !introDone ? "min(60vw, 360px)" : "72px";
+  // Intro: 50% larger than before (was min(60vw, 360px) → now min(90vw, 540px))
+  const logoSize = !introDone ? "min(90vw, 540px)" : "72px";
 
   return (
     <>
@@ -42,9 +43,18 @@ export function Header() {
         )}
       </AnimatePresence>
 
+      {/*
+        While intro is playing, anchor to the full viewport (fixed) so the logo
+        sits dead-center regardless of the sidebar. After the intro, switch to
+        the in-pane absolute header position (top-right area of the content pane).
+      */}
       <div
-        className="absolute top-0 left-0 right-0 z-[100] pointer-events-none"
-        style={{ height: introDone ? "72px" : "100vh" }}
+        className={
+          introDone
+            ? "absolute top-0 left-0 right-0 z-[100] pointer-events-none"
+            : "fixed inset-0 z-[100] pointer-events-none"
+        }
+        style={introDone ? { height: "72px" } : undefined}
       >
         <Link
           to="/"

@@ -63,7 +63,7 @@ export function AppSidebar({
       icon: LayoutGrid,
       children: [
         { id: "store", label: lang === "ar" ? "المتجر" : "Building Blocks", to: "/store" },
-        { id: "sheets", label: lang === "ar" ? "الصفائح" : "Sheets", to: "/store?filter=sheet" },
+        { id: "sheets", label: lang === "ar" ? "الموصِّلات" : "Connecters", to: "/store?filter=sheet" },
       ],
     },
     { id: "ai", label: lang === "ar" ? "الذكاء" : "AI", icon: Cpu, to: "/studio" },

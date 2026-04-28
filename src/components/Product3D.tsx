@@ -44,7 +44,7 @@ function Piece({ product, shinyWood = false, colorOverride }: { product: Product
   const clearcoat = shinyWood ? 1 : 0;
   return (
     <Center>
-      <mesh geometry={target.geom} scale={scale} castShadow receiveShadow>
+      <mesh geometry={target} scale={scale} castShadow receiveShadow>
         {shinyWood ? (
           // @ts-ignore - drei/three types
           <meshPhysicalMaterial

@@ -103,11 +103,11 @@
     --green-400: 170 55% 24%;
     --green-500: 170 60% 20%;
 
-    --text-primary: 220 20% 12%;
-    --text-secondary: 220 14% 22%;
-    --text-muted: 220 10% 36%;
+    --text-primary: 220 14% 22%;
+    --text-secondary: 220 12% 28%;
+    --text-muted: 220 10% 38%;
     --text-accent: 170 45% 26%;
-    --divider: 220 10% 54%;
+    --divider: 220 10% 50%;
 
     --card-bg: rgba(218, 222, 226, 0.78);
     --card-bg-hover: rgba(228, 232, 234, 0.92);

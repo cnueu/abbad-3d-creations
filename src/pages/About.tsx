@@ -11,6 +11,7 @@ interface TeamMember {
   email: string;
   linkedin: string;
   bio: string;
+  studies?: string[];
   achievements?: string[];
 }
 
@@ -117,6 +118,17 @@ export default function About() {
                   </div>
                   <h2 className="font-display text-2xl md:text-3xl font-semibold mb-3">{m.name}</h2>
                   <p className="text-base text-foreground/75 leading-relaxed mb-4">{m.bio}</p>
+
+                  {m.studies && m.studies.length > 0 && (
+                    <ul className="space-y-2 mb-5">
+                      {m.studies.map((s, si) => (
+                        <li key={si} className="flex gap-3 text-sm md:text-base text-foreground/80">
+                          <span className="mt-2 w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] shrink-0" />
+                          <span>{s}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
 
                   {m.achievements && m.achievements.length > 0 && (
                     <ul className="space-y-2 mb-5">

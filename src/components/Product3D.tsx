@@ -29,7 +29,7 @@ function useCenteredGeom(url: string) {
 }
 
 function Piece({ product, shinyWood = false, colorOverride }: { product: Product; shinyWood?: boolean; colorOverride?: string }) {
-  const kind = product.kind === "custom-cube" ? "cube" : product.kind === "custom-connecter" ? "connecter" : product.kind;
+  const kind = product.kind === "custom-cube" ? "cube" : product.kind === "custom-sheet" ? "connecter" : product.kind === "sheet" ? "connecter" : product.kind;
   const cubeGeom = useCenteredGeom("/models/FinalCube.obj");
   const connecterGeom = useCenteredGeom("/models/FinalConnecter.obj");
   const target = kind === "cube" ? cubeGeom : connecterGeom;

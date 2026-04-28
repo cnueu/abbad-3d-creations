@@ -1,7 +1,7 @@
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
 import { motion } from "framer-motion";
-import { Handshake, Sparkles, Mail, Send, CheckCircle2 } from "lucide-react";
+import { Handshake, Sparkles, Mail, Send, CheckCircle2, BarChart3, Workflow, HelpCircle } from "lucide-react";
 import { useState, FormEvent } from "react";
 
 export default function Partners() {
@@ -55,6 +55,23 @@ export default function Partners() {
 
         </section>
 
+        {/* Stats */}
+        <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+          {p.stats.map((s: { value: string; label: string }, i: number) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.05 }}
+              className="glass-card rounded-2xl p-6 text-center"
+            >
+              <div className="font-display text-3xl md:text-4xl font-bold text-[hsl(var(--accent))]">{s.value}</div>
+              <div className="text-[11px] tracking-[0.18em] uppercase text-foreground/60 mt-2">{s.label}</div>
+            </motion.div>
+          ))}
+        </section>
+
         {/* Forms of collaboration */}
         <section className="mb-10">
           <div className="flex items-center gap-2 mb-6">
@@ -63,7 +80,7 @@ export default function Partners() {
               {p.formsTitle}
             </span>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {p.forms.map((f: { title: string; body: string }, i: number) => (
               <motion.div
                 key={f.title}
@@ -79,6 +96,52 @@ export default function Partners() {
             ))}
           </div>
         </section>
+
+        {/* Process */}
+        <section className="glass-panel rounded-3xl p-8 md:p-12 mb-10">
+          <div className="flex items-center gap-2 mb-6">
+            <Workflow className="w-4 h-4 text-[hsl(var(--accent))]" />
+            <span className="text-[11px] tracking-[0.22em] uppercase text-[hsl(var(--accent))]">
+              {p.processTitle}
+            </span>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {p.process.map((s: { step: string; title: string; body: string }, i: number) => (
+              <div
+                key={i}
+                className="rounded-2xl p-5 border border-[color:var(--card-border)]"
+                style={{ background: "var(--card-bg)" }}
+              >
+                <div className="text-[11px] tracking-[0.22em] text-[hsl(var(--accent))] mb-2">{s.step}</div>
+                <h4 className="font-display text-base font-semibold mb-2">{s.title}</h4>
+                <p className="text-xs text-foreground/70 leading-relaxed">{s.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="glass-panel rounded-3xl p-8 md:p-12 mb-10">
+          <div className="flex items-center gap-2 mb-6">
+            <HelpCircle className="w-4 h-4 text-[hsl(var(--accent))]" />
+            <span className="text-[11px] tracking-[0.22em] uppercase text-[hsl(var(--accent))]">
+              {p.faqTitle}
+            </span>
+          </div>
+          <div className="space-y-3">
+            {p.faq.map((item: { q: string; a: string }, i: number) => (
+              <details
+                key={i}
+                className="rounded-2xl border border-[color:var(--card-border)] p-4"
+                style={{ background: "var(--card-bg)" }}
+              >
+                <summary className="cursor-pointer font-medium text-sm md:text-base">{item.q}</summary>
+                <p className="text-sm text-foreground/70 leading-relaxed mt-3">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
 
         {/* Contact form */}
         <section className="glass-panel rounded-3xl p-8 md:p-12">
@@ -131,8 +194,8 @@ export default function Partners() {
           <div className="mt-6 pt-6 border-t border-[color:var(--card-border)] text-sm text-foreground/65 flex flex-wrap items-center gap-2">
             <Mail className="w-4 h-4 text-[hsl(var(--accent))]" />
             <span>{p.directEmail}:</span>
-            <a href="mailto:partners@abbad.sa" className="text-[hsl(var(--text-accent))] hover:underline" dir="ltr">
-              partners@abbad.sa
+            <a href="mailto:partners@abaad.sa" className="text-[hsl(var(--text-accent))] hover:underline" dir="ltr">
+              partners@abaad.sa
             </a>
           </div>
         </section>

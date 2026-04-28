@@ -5,7 +5,7 @@ export function Logo({ className = "" }: { className?: string }) {
   return (
     <img
       src={logo}
-      alt="ABBAD logo"
+      alt="Abaad logo"
       draggable={false}
       className={`${className} abbad-logo-invert`}
     />

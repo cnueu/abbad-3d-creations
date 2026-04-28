@@ -19,7 +19,9 @@ function StaticPreview({ product }: { product: Product }) {
     <div
       className="w-full h-full flex items-center justify-center relative"
       style={{
-        background: `radial-gradient(ellipse at 30% 20%, ${c}ee 0%, ${c}aa 35%, ${c}66 70%, #0b0d10 100%)`,
+        // Outer fade uses the theme background so light mode doesn't get a
+        // black corner. Inner stops still use the product color for the bloom.
+        background: `radial-gradient(ellipse at 30% 20%, ${c}ee 0%, ${c}aa 35%, ${c}66 70%, hsl(var(--bg-main)) 100%)`,
       }}
     >
       {/* soft top sheen */}

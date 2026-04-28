@@ -28,8 +28,8 @@ export function Footer() {
         <div>
           <h4 className="font-display text-base mb-4">{t.footer.contact}</h4>
           <ul className="space-y-2 text-sm text-foreground/70">
-            <li><a href="mailto:hello@abbad.studio" className="flex items-center gap-2 hover:text-green-100"><Mail className="w-4 h-4" />hello@abbad.studio</a></li>
-            <li><a href="mailto:support@abbad.studio" className="flex items-center gap-2 hover:text-green-100"><Mail className="w-4 h-4" />support@abbad.studio</a></li>
+            <li><a href="mailto:hello@abaad.studio" className="flex items-center gap-2 hover:text-green-100"><Mail className="w-4 h-4" />hello@abaad.studio</a></li>
+            <li><a href="mailto:support@abaad.studio" className="flex items-center gap-2 hover:text-green-100"><Mail className="w-4 h-4" />support@abaad.studio</a></li>
             <li className="text-foreground/60">{lang === "ar" ? "نشحن داخل المملكة العربية السعودية فقط" : "Shipping within Saudi Arabia only"}</li>
             <li><Link to="/about" className="hover:text-green-100">{t.about.title}</Link></li>
           </ul>
@@ -58,7 +58,7 @@ export function Footer() {
         </div>
       </div>
       <div className="border-t border-[color:var(--card-border)] py-5 text-center text-xs text-foreground/50">
-        © {new Date().getFullYear()} {lang === "ar" ? "أبعاد" : "ABBAD"}. {t.footer.rights}
+        © {new Date().getFullYear()} {lang === "ar" ? "أبعاد" : "Abaad"}. {t.footer.rights}
       </div>
     </footer>
   );

@@ -15,6 +15,7 @@ import {
   LogIn,
   Sparkles,
   Languages,
+  Home as HomeIcon,
 } from "lucide-react";
 import { useLang } from "@/i18n/LanguageContext";
 
@@ -56,6 +57,7 @@ export function AppSidebar({
   const nav = useNavigate();
 
   const items: NavItem[] = [
+    { id: "home", label: lang === "ar" ? "الرئيسية" : "Home", icon: HomeIcon, to: "/" },
     { id: "notif", label: lang === "ar" ? "الإشعارات" : "Notifications", icon: Bell, to: "/notifications" },
     {
       id: "blocks",

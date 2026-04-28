@@ -91,7 +91,9 @@ export function AppSidebar({
       className="abbad-sidebar relative h-screen flex flex-col border-r transition-[width] duration-300 ease-in-out shrink-0"
       style={{
         width: collapsed ? 60 : 220,
-        background: "hsl(var(--bg-sidebar))",
+        background: "hsl(var(--bg-sidebar) / 0.87)",
+        backdropFilter: "blur(18px) saturate(1.2)",
+        WebkitBackdropFilter: "blur(18px) saturate(1.2)",
         borderColor: "var(--card-border)",
       }}
     >

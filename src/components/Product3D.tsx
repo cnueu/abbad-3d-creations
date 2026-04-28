@@ -5,35 +5,36 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import * as THREE from "three";
 import { Product } from "@/data/products";
 
-// Shared OBJ — split into cube + sheet pieces.
-function useObjPieces() {
-  const obj = useLoader(OBJLoader, "/models/Cube_and_sheet.obj");
+// Two separate OBJ files: FinalCube for cubes, FinalLocker for the locker (formerly "sheet").
+// Each file is loaded once, centered on origin, and re-used for every card.
+function useCenteredGeom(url: string) {
+  const obj = useLoader(OBJLoader, url);
   return useMemo(() => {
-    const meshes: { kind: "cube" | "sheet"; geom: THREE.BufferGeometry }[] = [];
+    // Merge all child meshes into one centered geometry.
+    let geom: THREE.BufferGeometry | null = null;
     obj.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
-        const m = child as THREE.Mesh;
-        const g = (m.geometry as THREE.BufferGeometry).clone();
-        g.computeBoundingBox();
-        const bb = g.boundingBox!;
-        const sz = new THREE.Vector3();
-        bb.getSize(sz);
-        const isSheet = Math.max(sz.x, sz.y, sz.z) / Math.max(Math.min(sz.x, sz.y, sz.z), 0.001) > 3;
-        const c = new THREE.Vector3();
-        bb.getCenter(c);
-        g.translate(-c.x, -c.y, -c.z);
-        meshes.push({ kind: isSheet ? "sheet" : "cube", geom: g });
+        const g = ((child as THREE.Mesh).geometry as THREE.BufferGeometry).clone();
+        geom = geom ?? g; // first mesh wins; both files are single-mesh exports
       }
     });
-    return meshes;
+    if (!geom) return null;
+    geom.computeBoundingBox();
+    const bb = geom.boundingBox!;
+    const c = new THREE.Vector3();
+    bb.getCenter(c);
+    geom.translate(-c.x, -c.y, -c.z);
+    return geom;
   }, [obj]);
 }
 
 function Piece({ product, shinyWood = false, colorOverride }: { product: Product; shinyWood?: boolean; colorOverride?: string }) {
-  const pieces = useObjPieces();
   const kind = product.kind === "custom-cube" ? "cube" : product.kind === "custom-sheet" ? "sheet" : product.kind;
-  const target = pieces.find((p) => p.kind === kind);
+  const cubeGeom = useCenteredGeom("/models/FinalCube.obj");
+  const lockerGeom = useCenteredGeom("/models/FinalLocker.obj");
+  const target = kind === "cube" ? cubeGeom : lockerGeom;
   if (!target) return null;
+  // Cube file is authored at 10cm — scale up for 20/30. Locker stays at authored size.
   const scale = kind === "cube" ? product.size / 10 : 1;
   // Shiny mode: glassy polished finish (clearcoat + reflections) on the
   // product's own color. The Home hero passes colorOverride to force walnut.

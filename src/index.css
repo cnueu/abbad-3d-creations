@@ -8,62 +8,63 @@
 @layer base {
   :root,
   [data-theme="dark"] {
-    /* Backgrounds (HSL of original hex values) */
-    --bg-root: 213 13% 9%;          /* #13161a */
-    --bg-sidebar: 216 14% 6%;       /* #0e1012 */
-    --bg-main: 153 12% 12%;         /* #19231f */
-    --bg-section-alt: 216 8% 9%;    /* #141618 */
+    /* Backgrounds — updated per design spec */
+    --bg-root: 187 33% 5%;          /* #080F10 */
+    --bg-sidebar: 180 4% 10%;       /* #171919 (navigation) */
+    --bg-main: 187 33% 5%;          /* #080F10 */
+    --bg-section-alt: 180 4% 10%;   /* #171919 */
 
-    /* Greens */
-    --green-100: 169 39% 75%;
-    --green-200: 169 32% 57%;
-    --green-300: 170 44% 43%;
-    --green-400: 170 47% 33%;
-    --green-500: 169 51% 25%;
+    /* Accents — switched from green to gold */
+    --green-100: 45 75% 78%;        /* light gold */
+    --green-200: 45 80% 65%;
+    --green-300: 45 80% 52%;        /* primary gold */
+    --green-400: 42 78% 42%;
+    --green-500: 40 75% 32%;        /* deep gold */
 
     /* Card glass — kept as raw rgba via custom utilities */
     --text-primary: 210 6% 92%;
-    --text-secondary: 165 8% 70%;
-    --text-muted: 168 7% 51%;
-    --text-accent: 167 39% 75%;
+    --text-secondary: 45 20% 78%;
+    --text-muted: 45 8% 60%;
+    --text-accent: 45 80% 65%;
     --divider: 0 0% 100%;
 
     /* Shadcn semantic mapping */
-    --background: 213 13% 9%;
+    --background: 187 33% 5%;
     --foreground: 210 6% 92%;
-    --card: 153 12% 12%;
+    --card: 180 4% 10%;
     --card-foreground: 210 6% 92%;
-    --popover: 216 14% 6%;
+    --popover: 180 4% 10%;
     --popover-foreground: 210 6% 92%;
-    --primary: 170 44% 43%;
-    --primary-foreground: 213 13% 9%;
-    --secondary: 169 39% 75%;
-    --secondary-foreground: 213 13% 9%;
-    --muted: 216 8% 14%;
-    --muted-foreground: 168 7% 51%;
-    --accent: 169 32% 57%;
-    --accent-foreground: 213 13% 9%;
+    --primary: 45 80% 52%;
+    --primary-foreground: 187 33% 5%;
+    --secondary: 45 75% 78%;
+    --secondary-foreground: 187 33% 5%;
+    --muted: 180 4% 14%;
+    --muted-foreground: 45 8% 60%;
+    --accent: 45 80% 65%;
+    --accent-foreground: 187 33% 5%;
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 98%;
-    --border: 169 51% 25%;
-    --input: 216 8% 14%;
-    --ring: 170 44% 43%;
+    --border: 45 60% 32%;
+    --input: 180 4% 14%;
+    --ring: 45 80% 52%;
     --radius: 1rem;
 
-    /* Custom raw rgba tokens preserved */
-    --card-bg: rgba(27, 54, 50, 0.38);
+    /* Custom raw rgba tokens — gold tint */
+    --card-bg: rgba(23, 25, 25, 0.87);            /* #171919 @ 87% */
     --card-bg-hover: rgba(120, 102, 55, 0.52);
-    --card-border: rgba(109, 184, 172, 0.28);
-    --card-border-hover: rgba(109, 184, 172, 0.55);
-    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(45, 125, 111, 0.2);
-    --card-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.4), 0 4px 16px rgba(45, 125, 111, 0.3);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --green-glass: rgba(45, 125, 111, 0.28);
+    --card-border: rgba(212, 175, 55, 0.28);
+    --card-border-hover: rgba(212, 175, 55, 0.55);
+    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(180, 140, 40, 0.18);
+    --card-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(212, 175, 55, 0.28);
+    --glass-border: rgba(255, 255, 255, 0.10);
+    --green-glass: rgba(212, 175, 55, 0.18);
 
-    --gradient-radial: radial-gradient(ellipse 70% 60% at 60% 20%, rgba(255, 255, 255, 0.08), transparent 70%),
-      radial-gradient(ellipse 50% 50% at 20% 80%, rgba(17, 21, 20, 0.9), transparent 60%);
-    --gradient-hero: linear-gradient(135deg, rgba(45, 125, 111, 0.35), rgba(168, 213, 204, 0.1));
-    --gradient-text: linear-gradient(135deg, #a8d5cc 0%, #6db8ac 50%, #3d9e8f 100%);
+    /* Background uses a middle radial blend from #3E3E3E -> #DEDEDE per spec,
+       layered subtly behind the dark base so the brand surface stays dark. */
+    --gradient-radial: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(222, 222, 222, 0.10), rgba(62, 62, 62, 0.10) 60%, transparent 80%);
+    --gradient-hero: linear-gradient(135deg, rgba(212, 175, 55, 0.30), rgba(255, 220, 130, 0.10));
+    --gradient-text: linear-gradient(135deg, #f4d97a 0%, #d4af37 50%, #a8801a 100%);
   }
 
   [data-theme="light"] {
@@ -146,8 +147,8 @@
     font-family: 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
     background:
-      radial-gradient(ellipse 80% 60% at 70% 10%, rgba(45, 125, 111, 0.18), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 10% 90%, rgba(109, 184, 172, 0.08), transparent 60%),
+      radial-gradient(ellipse 70% 55% at 50% 40%, rgba(222, 222, 222, 0.12), rgba(62, 62, 62, 0.10) 55%, transparent 80%),
+      rgba(8, 15, 16, 0.87),
       hsl(var(--bg-root));
     background-attachment: fixed;
   }

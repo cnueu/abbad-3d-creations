@@ -35,6 +35,40 @@ interface SimItem {
 const NUDGE = 5; // cm
 const PRESET_COLORS = ["#d9c6a3", "#b8a37e", "#8a8a8a", "#5a5a5a", "#a47148", "#c89b6c", "#6e4a2b", "#9aa3ad"];
 
+// Convert hex -> rgb for color distance
+function hexToRgb(hex: string): [number, number, number] {
+  const h = hex.replace("#", "");
+  const v = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const n = parseInt(v, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function colorDist(a: string, b: string) {
+  const [r1, g1, b1] = hexToRgb(a);
+  const [r2, g2, b2] = hexToRgb(b);
+  return Math.hypot(r1 - r2, g1 - g2, b1 - b2);
+}
+// Find the closest standard product by kind+size+color, or fall back to custom-cube.
+function matchProduct(kind: Kind, size: number, color: string): { product: Product; isCustom: boolean } {
+  const productKind = kind === "cube" ? "cube" : "sheet";
+  const candidates = PRODUCTS.filter((p) => p.kind === productKind && p.size === size);
+  if (candidates.length === 0) {
+    // shouldn't happen, but fall back to first matching size
+    return { product: PRODUCTS[0], isCustom: false };
+  }
+  let best = candidates[0];
+  let bestD = colorDist(best.color, color);
+  for (const c of candidates) {
+    const d = colorDist(c.color, color);
+    if (d < bestD) { best = c; bestD = d; }
+  }
+  // If color is far from any natural option AND this is a cube, use custom-cube
+  if (kind === "cube" && bestD > 60) {
+    const custom = CUSTOM_CUBES.find((p) => p.size === size);
+    if (custom) return { product: custom, isCustom: true };
+  }
+  return { product: best, isCustom: false };
+}
+
 function useObjGeom(url: string) {
   const obj = useLoader(OBJLoader, url);
   return useMemo(() => {

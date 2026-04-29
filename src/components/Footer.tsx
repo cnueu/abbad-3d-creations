@@ -6,7 +6,7 @@ import { Logo } from "./Logo";
 export function Footer() {
   const { t, lang } = useLang();
   return (
-    <footer className="mt-24 border-t border-[color:var(--card-border)] bg-black/30 backdrop-blur-md">
+    <footer className="mt-24 border-t border-[color:var(--card-border)] backdrop-blur-md" style={{ background: "hsl(var(--bg-sidebar) / 0.6)" }}>
       <div className="container mx-auto px-6 py-14 grid md:grid-cols-4 gap-10">
         <div>
           <div className="flex items-center gap-3 mb-4">

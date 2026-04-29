@@ -5,8 +5,11 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import * as THREE from "three";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
-import { Trash2, RotateCw, Box, Link2, Palette, Ruler, Move3d } from "lucide-react";
+import { Trash2, RotateCw, Box, Link2, Palette, Ruler, Move3d, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PRODUCTS, CUSTOM_CUBES, type Product } from "@/data/products";
+import { useCart } from "@/hooks/useCart";
+import { toast } from "sonner";
 
 // ============================================================
 // 1 scene unit = 1 cm.
@@ -29,8 +32,42 @@ interface SimItem {
   color: string;
 }
 
-const NUDGE = 10; // cm
-const PRESET_COLORS = ["#e8c547", "#5b8def", "#ef6f6c", "#7ed957", "#b07cff", "#f6f6f6", "#2c2c2c"];
+const NUDGE = 5; // cm
+const PRESET_COLORS = ["#d9c6a3", "#b8a37e", "#8a8a8a", "#5a5a5a", "#a47148", "#c89b6c", "#6e4a2b", "#9aa3ad"];
+
+// Convert hex -> rgb for color distance
+function hexToRgb(hex: string): [number, number, number] {
+  const h = hex.replace("#", "");
+  const v = h.length === 3 ? h.split("").map((c) => c + c).join("") : h;
+  const n = parseInt(v, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function colorDist(a: string, b: string) {
+  const [r1, g1, b1] = hexToRgb(a);
+  const [r2, g2, b2] = hexToRgb(b);
+  return Math.hypot(r1 - r2, g1 - g2, b1 - b2);
+}
+// Find the closest standard product by kind+size+color, or fall back to custom-cube.
+function matchProduct(kind: Kind, size: number, color: string): { product: Product; isCustom: boolean } {
+  const productKind = kind === "cube" ? "cube" : "sheet";
+  const candidates = PRODUCTS.filter((p) => p.kind === productKind && p.size === size);
+  if (candidates.length === 0) {
+    // shouldn't happen, but fall back to first matching size
+    return { product: PRODUCTS[0], isCustom: false };
+  }
+  let best = candidates[0];
+  let bestD = colorDist(best.color, color);
+  for (const c of candidates) {
+    const d = colorDist(c.color, color);
+    if (d < bestD) { best = c; bestD = d; }
+  }
+  // If color is far from any natural option AND this is a cube, use custom-cube
+  if (kind === "cube" && bestD > 60) {
+    const custom = CUSTOM_CUBES.find((p) => p.size === size);
+    if (custom) return { product: custom, isCustom: true };
+  }
+  return { product: best, isCustom: false };
+}
 
 function useObjGeom(url: string) {
   const obj = useLoader(OBJLoader, url);
@@ -108,7 +145,7 @@ function CubeMesh({ item, selected, onPointerDown, onClick }: {
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
   onClick: (e: ThreeEvent<MouseEvent>) => void;
 }) {
-  const geom = useObjGeom("/models/Cube_and_sheet.obj");
+  const geom = useObjGeom("/models/FinalCube.obj");
 
   const scale = useMemo(() => {
     if (!geom) return 1;
@@ -270,6 +307,23 @@ export default function Simulation() {
   const [openPanel, setOpenPanel] = useState<null | "size" | "rotate" | "color">(null);
 
   const selected = items.find((i) => i.id === selectedId) || null;
+  const { add: addToCart } = useCart();
+
+  // Bill of materials: aggregate sim items into store products by kind+size+color match
+  const bom = useMemo(() => {
+    const map = new Map<string, { product: Product; qty: number; customColor?: string; isCustom: boolean }>();
+    for (const it of items) {
+      const { product, isCustom } = matchProduct(it.kind, it.kind === "cube" ? it.size : 10, it.color);
+      const customColor = isCustom ? it.color : undefined;
+      const key = product.id + "|" + (customColor || "");
+      const existing = map.get(key);
+      if (existing) existing.qty += 1;
+      else map.set(key, { product, qty: 1, customColor, isCustom });
+    }
+    return Array.from(map.values());
+  }, [items]);
+
+  const bomTotal = bom.reduce((s, l) => s + l.product.price * l.qty, 0);
 
   const addItem = useCallback((kind: Kind) => {
     const id = Math.random().toString(36).slice(2, 9);
@@ -390,8 +444,8 @@ export default function Simulation() {
           <h1 className="text-2xl font-bold">{t("Simulation Platform", "منصة المحاكاة")}</h1>
           <p className="text-sm text-muted-foreground">
             {t(
-              "Drag to move on the floor. Use the on-screen arrows or arrow keys / Q-E for up & down. Each step is 10 cm.",
-              "اسحب للتحريك على الأرضية. استخدم الأسهم على الشاشة أو لوحة المفاتيح، و Q/E للأعلى والأسفل. كل خطوة ١٠ سم."
+              "Drag to move on the floor. Use the on-screen arrows or arrow keys / Q-E for up & down. Each step is 5 cm.",
+              "اسحب للتحريك على الأرضية. استخدم الأسهم على الشاشة أو لوحة المفاتيح، و Q/E للأعلى والأسفل. كل خطوة ٥ سم."
             )}
           </p>
         </div>
@@ -408,7 +462,7 @@ export default function Simulation() {
             </Button>
             <div className="pt-3 mt-3 border-t text-xs text-muted-foreground space-y-1">
               <p>↔ {t("Drag to move", "اسحب للتحريك")}</p>
-              <p>⌨ {t("Arrows = X/Z (10 cm)", "أسهم = X/Z (١٠ سم)")}</p>
+              <p>⌨ {t("Arrows = X/Z (5 cm)", "أسهم = X/Z (٥ سم)")}</p>
               <p>Q / E {t("= Down / Up", "= أسفل / أعلى")}</p>
               <p>R {t("Rotate", "تدوير")}</p>
               <p>Del {t("Delete", "حذف")}</p>
@@ -499,7 +553,7 @@ export default function Simulation() {
                   <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, 0, -NUDGE)}>↑</Button>
                   <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, NUDGE, 0)} title="Up">⤴</Button>
                   <Button size="sm" variant="outline" onClick={() => nudgeSelected(-NUDGE, 0, 0)}>←</Button>
-                  <span className="text-[10px] text-muted-foreground self-center text-center">10cm</span>
+                  <span className="text-[10px] text-muted-foreground self-center text-center">5cm</span>
                   <Button size="sm" variant="outline" onClick={() => nudgeSelected(NUDGE, 0, 0)}>→</Button>
                   <span />
                   <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, 0, NUDGE)}>↓</Button>
@@ -603,6 +657,83 @@ export default function Simulation() {
               </div>
             )}
           </aside>
+        </div>
+
+        {/* Bill of Materials — pulled from the store */}
+        <div className="mt-6 rounded-lg border bg-card p-4">
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <div>
+              <h2 className="text-base font-semibold">{t("Materials from the store", "المواد من المتجر")}</h2>
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  "Pieces you place are matched to store products by size and color.",
+                  "تُطابَق القطع التي تضعها بمنتجات المتجر حسب الحجم واللون."
+                )}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm">
+                {t("Total", "المجموع")}: <span className="font-semibold">{bomTotal.toFixed(2)} SAR</span>
+              </span>
+              <Button
+                size="sm"
+                disabled={bom.length === 0}
+                onClick={() => {
+                  for (const line of bom) {
+                    addToCart(line.product, line.qty, line.customColor ? { customColor: line.customColor } : undefined);
+                  }
+                  toast.success(t("Added to cart", "أُضيفت إلى السلة"));
+                }}
+              >
+                <ShoppingCart className="w-4 h-4" /> {t("Add all to cart", "أضف الكل للسلة")}
+              </Button>
+            </div>
+          </div>
+          {bom.length === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              {t("Add cubes or connecters to build your bill of materials.", "أضف مكعبات أو موصِّلات لبناء قائمة المواد.")}
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {bom.map((line, idx) => {
+                const displayColor = line.customColor || line.product.color;
+                const colorName = line.isCustom
+                  ? (isAr ? "لون مخصص" : "Custom color")
+                  : (isAr ? line.product.colorName.ar : line.product.colorName.en);
+                const kindLabel = line.product.kind === "sheet"
+                  ? t("Connecter", "موصِّل")
+                  : t("Cube", "مكعب");
+                return (
+                  <div key={idx} className="flex items-center gap-3 rounded border bg-background/50 p-2">
+                    <div
+                      className="w-10 h-10 rounded border shrink-0"
+                      style={{ background: displayColor }}
+                      aria-label={colorName}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate">
+                        {kindLabel} • {line.product.size} cm
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {colorName} • {line.product.price.toFixed(2)} SAR
+                      </div>
+                    </div>
+                    <div className="text-sm font-semibold tabular-nums">×{line.qty}</div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        addToCart(line.product, line.qty, line.customColor ? { customColor: line.customColor } : undefined);
+                        toast.success(t("Added", "أُضيف"));
+                      }}
+                    >
+                      <ShoppingCart className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </Layout>

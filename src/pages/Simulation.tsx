@@ -72,15 +72,29 @@ function matchProduct(kind: Kind, size: number, color: string): { product: Produ
 function useObjGeom(url: string) {
   const obj = useLoader(OBJLoader, url);
   return useMemo(() => {
-    let merged: THREE.BufferGeometry | null = null;
+    // Merge ALL sub-meshes from the OBJ. Keeping only the first one made the
+    // cube look broken on the web vs. correct in Blender. We also drop the
+    // file's normals and recompute them so shading matches Blender's viewport.
+    const meshes: THREE.Mesh[] = [];
+    obj.updateMatrixWorld(true);
     obj.traverse((c) => {
       const m = c as THREE.Mesh;
-      if (m.isMesh) {
-        const g = (m.geometry as THREE.BufferGeometry).clone();
-        merged = merged ?? g;
-      }
+      if (m.isMesh && m.geometry) meshes.push(m);
     });
-    if (!merged) return null;
+    if (meshes.length === 0) return null;
+
+    const positions: number[] = [];
+    for (const m of meshes) {
+      const g = (m.geometry as THREE.BufferGeometry).clone();
+      g.applyMatrix4(m.matrixWorld);
+      const nonIndexed = g.index ? g.toNonIndexed() : g;
+      const pos = nonIndexed.getAttribute("position") as THREE.BufferAttribute;
+      for (let i = 0; i < pos.count; i++) {
+        positions.push(pos.getX(i), pos.getY(i), pos.getZ(i));
+      }
+    }
+    const merged = new THREE.BufferGeometry();
+    merged.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
     merged.computeBoundingBox();
     const bb = merged.boundingBox!;
     const center = new THREE.Vector3();

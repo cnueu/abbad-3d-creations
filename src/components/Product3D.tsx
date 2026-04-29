@@ -2,6 +2,7 @@ import { Suspense, useMemo } from "react";
 import { Canvas, useLoader } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows, Center, Bounds } from "@react-three/drei";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import * as THREE from "three";
 import { Product } from "@/data/products";
 

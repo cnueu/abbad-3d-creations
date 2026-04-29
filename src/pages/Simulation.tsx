@@ -112,6 +112,8 @@ function useStlGeom(url: string) {
   const raw = useLoader(STLLoader, url);
   return useMemo(() => {
     const g = raw.clone();
+    // Blender STL is Z-up; three.js is Y-up. Rotate so it stands like in Blender.
+    g.rotateX(-Math.PI / 2);
     g.computeVertexNormals();
     g.computeBoundingBox();
     const bb = g.boundingBox!;

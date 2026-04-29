@@ -60,6 +60,9 @@ function useCenteredStl(url: string) {
   const geomRaw = useLoader(STLLoader, url);
   return useMemo(() => {
     const geom = geomRaw.clone();
+    // Blender exports STL as Z-up; three.js is Y-up. Rotate -90° on X so the
+    // cube stands the same way it does in Blender's viewport.
+    geom.rotateX(-Math.PI / 2);
     geom.computeVertexNormals();
     geom.computeBoundingBox();
     const bb = geom.boundingBox!;

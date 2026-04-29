@@ -178,7 +178,7 @@ function CubeMesh({ item, selected, onPointerDown, onClick }: {
       onClick={onClick}
     >
       <mesh geometry={geom} scale={scale} castShadow receiveShadow>
-        <meshStandardMaterial color={item.color} metalness={0.1} roughness={0.55} />
+        <meshStandardMaterial color={item.color} metalness={0.1} roughness={0.55} side={THREE.DoubleSide} />
       </mesh>
       {selected && (
         <mesh>

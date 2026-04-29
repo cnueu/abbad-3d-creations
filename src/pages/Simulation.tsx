@@ -106,6 +106,22 @@ function useObjGeom(url: string) {
   }, [obj]);
 }
 
+// STL loader: clean single-mesh geometry with proper face normals — used for
+// the cube to match what the user sees in Blender / 3D viewers.
+function useStlGeom(url: string) {
+  const raw = useLoader(STLLoader, url);
+  return useMemo(() => {
+    const g = raw.clone();
+    g.computeVertexNormals();
+    g.computeBoundingBox();
+    const bb = g.boundingBox!;
+    const c = new THREE.Vector3();
+    bb.getCenter(c);
+    g.translate(-c.x, -c.y, -c.z);
+    return g;
+  }, [raw]);
+}
+
 // AABB of an item in world space (axis-aligned approximation).
 function itemAABB(it: SimItem): { min: THREE.Vector3; max: THREE.Vector3 } {
   if (it.kind === "cube") {

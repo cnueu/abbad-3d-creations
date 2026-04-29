@@ -349,7 +349,7 @@ export const translations: { en: Dict; ar: Dict } = {
       teamTitle: "الفريق",
       team: [
         {
-          name: "حصة الذويب",
+          name: "حصه الذويب",
           role: "المؤسِّسة",
           email: "hessaibrahim129@gmail.com",
           linkedin: "https://www.linkedin.com/in/hessa-althuwaib-870742325/",

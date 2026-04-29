@@ -658,6 +658,83 @@ export default function Simulation() {
             )}
           </aside>
         </div>
+
+        {/* Bill of Materials — pulled from the store */}
+        <div className="mt-6 rounded-lg border bg-card p-4">
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+            <div>
+              <h2 className="text-base font-semibold">{t("Materials from the store", "المواد من المتجر")}</h2>
+              <p className="text-xs text-muted-foreground">
+                {t(
+                  "Pieces you place are matched to store products by size and color.",
+                  "تُطابَق القطع التي تضعها بمنتجات المتجر حسب الحجم واللون."
+                )}
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm">
+                {t("Total", "المجموع")}: <span className="font-semibold">{bomTotal.toFixed(2)} SAR</span>
+              </span>
+              <Button
+                size="sm"
+                disabled={bom.length === 0}
+                onClick={() => {
+                  for (const line of bom) {
+                    addToCart(line.product, line.qty, line.customColor ? { customColor: line.customColor } : undefined);
+                  }
+                  toast.success(t("Added to cart", "أُضيفت إلى السلة"));
+                }}
+              >
+                <ShoppingCart className="w-4 h-4" /> {t("Add all to cart", "أضف الكل للسلة")}
+              </Button>
+            </div>
+          </div>
+          {bom.length === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              {t("Add cubes or connecters to build your bill of materials.", "أضف مكعبات أو موصِّلات لبناء قائمة المواد.")}
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+              {bom.map((line, idx) => {
+                const displayColor = line.customColor || line.product.color;
+                const colorName = line.isCustom
+                  ? (isAr ? "لون مخصص" : "Custom color")
+                  : (isAr ? line.product.colorName.ar : line.product.colorName.en);
+                const kindLabel = line.product.kind === "sheet"
+                  ? t("Connecter", "موصِّل")
+                  : t("Cube", "مكعب");
+                return (
+                  <div key={idx} className="flex items-center gap-3 rounded border bg-background/50 p-2">
+                    <div
+                      className="w-10 h-10 rounded border shrink-0"
+                      style={{ background: displayColor }}
+                      aria-label={colorName}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium truncate">
+                        {kindLabel} • {line.product.size} cm
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {colorName} • {line.product.price.toFixed(2)} SAR
+                      </div>
+                    </div>
+                    <div className="text-sm font-semibold tabular-nums">×{line.qty}</div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => {
+                        addToCart(line.product, line.qty, line.customColor ? { customColor: line.customColor } : undefined);
+                        toast.success(t("Added", "أُضيف"));
+                      }}
+                    >
+                      <ShoppingCart className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </Layout>
   );

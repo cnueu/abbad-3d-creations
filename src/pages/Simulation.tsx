@@ -5,8 +5,11 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import * as THREE from "three";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
-import { Trash2, RotateCw, Box, Link2, Palette, Ruler, Move3d } from "lucide-react";
+import { Trash2, RotateCw, Box, Link2, Palette, Ruler, Move3d, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PRODUCTS, CUSTOM_CUBES, CUBE_PRICE, CONNECTER_PRICE, type Product } from "@/data/products";
+import { useCart } from "@/hooks/useCart";
+import { toast } from "sonner";
 
 // ============================================================
 // 1 scene unit = 1 cm.

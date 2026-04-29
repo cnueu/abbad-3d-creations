@@ -2,6 +2,7 @@ import { Suspense, useMemo, useRef, useState, useCallback, useEffect } from "rea
 import { Canvas, useLoader, useThree, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows, Grid } from "@react-three/drei";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import * as THREE from "three";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
@@ -105,6 +106,22 @@ function useObjGeom(url: string) {
   }, [obj]);
 }
 
+// STL loader: clean single-mesh geometry with proper face normals — used for
+// the cube to match what the user sees in Blender / 3D viewers.
+function useStlGeom(url: string) {
+  const raw = useLoader(STLLoader, url);
+  return useMemo(() => {
+    const g = raw.clone();
+    g.computeVertexNormals();
+    g.computeBoundingBox();
+    const bb = g.boundingBox!;
+    const c = new THREE.Vector3();
+    bb.getCenter(c);
+    g.translate(-c.x, -c.y, -c.z);
+    return g;
+  }, [raw]);
+}
+
 // AABB of an item in world space (axis-aligned approximation).
 function itemAABB(it: SimItem): { min: THREE.Vector3; max: THREE.Vector3 } {
   if (it.kind === "cube") {
@@ -159,7 +176,7 @@ function CubeMesh({ item, selected, onPointerDown, onClick }: {
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
   onClick: (e: ThreeEvent<MouseEvent>) => void;
 }) {
-  const geom = useObjGeom("/models/FinalCube.obj");
+  const geom = useStlGeom("/models/FinalCube.stl");
 
   const scale = useMemo(() => {
     if (!geom) return 1;

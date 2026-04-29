@@ -2,6 +2,7 @@ import { Suspense, useMemo } from "react";
 import { Canvas, useLoader } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows, Center, Bounds } from "@react-three/drei";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import * as THREE from "three";
 import { Product } from "@/data/products";
 
@@ -52,9 +53,26 @@ function useCenteredGeom(url: string) {
   }, [obj]);
 }
 
+// STL gives us a clean, single-mesh BufferGeometry with proper face normals —
+// no missing sub-meshes, no broken normal indices. Used for the cube which
+// the user authored in Blender and exported as STL.
+function useCenteredStl(url: string) {
+  const geomRaw = useLoader(STLLoader, url);
+  return useMemo(() => {
+    const geom = geomRaw.clone();
+    geom.computeVertexNormals();
+    geom.computeBoundingBox();
+    const bb = geom.boundingBox!;
+    const c = new THREE.Vector3();
+    bb.getCenter(c);
+    geom.translate(-c.x, -c.y, -c.z);
+    return geom;
+  }, [geomRaw]);
+}
+
 function Piece({ product, shinyWood = false, colorOverride }: { product: Product; shinyWood?: boolean; colorOverride?: string }) {
   const kind = product.kind === "custom-cube" ? "cube" : product.kind === "custom-sheet" ? "connecter" : product.kind === "sheet" ? "connecter" : product.kind;
-  const cubeGeom = useCenteredGeom("/models/FinalCube.obj");
+  const cubeGeom = useCenteredStl("/models/FinalCube.stl");
   const connecterGeom = useCenteredGeom("/models/FinalConnecter.obj");
   const target = kind === "cube" ? cubeGeom : connecterGeom;
   if (!target) return null;

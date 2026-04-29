@@ -78,9 +78,10 @@ function Piece({ product, shinyWood = false, colorOverride }: { product: Product
             clearcoat={clearcoat}
             clearcoatRoughness={0.08}
             reflectivity={0.6}
+            side={THREE.DoubleSide}
           />
         ) : (
-          <meshStandardMaterial color={color} metalness={metalness} roughness={roughness} />
+          <meshStandardMaterial color={color} metalness={metalness} roughness={roughness} side={THREE.DoubleSide} />
         )}
       </mesh>
     </Center>

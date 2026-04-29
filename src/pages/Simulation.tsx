@@ -1,40 +1,36 @@
 import { Suspense, useMemo, useRef, useState, useCallback, useEffect } from "react";
 import { Canvas, useLoader, useThree, ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, Environment, ContactShadows, Grid, Html } from "@react-three/drei";
+import { OrbitControls, Environment, ContactShadows, Grid } from "@react-three/drei";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import * as THREE from "three";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
-import { Trash2, RotateCw, Box, Link2, Plus, Palette, Ruler, Compass } from "lucide-react";
+import { Trash2, RotateCw, Box, Link2, Palette, Ruler, Move3d } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // ============================================================
-// Unit system: 1 scene unit = 1 cm.
+// 1 scene unit = 1 cm.
 // Cubes: 10/20/30 cm. Connecter: fixed 10 cm long.
-// Free pointer-drag in XZ plane (game-style).
-// On-canvas arrow gizmos nudge the selected item by exactly 10 cm.
+// Free pointer-drag in XZ plane + Y nudging via gizmo / keyboard.
+// Connecter free rotation in 45° steps on X / Y / Z.
 // AABB collision prevents cube overlap.
 // ============================================================
 
 type Kind = "cube" | "connecter";
 type CubeSize = 10 | 20 | 30;
-type ConAxis = "x" | "y" | "z";
 
 interface SimItem {
   id: string;
   kind: Kind;
   position: [number, number, number];
-  rotationY: number; // 0/90/180/270
+  rotationY: number;        // cube rotation
+  rot: [number, number, number]; // connecter rotation in degrees (X, Y, Z) — multiples of 45
   size: CubeSize;
-  axis: ConAxis;
   color: string;
 }
 
 const NUDGE = 10; // cm
-const CUBE_COLORS = ["#e8c547", "#5b8def", "#ef6f6c", "#7ed957", "#b07cff", "#f6f6f6", "#2c2c2c"];
-
-// Authored model dims (from FinalConnecter.obj bbox we know it's ~10cm long)
-// We'll measure at runtime and rescale to the requested cm.
+const PRESET_COLORS = ["#e8c547", "#5b8def", "#ef6f6c", "#7ed957", "#b07cff", "#f6f6f6", "#2c2c2c"];
 
 function useObjGeom(url: string) {
   const obj = useLoader(OBJLoader, url);
@@ -58,7 +54,7 @@ function useObjGeom(url: string) {
   }, [obj]);
 }
 
-// AABB of an item in world space
+// AABB of an item in world space (axis-aligned approximation).
 function itemAABB(it: SimItem): { min: THREE.Vector3; max: THREE.Vector3 } {
   if (it.kind === "cube") {
     const h = it.size / 2;
@@ -68,17 +64,12 @@ function itemAABB(it: SimItem): { min: THREE.Vector3; max: THREE.Vector3 } {
       max: new THREE.Vector3(x + h, y + h, z + h),
     };
   }
-  // connecter: 2x10x2 cm box along chosen axis
+  // Connecter: 2x10x2 cm bounding sphere-ish. Use a 10cm cube as conservative AABB.
   const [x, y, z] = it.position;
-  const long = 5; // half of 10
-  const thin = 1; // half of 2
-  let hx = thin, hy = thin, hz = thin;
-  if (it.axis === "x") hx = long;
-  if (it.axis === "y") hy = long;
-  if (it.axis === "z") hz = long;
+  const h = 5;
   return {
-    min: new THREE.Vector3(x - hx, y - hy, z - hz),
-    max: new THREE.Vector3(x + hx, y + hy, z + hz),
+    min: new THREE.Vector3(x - h, y - h, z - h),
+    max: new THREE.Vector3(x + h, y + h, z + h),
   };
 }
 
@@ -91,27 +82,22 @@ function aabbOverlap(a: { min: THREE.Vector3; max: THREE.Vector3 }, b: { min: TH
   );
 }
 
-// Try moving an item to newPos; reject if overlaps with another CUBE.
-// (Connecters are allowed to pass through anything — they're meant to bridge cubes.)
 function canPlace(items: SimItem[], item: SimItem, newPos: [number, number, number]): boolean {
   const candidate = { ...item, position: newPos };
-  if (candidate.kind !== "cube") return true; // free placement for connecters
+  if (candidate.kind !== "cube") return true;
   const ca = itemAABB(candidate);
   for (const other of items) {
     if (other.id === item.id) continue;
     if (other.kind !== "cube") continue;
-    const ob = itemAABB(other);
-    if (aabbOverlap(ca, ob)) return false;
+    if (aabbOverlap(ca, itemAABB(other))) return false;
   }
   return true;
 }
 
-// Floor at y=0 means item rests with its bottom on the floor.
-// We keep y so item sits above floor: cube center y = size/2; connecter y depends on axis.
-function floorY(it: SimItem) {
+// Minimum y so the item sits at-or-above the floor.
+function minY(it: SimItem) {
   if (it.kind === "cube") return it.size / 2;
-  if (it.axis === "y") return 5; // half of 10
-  return 1; // half of 2
+  return 5; // connecter half-height (using conservative 10cm)
 }
 
 // ===================== 3D pieces =====================
@@ -122,10 +108,8 @@ function CubeMesh({ item, selected, onPointerDown, onClick }: {
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
   onClick: (e: ThreeEvent<MouseEvent>) => void;
 }) {
-  const geom = useObjGeom("/models/FinalCube.obj");
-  const meshRef = useRef<THREE.Mesh>(null);
+  const geom = useObjGeom("/models/Cube_and_sheet.obj");
 
-  // Determine native size of model and rescale so it equals item.size cm.
   const scale = useMemo(() => {
     if (!geom) return 1;
     geom.computeBoundingBox();
@@ -142,16 +126,12 @@ function CubeMesh({ item, selected, onPointerDown, onClick }: {
       onPointerDown={onPointerDown}
       onClick={onClick}
     >
-      <mesh ref={meshRef} geometry={geom} scale={scale} castShadow receiveShadow>
+      <mesh geometry={geom} scale={scale} castShadow receiveShadow>
         <meshStandardMaterial color={item.color} metalness={0.1} roughness={0.55} />
       </mesh>
       {selected && (
-        <mesh scale={scale * 1.02}>
-          <boxGeometry args={[
-            (geom.boundingBox!.max.x - geom.boundingBox!.min.x),
-            (geom.boundingBox!.max.y - geom.boundingBox!.min.y),
-            (geom.boundingBox!.max.z - geom.boundingBox!.min.z),
-          ]} />
+        <mesh>
+          <boxGeometry args={[item.size * 1.02, item.size * 1.02, item.size * 1.02]} />
           <meshBasicMaterial color="#ffd34d" wireframe />
         </mesh>
       )}
@@ -171,81 +151,87 @@ function ConnecterMesh({ item, selected, onPointerDown, onClick }: {
     geom.computeBoundingBox();
     const bb = geom.boundingBox!;
     const longest = Math.max(bb.max.x - bb.min.x, bb.max.y - bb.min.y, bb.max.z - bb.min.z);
-    return 10 / longest; // 10 cm long
+    return 10 / longest;
   }, [geom]);
 
-  // Connecter is authored long along Y. Rotate to chosen axis.
-  const rot = useMemo<[number, number, number]>(() => {
-    if (item.axis === "y") return [0, 0, 0];
-    if (item.axis === "x") return [0, 0, Math.PI / 2];
-    return [Math.PI / 2, 0, 0]; // z
-  }, [item.axis]);
+  const rot: [number, number, number] = [
+    (item.rot[0] * Math.PI) / 180,
+    (item.rot[1] * Math.PI) / 180,
+    (item.rot[2] * Math.PI) / 180,
+  ];
 
   if (!geom) return null;
   return (
-    <group position={item.position} onPointerDown={onPointerDown} onClick={onClick}>
-      <group rotation={rot}>
-        <mesh geometry={geom} scale={scale} castShadow receiveShadow>
-          <meshStandardMaterial color={item.color} metalness={0.2} roughness={0.4} />
+    <group position={item.position} rotation={rot} onPointerDown={onPointerDown} onClick={onClick}>
+      <mesh geometry={geom} scale={scale} castShadow receiveShadow>
+        <meshStandardMaterial color={item.color} metalness={0.2} roughness={0.4} />
+      </mesh>
+      {selected && (
+        <mesh>
+          <boxGeometry args={[3, 11, 3]} />
+          <meshBasicMaterial color="#ffd34d" wireframe />
         </mesh>
-        {selected && (
-          <mesh scale={scale * 1.05}>
-            <boxGeometry args={[2, 10, 2]} />
-            <meshBasicMaterial color="#ffd34d" wireframe />
-          </mesh>
-        )}
-      </group>
+      )}
     </group>
   );
 }
 
-// On-canvas arrow gizmo: 4 arrows around a selected item to nudge ±10cm in X/Z.
-function ArrowGizmo({ item, onNudge }: { item: SimItem; onNudge: (dx: number, dz: number) => void }) {
+// On-canvas arrow gizmo: 6 arrows around a selected item to nudge ±10cm in X / Y / Z.
+function ArrowGizmo({ item, onNudge }: { item: SimItem; onNudge: (dx: number, dy: number, dz: number) => void }) {
   const [x, y, z] = item.position;
-  const offset = (item.kind === "cube" ? item.size / 2 : item.axis === "x" ? 5 : item.axis === "z" ? 5 : 1) + 4;
+  const reach = (item.kind === "cube" ? item.size / 2 : 5) + 4;
 
-  const Arrow = ({ pos, rotY, onClick: cb }: { pos: [number, number, number]; rotY: number; onClick: () => void }) => (
-    <group position={pos} rotation={[0, rotY, 0]} onClick={(e) => { e.stopPropagation(); cb(); }}>
-      <mesh position={[0, 0, 1.2]}>
+  const Arrow = ({
+    pos, rotation, color = "#ffd34d", onClick: cb,
+  }: {
+    pos: [number, number, number];
+    rotation: [number, number, number];
+    color?: string;
+    onClick: () => void;
+  }) => (
+    <group position={pos} rotation={rotation} onClick={(e) => { e.stopPropagation(); cb(); }}>
+      <mesh position={[0, 0.8, 0]}>
         <coneGeometry args={[1.1, 2.4, 16]} />
-        <meshStandardMaterial color="#ffd34d" emissive="#ffaa00" emissiveIntensity={0.4} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.4} />
       </mesh>
-      <mesh position={[0, 0, -0.4]}>
+      <mesh>
         <cylinderGeometry args={[0.25, 0.25, 1.6, 12]} />
-        <meshStandardMaterial color="#ffd34d" />
+        <meshStandardMaterial color={color} />
       </mesh>
     </group>
   );
 
   return (
-    <group position={[x, Math.max(y, 0.6), z]}>
+    <group position={[x, y, z]}>
       {/* +X (right) */}
-      <Arrow pos={[offset, 0, 0]} rotY={-Math.PI / 2} onClick={() => onNudge(NUDGE, 0)} />
+      <Arrow pos={[reach, 0, 0]} rotation={[0, 0, -Math.PI / 2]} color="#ef6f6c" onClick={() => onNudge(NUDGE, 0, 0)} />
       {/* -X (left) */}
-      <Arrow pos={[-offset, 0, 0]} rotY={Math.PI / 2} onClick={() => onNudge(-NUDGE, 0)} />
+      <Arrow pos={[-reach, 0, 0]} rotation={[0, 0, Math.PI / 2]} color="#ef6f6c" onClick={() => onNudge(-NUDGE, 0, 0)} />
       {/* +Z (forward) */}
-      <Arrow pos={[0, 0, offset]} rotY={0} onClick={() => onNudge(0, NUDGE)} />
+      <Arrow pos={[0, 0, reach]} rotation={[Math.PI / 2, 0, 0]} color="#5b8def" onClick={() => onNudge(0, 0, NUDGE)} />
       {/* -Z (back) */}
-      <Arrow pos={[0, 0, -offset]} rotY={Math.PI} onClick={() => onNudge(0, -NUDGE)} />
+      <Arrow pos={[0, 0, -reach]} rotation={[-Math.PI / 2, 0, 0]} color="#5b8def" onClick={() => onNudge(0, 0, -NUDGE)} />
+      {/* +Y (up) */}
+      <Arrow pos={[0, reach, 0]} rotation={[0, 0, 0]} color="#7ed957" onClick={() => onNudge(0, NUDGE, 0)} />
+      {/* -Y (down) */}
+      <Arrow pos={[0, -reach, 0]} rotation={[Math.PI, 0, 0]} color="#7ed957" onClick={() => onNudge(0, -NUDGE, 0)} />
     </group>
   );
 }
 
-// Floor that catches drag events. We project pointer onto y=floorY plane while dragging.
-function DragFloor({ enabled, onMove, onUp }: {
+function DragFloor({ enabled, planeYRef, onMove, onUp }: {
   enabled: boolean;
+  planeYRef: React.MutableRefObject<number>;
   onMove: (point: THREE.Vector3) => void;
   onUp: () => void;
 }) {
   const { camera, gl } = useThree();
-  const planeY = useRef(0);
 
   useEffect(() => {
     if (!enabled) return;
     const dom = gl.domElement;
     const raycaster = new THREE.Raycaster();
     const ndc = new THREE.Vector2();
-    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -planeY.current);
     const target = new THREE.Vector3();
 
     const handleMove = (ev: PointerEvent) => {
@@ -253,6 +239,7 @@ function DragFloor({ enabled, onMove, onUp }: {
       ndc.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
       ndc.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
       raycaster.setFromCamera(ndc, camera);
+      const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -planeYRef.current);
       if (raycaster.ray.intersectPlane(plane, target)) {
         onMove(target.clone());
       }
@@ -265,7 +252,7 @@ function DragFloor({ enabled, onMove, onUp }: {
       dom.removeEventListener("pointermove", handleMove);
       window.removeEventListener("pointerup", handleUp);
     };
-  }, [enabled, camera, gl, onMove, onUp]);
+  }, [enabled, camera, gl, onMove, onUp, planeYRef]);
 
   return null;
 }
@@ -280,7 +267,7 @@ export default function Simulation() {
   const [items, setItems] = useState<SimItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
-  const [openPanel, setOpenPanel] = useState<null | "size" | "rotate" | "axis" | "color">(null);
+  const [openPanel, setOpenPanel] = useState<null | "size" | "rotate" | "color">(null);
 
   const selected = items.find((i) => i.id === selectedId) || null;
 
@@ -291,13 +278,12 @@ export default function Simulation() {
       kind,
       position: [0, 0, 0],
       rotationY: 0,
+      rot: [0, 0, 0],
       size: 10,
-      axis: "y",
       color: kind === "cube" ? "#e8c547" : "#cccccc",
     };
-    base.position = [0, floorY(base), 0];
-    // try to place near origin avoiding overlap
-    const tries = [[0,0],[12,0],[-12,0],[0,12],[0,-12],[12,12],[-12,-12]] as const;
+    base.position = [0, minY(base), 0];
+    const tries = [[0, 0], [12, 0], [-12, 0], [0, 12], [0, -12], [12, 12], [-12, -12]] as const;
     for (const [dx, dz] of tries) {
       const pos: [number, number, number] = [dx, base.position[1], dz];
       if (canPlace(items, base, pos)) {
@@ -314,10 +300,11 @@ export default function Simulation() {
     setItems((prev) => prev.map((it) => {
       if (it.id !== id) return it;
       const next = { ...it, ...patch };
-      next.position = [next.position[0], floorY(next), next.position[2]];
-      // collision check for cubes
+      // keep above floor
+      const minimum = minY(next);
+      if (next.position[1] < minimum) next.position = [next.position[0], minimum, next.position[2]];
       if (next.kind === "cube" && !canPlace(prev.filter(p => p.id !== id), next, next.position)) {
-        return it; // reject
+        return it;
       }
       return next;
     }));
@@ -330,20 +317,24 @@ export default function Simulation() {
     setOpenPanel(null);
   };
 
-  const nudgeSelected = (dx: number, dz: number) => {
+  const nudgeSelected = (dx: number, dy: number, dz: number) => {
     if (!selected) return;
-    const newPos: [number, number, number] = [selected.position[0] + dx, selected.position[1], selected.position[2] + dz];
+    const minimum = minY(selected);
+    const newY = Math.max(minimum, selected.position[1] + dy);
+    const newPos: [number, number, number] = [selected.position[0] + dx, newY, selected.position[2] + dz];
     if (canPlace(items, selected, newPos)) {
       setItems((prev) => prev.map((i) => i.id === selected.id ? { ...i, position: newPos } : i));
     }
   };
 
-  // Drag handlers
+  // Drag (XZ plane at the item's current Y)
   const dragOffset = useRef<{ ox: number; oz: number }>({ ox: 0, oz: 0 });
+  const dragPlaneY = useRef<number>(0);
   const beginDrag = (item: SimItem, e: ThreeEvent<PointerEvent>) => {
     e.stopPropagation();
     setSelectedId(item.id);
     setOpenPanel(null);
+    dragPlaneY.current = item.position[1];
     const hit = e.point;
     dragOffset.current = { ox: item.position[0] - hit.x, oz: item.position[2] - hit.z };
     setDraggingId(item.id);
@@ -357,7 +348,6 @@ export default function Simulation() {
       const newZ = point.z + dragOffset.current.oz;
       const candidate: [number, number, number] = [newX, it.position[1], newZ];
       if (it.kind === "cube" && !canPlace(prev.filter(p => p.id !== it.id), it, candidate)) {
-        // try sliding on each axis separately
         const tryX: [number, number, number] = [newX, it.position[1], it.position[2]];
         if (canPlace(prev.filter(p => p.id !== it.id), it, tryX)) return { ...it, position: tryX };
         const tryZ: [number, number, number] = [it.position[0], it.position[1], newZ];
@@ -370,20 +360,23 @@ export default function Simulation() {
 
   const endDrag = useCallback(() => setDraggingId(null), []);
 
-  // Keyboard nudges
+  // Keyboard
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (!selected) return;
       const target = e.target as HTMLElement;
       if (target && (target.tagName === "INPUT" || target.tagName === "TEXTAREA")) return;
-      if (e.key === "ArrowLeft") { e.preventDefault(); nudgeSelected(-NUDGE, 0); }
-      else if (e.key === "ArrowRight") { e.preventDefault(); nudgeSelected(NUDGE, 0); }
-      else if (e.key === "ArrowUp") { e.preventDefault(); nudgeSelected(0, -NUDGE); }
-      else if (e.key === "ArrowDown") { e.preventDefault(); nudgeSelected(0, NUDGE); }
+      if (e.key === "ArrowLeft") { e.preventDefault(); nudgeSelected(-NUDGE, 0, 0); }
+      else if (e.key === "ArrowRight") { e.preventDefault(); nudgeSelected(NUDGE, 0, 0); }
+      else if (e.key === "ArrowUp") { e.preventDefault(); nudgeSelected(0, 0, -NUDGE); }
+      else if (e.key === "ArrowDown") { e.preventDefault(); nudgeSelected(0, 0, NUDGE); }
+      else if (e.key === "PageUp" || e.key.toLowerCase() === "e") { e.preventDefault(); nudgeSelected(0, NUDGE, 0); }
+      else if (e.key === "PageDown" || e.key.toLowerCase() === "q") { e.preventDefault(); nudgeSelected(0, -NUDGE, 0); }
       else if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); deleteSelected(); }
       else if (e.key.toLowerCase() === "r") {
         e.preventDefault();
-        if (selected.kind === "cube") updateItem(selected.id, { rotationY: ((selected.rotationY + 90) % 360) as any });
+        if (selected.kind === "cube") updateItem(selected.id, { rotationY: (selected.rotationY + 90) % 360 });
+        else updateItem(selected.id, { rot: [selected.rot[0], (selected.rot[1] + 45) % 360, selected.rot[2]] });
       }
     };
     window.addEventListener("keydown", onKey);
@@ -397,8 +390,8 @@ export default function Simulation() {
           <h1 className="text-2xl font-bold">{t("Simulation Platform", "منصة المحاكاة")}</h1>
           <p className="text-sm text-muted-foreground">
             {t(
-              "Drag pieces freely. Use the on-screen arrows or arrow keys to nudge by 10 cm. Cubes cannot overlap.",
-              "اسحب القطع بحرية. استخدم الأسهم على الشاشة أو مفاتيح الأسهم للتحريك بمقدار ١٠ سم. لا يمكن تداخل المكعبات."
+              "Drag to move on the floor. Use the on-screen arrows or arrow keys / Q-E for up & down. Each step is 10 cm.",
+              "اسحب للتحريك على الأرضية. استخدم الأسهم على الشاشة أو لوحة المفاتيح، و Q/E للأعلى والأسفل. كل خطوة ١٠ سم."
             )}
           </p>
         </div>
@@ -415,8 +408,9 @@ export default function Simulation() {
             </Button>
             <div className="pt-3 mt-3 border-t text-xs text-muted-foreground space-y-1">
               <p>↔ {t("Drag to move", "اسحب للتحريك")}</p>
-              <p>⌨ {t("Arrow keys = 10 cm", "أسهم = ١٠ سم")}</p>
-              <p>R {t("Rotate cube 90°", "تدوير ٩٠°")}</p>
+              <p>⌨ {t("Arrows = X/Z (10 cm)", "أسهم = X/Z (١٠ سم)")}</p>
+              <p>Q / E {t("= Down / Up", "= أسفل / أعلى")}</p>
+              <p>R {t("Rotate", "تدوير")}</p>
               <p>Del {t("Delete", "حذف")}</p>
             </div>
           </aside>
@@ -435,7 +429,6 @@ export default function Simulation() {
                 <Environment preset="city" />
               </Suspense>
 
-              {/* Floor grid: 10cm cells */}
               <Grid
                 position={[0, 0.01, 0]}
                 args={[400, 400]}
@@ -451,7 +444,6 @@ export default function Simulation() {
               />
               <ContactShadows position={[0, 0.02, 0]} opacity={0.4} scale={200} blur={2.5} far={50} />
 
-              {/* Items */}
               {items.map((it) =>
                 it.kind === "cube" ? (
                   <CubeMesh
@@ -472,10 +464,9 @@ export default function Simulation() {
                 )
               )}
 
-              {/* Arrow gizmo around selected */}
               {selected && <ArrowGizmo item={selected} onNudge={nudgeSelected} />}
 
-              <DragFloor enabled={!!draggingId} onMove={onDragMove} onUp={endDrag} />
+              <DragFloor enabled={!!draggingId} planeYRef={dragPlaneY} onMove={onDragMove} onUp={endDrag} />
 
               <OrbitControls
                 enablePan
@@ -486,7 +477,6 @@ export default function Simulation() {
               />
             </Canvas>
 
-            {/* Overlay HUD */}
             <div className="absolute top-3 left-3 text-xs bg-background/70 backdrop-blur px-2 py-1 rounded border">
               {items.length} {t("pieces", "قطعة")}
             </div>
@@ -503,20 +493,19 @@ export default function Simulation() {
                   {selected.kind === "cube" ? t("Cube", "مكعب") : t("Connecter", "موصِّل")}
                 </div>
 
-                {/* Move arrows mirror */}
-                <div className="grid grid-cols-3 gap-1 w-32 mx-auto">
+                {/* Move grid: XZ + Y */}
+                <div className="grid grid-cols-3 gap-1 w-40 mx-auto">
                   <span />
-                  <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, -NUDGE)}>↑</Button>
-                  <span />
-                  <Button size="sm" variant="outline" onClick={() => nudgeSelected(-NUDGE, 0)}>←</Button>
+                  <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, 0, -NUDGE)}>↑</Button>
+                  <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, NUDGE, 0)} title="Up">⤴</Button>
+                  <Button size="sm" variant="outline" onClick={() => nudgeSelected(-NUDGE, 0, 0)}>←</Button>
                   <span className="text-[10px] text-muted-foreground self-center text-center">10cm</span>
-                  <Button size="sm" variant="outline" onClick={() => nudgeSelected(NUDGE, 0)}>→</Button>
+                  <Button size="sm" variant="outline" onClick={() => nudgeSelected(NUDGE, 0, 0)}>→</Button>
                   <span />
-                  <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, NUDGE)}>↓</Button>
-                  <span />
+                  <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, 0, NUDGE)}>↓</Button>
+                  <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, -NUDGE, 0)} title="Down">⤵</Button>
                 </div>
 
-                {/* Buttons that reveal sub-panels */}
                 {selected.kind === "cube" && (
                   <Button variant={openPanel === "size" ? "default" : "outline"} className="w-full justify-start" size="sm"
                     onClick={() => setOpenPanel(openPanel === "size" ? null : "size")}>
@@ -532,33 +521,49 @@ export default function Simulation() {
                   </div>
                 )}
 
-                {selected.kind === "cube" && (
-                  <Button variant={openPanel === "rotate" ? "default" : "outline"} className="w-full justify-start" size="sm"
-                    onClick={() => setOpenPanel(openPanel === "rotate" ? null : "rotate")}>
-                    <RotateCw className="w-4 h-4" /> {t("Rotate", "تدوير")} ({selected.rotationY}°)
-                  </Button>
-                )}
+                <Button variant={openPanel === "rotate" ? "default" : "outline"} className="w-full justify-start" size="sm"
+                  onClick={() => setOpenPanel(openPanel === "rotate" ? null : "rotate")}>
+                  <RotateCw className="w-4 h-4" /> {t("Rotate", "تدوير")}
+                </Button>
                 {openPanel === "rotate" && selected.kind === "cube" && (
-                  <div className="grid grid-cols-4 gap-1">
-                    {[0, 90, 180, 270].map((r) => (
-                      <Button key={r} size="sm" variant={selected.rotationY === r ? "default" : "outline"}
-                        onClick={() => updateItem(selected.id, { rotationY: r })}>{r}°</Button>
-                    ))}
+                  <div className="space-y-1">
+                    <div className="text-[10px] text-muted-foreground">Y ({selected.rotationY}°)</div>
+                    <div className="grid grid-cols-4 gap-1">
+                      {[0, 90, 180, 270].map((r) => (
+                        <Button key={r} size="sm" variant={selected.rotationY === r ? "default" : "outline"}
+                          onClick={() => updateItem(selected.id, { rotationY: r })}>{r}°</Button>
+                      ))}
+                    </div>
                   </div>
                 )}
-
-                {selected.kind === "connecter" && (
-                  <Button variant={openPanel === "axis" ? "default" : "outline"} className="w-full justify-start" size="sm"
-                    onClick={() => setOpenPanel(openPanel === "axis" ? null : "axis")}>
-                    <Compass className="w-4 h-4" /> {t("Orientation", "الاتجاه")} ({selected.axis.toUpperCase()})
-                  </Button>
-                )}
-                {openPanel === "axis" && selected.kind === "connecter" && (
-                  <div className="grid grid-cols-3 gap-1">
-                    {(["x", "y", "z"] as ConAxis[]).map((a) => (
-                      <Button key={a} size="sm" variant={selected.axis === a ? "default" : "outline"}
-                        onClick={() => updateItem(selected.id, { axis: a })}>{a.toUpperCase()}</Button>
+                {openPanel === "rotate" && selected.kind === "connecter" && (
+                  <div className="space-y-2">
+                    {(["X", "Y", "Z"] as const).map((axisLabel, idx) => (
+                      <div key={axisLabel} className="space-y-1">
+                        <div className="text-[10px] text-muted-foreground">
+                          {axisLabel} ({selected.rot[idx]}°)
+                        </div>
+                        <div className="grid grid-cols-4 gap-1">
+                          {[0, 45, 90, 135, 180, 225, 270, 315].map((r) => (
+                            <Button
+                              key={r}
+                              size="sm"
+                              variant={selected.rot[idx] === r ? "default" : "outline"}
+                              className="text-[10px] px-1"
+                              onClick={() => {
+                                const newRot = [...selected.rot] as [number, number, number];
+                                newRot[idx] = r;
+                                updateItem(selected.id, { rot: newRot });
+                              }}
+                            >{r}°</Button>
+                          ))}
+                        </div>
+                      </div>
                     ))}
+                    <Button size="sm" variant="ghost" className="w-full"
+                      onClick={() => updateItem(selected.id, { rot: [0, 0, 0] })}>
+                      <Move3d className="w-3 h-3" /> {t("Reset rotation", "إعادة ضبط")}
+                    </Button>
                   </div>
                 )}
 
@@ -567,12 +572,24 @@ export default function Simulation() {
                   <Palette className="w-4 h-4" /> {t("Color", "اللون")}
                 </Button>
                 {openPanel === "color" && (
-                  <div className="grid grid-cols-7 gap-1">
-                    {CUBE_COLORS.map((c) => (
-                      <button key={c} className="w-7 h-7 rounded border-2"
-                        style={{ background: c, borderColor: selected.color === c ? "#ffd34d" : "transparent" }}
-                        onClick={() => updateItem(selected.id, { color: c })} />
-                    ))}
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-7 gap-1">
+                      {PRESET_COLORS.map((c) => (
+                        <button key={c} className="w-7 h-7 rounded border-2"
+                          style={{ background: c, borderColor: selected.color === c ? "#ffd34d" : "transparent" }}
+                          onClick={() => updateItem(selected.id, { color: c })} />
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={selected.color}
+                        onChange={(e) => updateItem(selected.id, { color: e.target.value })}
+                        className="h-8 w-12 rounded border bg-transparent cursor-pointer"
+                      />
+                      <span className="text-[10px] text-muted-foreground">{t("Custom color", "لون مخصص")}</span>
+                      <span className="text-[10px] font-mono ml-auto">{selected.color}</span>
+                    </div>
                   </div>
                 )}
 
@@ -581,7 +598,7 @@ export default function Simulation() {
                 </Button>
 
                 <div className="text-[10px] text-muted-foreground pt-2 border-t">
-                  x: {selected.position[0].toFixed(1)} • z: {selected.position[2].toFixed(1)} cm
+                  x: {selected.position[0].toFixed(1)} • y: {selected.position[1].toFixed(1)} • z: {selected.position[2].toFixed(1)} cm
                 </div>
               </div>
             )}

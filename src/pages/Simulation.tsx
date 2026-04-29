@@ -307,6 +307,23 @@ export default function Simulation() {
   const [openPanel, setOpenPanel] = useState<null | "size" | "rotate" | "color">(null);
 
   const selected = items.find((i) => i.id === selectedId) || null;
+  const { add: addToCart } = useCart();
+
+  // Bill of materials: aggregate sim items into store products by kind+size+color match
+  const bom = useMemo(() => {
+    const map = new Map<string, { product: Product; qty: number; customColor?: string; isCustom: boolean }>();
+    for (const it of items) {
+      const { product, isCustom } = matchProduct(it.kind, it.kind === "cube" ? it.size : 10, it.color);
+      const customColor = isCustom ? it.color : undefined;
+      const key = product.id + "|" + (customColor || "");
+      const existing = map.get(key);
+      if (existing) existing.qty += 1;
+      else map.set(key, { product, qty: 1, customColor, isCustom });
+    }
+    return Array.from(map.values());
+  }, [items]);
+
+  const bomTotal = bom.reduce((s, l) => s + l.product.price * l.qty, 0);
 
   const addItem = useCallback((kind: Kind) => {
     const id = Math.random().toString(36).slice(2, 9);

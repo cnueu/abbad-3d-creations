@@ -215,7 +215,7 @@ function ConnecterMesh({ item, selected, onPointerDown, onClick }: {
   return (
     <group position={item.position} rotation={rot} onPointerDown={onPointerDown} onClick={onClick}>
       <mesh geometry={geom} scale={scale} castShadow receiveShadow>
-        <meshStandardMaterial color={item.color} metalness={0.2} roughness={0.4} />
+        <meshStandardMaterial color={item.color} metalness={0.2} roughness={0.4} side={THREE.DoubleSide} />
       </mesh>
       {selected && (
         <mesh>

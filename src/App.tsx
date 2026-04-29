@@ -12,6 +12,7 @@ import Checkout from "./pages/Checkout";
 import About from "./pages/About";
 import Partners from "./pages/Partners";
 import Notifications from "./pages/Notifications";
+import Simulation from "./pages/Simulation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/partners" element={<Partners />} />
             <Route path="/notifications" element={<Notifications />} />
+            <Route path="/simulation" element={<Simulation />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

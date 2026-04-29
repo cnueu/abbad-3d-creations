@@ -2,6 +2,7 @@ import { Suspense, useMemo, useRef, useState, useCallback, useEffect } from "rea
 import { Canvas, useLoader, useThree, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Environment, ContactShadows, Grid } from "@react-three/drei";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import * as THREE from "three";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";

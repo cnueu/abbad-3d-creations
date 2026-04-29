@@ -176,7 +176,7 @@ function CubeMesh({ item, selected, onPointerDown, onClick }: {
   onPointerDown: (e: ThreeEvent<PointerEvent>) => void;
   onClick: (e: ThreeEvent<MouseEvent>) => void;
 }) {
-  const geom = useObjGeom("/models/FinalCube.obj");
+  const geom = useStlGeom("/models/FinalCube.stl");
 
   const scale = useMemo(() => {
     if (!geom) return 1;

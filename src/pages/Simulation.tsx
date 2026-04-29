@@ -5,82 +5,48 @@ import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import * as THREE from "three";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
-import { Trash2, Move, RotateCw, Box, Link2, Plus, Magnet } from "lucide-react";
+import { Trash2, Move, RotateCw, Box, Link2, Plus, Palette, Maximize2, Compass } from "lucide-react";
 
-// Unit system: 1 scene unit = 10cm.
-// Cube sizes are strict: 10, 20, 30 cm => 1, 2, 3 units.
-// Connecter is fixed at 10cm long, ~2.3cm cross-section.
+// Unit system: 1 scene unit = 1 cm.
+// FinalCube.obj is ~10x10x10cm authored. Cubes scale to 10/20/30 cm.
+// FinalConnecter.obj is ~10cm long along its Y axis.
 type Kind = "cube" | "connecter";
 type CubeSize = 10 | 20 | 30;
 type ConAxis = "x" | "y" | "z";
+type Mode = "translate" | "rotate";
 
 interface SimItem {
   id: string;
   kind: Kind;
   position: [number, number, number];
-  rotationY: number; // degrees, snapped 0/90/180/270
-  size: CubeSize; // for cubes
-  axis: ConAxis; // for connecters: orientation along axis
+  rotationY: number; // degrees: 0/90/180/270
+  size: CubeSize; // for cubes (cm)
+  axis: ConAxis; // for connecters: long axis orientation
   color: string;
 }
 
-const GRID = 1; // 1 unit = 10cm cubes snap on integer grid
-const CON_LEN = 1; // connecter length in units (10cm)
-const CON_THICK = 0.23; // connecter cross-section in units (2.3cm)
-
-function useCenteredGeom(url: string) {
+// Load OBJ and return a single merged-style geometry, centered at origin.
+// We DO NOT normalize/scale here — we keep the model's authored cm units.
+function useObjGeom(url: string) {
   const obj = useLoader(OBJLoader, url);
   return useMemo(() => {
     let geom: THREE.BufferGeometry | null = null;
     obj.traverse((c) => {
-      if ((c as THREE.Mesh).isMesh) {
-        const g = ((c as THREE.Mesh).geometry as THREE.BufferGeometry).clone();
+      const m = c as THREE.Mesh;
+      if (m.isMesh) {
+        const g = (m.geometry as THREE.BufferGeometry).clone();
         geom = geom ?? g;
       }
     });
     if (!geom) return null;
     geom.computeBoundingBox();
     const bb = geom.boundingBox!;
-    const size = new THREE.Vector3();
-    bb.getSize(size);
     const c = new THREE.Vector3();
     bb.getCenter(c);
     geom.translate(-c.x, -c.y, -c.z);
-    // Normalize to a 1-unit bounding box on its largest axis,
-    // so we can scale precisely afterwards regardless of authored units.
-    const maxDim = Math.max(size.x, size.y, size.z) || 1;
-    geom.scale(1 / maxDim, 1 / maxDim, 1 / maxDim);
+    geom.computeVertexNormals();
     return geom;
   }, [obj]);
-}
-
-function snapCube(p: [number, number, number], size: CubeSize): [number, number, number] {
-  // Cube center sits at multiples of GRID, vertical so bottom rests on y=0.
-  const half = size / 10 / 2;
-  const sx = Math.round(p[0] / GRID) * GRID;
-  const sz = Math.round(p[2] / GRID) * GRID;
-  // Snap y to integer stacks of 1u above ground (cube height = size/10).
-  const stepY = size / 10;
-  const sy = Math.max(half, Math.round((p[1] - half) / stepY) * stepY + half);
-  return [sx, sy, sz];
-}
-
-function snapConnecter(
-  p: [number, number, number],
-  axis: ConAxis,
-): [number, number, number] {
-  // Connecter sits between two grid cells on its axis: center at half-step on that axis,
-  // and on integer grid on the other axes. Default elevation: y = 0.5 (mid of 1u cube).
-  const round = (v: number) => Math.round(v / GRID) * GRID;
-  const half = (v: number) => Math.round(v / GRID - 0.5) * GRID + GRID / 2;
-  let x = round(p[0]);
-  let y = p[1];
-  let z = round(p[2]);
-  if (axis === "x") x = half(p[0]);
-  if (axis === "z") z = half(p[2]);
-  if (axis === "y") y = half(Math.max(p[1], 0.5));
-  else y = Math.max(0.5, Math.round((p[1] - 0.5) / GRID) * GRID + 0.5);
-  return [x, y, z];
 }
 
 function CubeMesh({
@@ -89,27 +55,27 @@ function CubeMesh({
   onSelect,
   onChange,
   mode,
-  snap,
-  cubeGeom,
+  geom,
+  baseSizeCm,
 }: {
   item: SimItem;
   selected: boolean;
   onSelect: () => void;
   onChange: (next: Partial<SimItem>) => void;
-  mode: "translate" | "rotate";
-  snap: boolean;
-  cubeGeom: THREE.BufferGeometry;
+  mode: Mode;
+  geom: THREE.BufferGeometry;
+  baseSizeCm: number; // authored size of the OBJ in cm (~10)
 }) {
   const meshRef = useRef<THREE.Mesh>(null!);
-  const sizeU = item.size / 10;
+  const scale = item.size / baseSizeCm;
 
   const node = (
     <mesh
       ref={meshRef}
-      geometry={cubeGeom}
+      geometry={geom}
       position={item.position}
       rotation={[0, (item.rotationY * Math.PI) / 180, 0]}
-      scale={sizeU}
+      scale={scale}
       castShadow
       receiveShadow
       onPointerDown={(e) => {
@@ -117,7 +83,7 @@ function CubeMesh({
         onSelect();
       }}
     >
-      <meshStandardMaterial color={item.color} metalness={0.15} roughness={0.45} />
+      <meshStandardMaterial color={item.color} metalness={0.15} roughness={0.5} />
     </mesh>
   );
 
@@ -131,18 +97,15 @@ function CubeMesh({
         const m = meshRef.current;
         if (!m) return;
         if (mode === "translate") {
-          let p: [number, number, number] = [m.position.x, m.position.y, m.position.z];
-          if (snap) p = snapCube(p, item.size);
-          m.position.set(p[0], p[1], p[2]);
-          onChange({ position: p });
+          onChange({ position: [m.position.x, m.position.y, m.position.z] });
         } else {
+          // Rotation only handled via preset buttons — keep snapped quarter-turns.
           const deg = (m.rotation.y * 180) / Math.PI;
-          const snapDeg = ((Math.round(deg / 90) * 90) % 360 + 360) % 360;
+          const snapDeg = (((Math.round(deg / 90) * 90) % 360) + 360) % 360;
           m.rotation.y = (snapDeg * Math.PI) / 180;
           onChange({ rotationY: snapDeg });
         }
       }}
-      translationSnap={snap ? GRID : null}
       rotationSnap={Math.PI / 2}
       showY={mode === "translate"}
     >
@@ -157,28 +120,30 @@ function ConnecterMesh({
   onSelect,
   onChange,
   mode,
-  snap,
+  geom,
 }: {
   item: SimItem;
   selected: boolean;
   onSelect: () => void;
   onChange: (next: Partial<SimItem>) => void;
-  mode: "translate" | "rotate";
-  snap: boolean;
+  mode: Mode;
+  geom: THREE.BufferGeometry;
 }) {
   const meshRef = useRef<THREE.Mesh>(null!);
-  // Build dimensions from axis: long along chosen axis.
-  const dims: [number, number, number] =
-    item.axis === "x"
-      ? [CON_LEN, CON_THICK, CON_THICK]
-      : item.axis === "y"
-      ? [CON_THICK, CON_LEN, CON_THICK]
-      : [CON_THICK, CON_THICK, CON_LEN];
+  // Authored long axis is Y. Rotate so it points along chosen axis.
+  const rot: [number, number, number] =
+    item.axis === "y"
+      ? [0, 0, 0]
+      : item.axis === "x"
+      ? [0, 0, Math.PI / 2]
+      : [Math.PI / 2, 0, 0];
 
   const node = (
     <mesh
       ref={meshRef}
+      geometry={geom}
       position={item.position}
+      rotation={rot}
       castShadow
       receiveShadow
       onPointerDown={(e) => {
@@ -186,8 +151,7 @@ function ConnecterMesh({
         onSelect();
       }}
     >
-      <boxGeometry args={dims} />
-      <meshStandardMaterial color={item.color} metalness={0.35} roughness={0.35} />
+      <meshStandardMaterial color={item.color} metalness={0.3} roughness={0.4} />
     </mesh>
   );
 
@@ -195,20 +159,14 @@ function ConnecterMesh({
 
   return (
     <TransformControls
-      mode={mode}
+      mode={mode === "rotate" ? "translate" : mode}
       object={meshRef.current ?? undefined}
       onObjectChange={() => {
         const m = meshRef.current;
         if (!m) return;
-        if (mode === "translate") {
-          let p: [number, number, number] = [m.position.x, m.position.y, m.position.z];
-          if (snap) p = snapConnecter(p, item.axis);
-          m.position.set(p[0], p[1], p[2]);
-          onChange({ position: p });
-        }
+        onChange({ position: [m.position.x, m.position.y, m.position.z] });
       }}
-      translationSnap={snap ? GRID / 2 : null}
-      showY={mode === "translate"}
+      showY
     >
       {node}
     </TransformControls>
@@ -221,27 +179,38 @@ function Scene({
   setSelectedId,
   updateItem,
   mode,
-  snap,
 }: {
   items: SimItem[];
   selectedId: string | null;
   setSelectedId: (id: string | null) => void;
   updateItem: (id: string, patch: Partial<SimItem>) => void;
-  mode: "translate" | "rotate";
-  snap: boolean;
+  mode: Mode;
 }) {
-  const cubeGeom = useCenteredGeom("/models/FinalCube.obj");
+  const cubeGeom = useObjGeom("/models/FinalCube.obj");
+  const conGeom = useObjGeom("/models/FinalConnecter.obj");
+
+  // Compute authored cube size from its bounding box (≈10cm).
+  const cubeBaseCm = useMemo(() => {
+    if (!cubeGeom) return 10;
+    cubeGeom.computeBoundingBox();
+    const bb = cubeGeom.boundingBox!;
+    const s = new THREE.Vector3();
+    bb.getSize(s);
+    return Math.max(s.x, s.y, s.z);
+  }, [cubeGeom]);
+
   return (
     <Canvas
       shadows
-      camera={{ position: [6, 6, 7], fov: 38 }}
+      camera={{ position: [40, 35, 50], fov: 38 }}
       onPointerMissed={() => setSelectedId(null)}
       gl={{ antialias: true }}
     >
       <ambientLight intensity={0.55} />
-      <directionalLight position={[8, 14, 6]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
+      <directionalLight position={[40, 70, 30]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
       <Suspense fallback={null}>
         {cubeGeom &&
+          conGeom &&
           items.map((it) =>
             it.kind === "cube" ? (
               <CubeMesh
@@ -251,8 +220,8 @@ function Scene({
                 onSelect={() => setSelectedId(it.id)}
                 onChange={(patch) => updateItem(it.id, patch)}
                 mode={mode}
-                snap={snap}
-                cubeGeom={cubeGeom}
+                geom={cubeGeom}
+                baseSizeCm={cubeBaseCm}
               />
             ) : (
               <ConnecterMesh
@@ -262,23 +231,23 @@ function Scene({
                 onSelect={() => setSelectedId(it.id)}
                 onChange={(patch) => updateItem(it.id, patch)}
                 mode={mode}
-                snap={snap}
+                geom={conGeom}
               />
             ),
           )}
-        <ContactShadows position={[0, -0.01, 0]} opacity={0.4} scale={30} blur={2.4} />
+        <ContactShadows position={[0, -0.01, 0]} opacity={0.35} scale={150} blur={2.4} />
         <Environment preset="city" />
       </Suspense>
       <Grid
         position={[0, 0, 0]}
-        args={[40, 40]}
-        cellSize={GRID}
+        args={[200, 200]}
+        cellSize={10}
         cellThickness={0.6}
-        cellColor="#888"
-        sectionSize={GRID * 5}
+        cellColor="#777"
+        sectionSize={50}
         sectionThickness={1.2}
         sectionColor="#bba24a"
-        fadeDistance={30}
+        fadeDistance={200}
         infiniteGrid
       />
       <OrbitControls makeDefault enableDamping />
@@ -291,60 +260,57 @@ export default function Simulation() {
   const ar = lang === "ar";
   const [items, setItems] = useState<SimItem[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [mode, setMode] = useState<"translate" | "rotate">("translate");
-  const [snap, setSnap] = useState(true);
-  const [nextSize, setNextSize] = useState<CubeSize>(10);
+  const [mode, setMode] = useState<Mode>("translate");
+  const [openPanel, setOpenPanel] = useState<null | "size" | "rotate" | "color" | "axis">(null);
   const dragKindRef = useRef<{ kind: Kind; size?: CubeSize } | null>(null);
 
   const selected = items.find((i) => i.id === selectedId) ?? null;
 
-  function addCube(size: CubeSize, position?: [number, number, number]) {
+  function addCube(size: CubeSize) {
     const id = `cube-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-    const half = size / 10 / 2;
-    const pos = position ?? [0, half, 0];
-    const snapped = snap ? snapCube(pos, size) : pos;
     setItems((prev) => [
       ...prev,
-      { id, kind: "cube", position: snapped, rotationY: 0, size, axis: "x", color: "#c9a24a" },
+      {
+        id,
+        kind: "cube",
+        position: [0, size / 2, 0],
+        rotationY: 0,
+        size,
+        axis: "x",
+        color: "#c9a24a",
+      },
     ]);
     setSelectedId(id);
+    setOpenPanel(null);
   }
 
-  function addConnecter(position?: [number, number, number]) {
+  function addConnecter() {
     const id = `con-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
-    const axis: ConAxis = "x";
-    const pos = position ?? [GRID / 2, 0.5, 0];
-    const snapped = snap ? snapConnecter(pos, axis) : pos;
     setItems((prev) => [
       ...prev,
-      { id, kind: "connecter", position: snapped, rotationY: 0, size: 10, axis, color: "#9aa6b2" },
+      {
+        id,
+        kind: "connecter",
+        position: [0, 5, 0],
+        rotationY: 0,
+        size: 10,
+        axis: "x",
+        color: "#9aa6b2",
+      },
     ]);
     setSelectedId(id);
+    setOpenPanel(null);
   }
 
   function updateItem(id: string, patch: Partial<SimItem>) {
-    setItems((prev) =>
-      prev.map((i) => {
-        if (i.id !== id) return i;
-        const next = { ...i, ...patch };
-        // Re-snap if axis or size changed.
-        if (snap) {
-          if (next.kind === "cube" && (patch.size !== undefined || patch.position)) {
-            next.position = snapCube(next.position, next.size);
-          }
-          if (next.kind === "connecter" && (patch.axis !== undefined || patch.position)) {
-            next.position = snapConnecter(next.position, next.axis);
-          }
-        }
-        return next;
-      }),
-    );
+    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...patch } : i)));
   }
 
   function removeSelected() {
     if (!selectedId) return;
     setItems((prev) => prev.filter((i) => i.id !== selectedId));
     setSelectedId(null);
+    setOpenPanel(null);
   }
 
   function rotateSelectedTo(deg: number) {
@@ -371,19 +337,24 @@ export default function Simulation() {
     else addConnecter();
   }
 
-  // Keyboard: G toggle snap, R rotate 90, Delete remove
+  // Keyboard: Delete remove
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "g" || e.key === "G") setSnap((s) => !s);
-      if ((e.key === "Delete" || e.key === "Backspace") && selectedId) removeSelected();
-      if ((e.key === "r" || e.key === "R") && selected) {
-        rotateSelectedTo(((selected.rotationY + 90) % 360) as number);
+      if ((e.key === "Delete" || e.key === "Backspace") && selectedId) {
+        const tag = (e.target as HTMLElement)?.tagName;
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
+        removeSelected();
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedId, selected?.rotationY]);
+  }, [selectedId]);
+
+  // Reset open panel when selection changes
+  useEffect(() => {
+    setOpenPanel(null);
+  }, [selectedId]);
 
   return (
     <Layout>
@@ -394,8 +365,8 @@ export default function Simulation() {
           </h1>
           <p className="text-sm opacity-70 mt-1">
             {ar
-              ? "اسحب المكعبات (10/20/30 سم) والموصِّلات (10 سم) إلى المشهد. التثبيت على الشبكة يضع القطع بجانب أو فوق بعضها، والموصِّلات بين قطعتين."
-              : "Drag cubes (10/20/30 cm) and connecters (10 cm) into the scene. Snap-to-grid places pieces next to or above each other, with connecters fitting between two pieces."}
+              ? "اسحب المكعبات (10/20/30 سم) والموصِّلات (10 سم) إلى المشهد. حركها بحرية، وغيّر خصائصها من اللوحة الجانبية."
+              : "Drag cubes (10/20/30 cm) and connecters (10 cm) into the scene. Move them freely and tweak each piece from the inspector."}
           </p>
         </div>
 
@@ -438,26 +409,8 @@ export default function Simulation() {
             <div className="text-[11px] opacity-50 mt-3 leading-snug">
               {ar ? "اسحب أو اضغط للإضافة" : "Drag or click to add"}
             </div>
-
-            <div className="mt-4 pt-3 border-t" style={{ borderColor: "var(--card-border)" }}>
-              <button
-                onClick={() => setSnap((s) => !s)}
-                className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs border transition"
-                style={{
-                  borderColor: "var(--card-border)",
-                  background: snap ? "hsl(var(--accent) / 0.3)" : "transparent",
-                  color: snap ? "hsl(var(--text-accent))" : undefined,
-                }}
-                title="G"
-              >
-                <Magnet className="w-3.5 h-3.5" />
-                {snap
-                  ? ar ? "التثبيت مفعّل" : "Snap: On"
-                  : ar ? "التثبيت معطّل" : "Snap: Off"}
-              </button>
-              <div className="text-[10px] opacity-50 mt-2 leading-snug">
-                {ar ? "اختصارات: G للتثبيت، R للتدوير، Delete للحذف" : "Keys: G snap, R rotate, Del delete"}
-              </div>
+            <div className="mt-4 pt-3 border-t text-[10px] opacity-50 leading-snug" style={{ borderColor: "var(--card-border)" }}>
+              {ar ? "حرّكها بحرّية كاللعبة. حذف بزر Delete." : "Move freely like a game. Delete with the Del key."}
             </div>
           </aside>
 
@@ -479,7 +432,6 @@ export default function Simulation() {
               setSelectedId={setSelectedId}
               updateItem={updateItem}
               mode={mode}
-              snap={snap}
             />
 
             {/* Mode toolbar */}
@@ -524,8 +476,8 @@ export default function Simulation() {
                 {ar ? "اختر شكلاً من المشهد." : "Select a shape in the scene."}
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="text-sm font-medium">
+              <div className="space-y-2">
+                <div className="text-sm font-medium mb-1">
                   {selected.kind === "cube"
                     ? ar
                       ? `مكعب ${selected.size} سم`
@@ -535,13 +487,15 @@ export default function Simulation() {
                     : "Connecter 10 cm"}
                 </div>
 
-                {/* Cube size selector */}
+                {/* Action buttons — settings reveal on click */}
                 {selected.kind === "cube" && (
-                  <div>
-                    <label className="text-[11px] uppercase tracking-wide opacity-60">
-                      {ar ? "المقاس" : "Size"}
-                    </label>
-                    <div className="grid grid-cols-3 gap-1 mt-1">
+                  <ActionRow
+                    icon={<Maximize2 className="w-3.5 h-3.5" />}
+                    label={ar ? "المقاس" : "Size"}
+                    open={openPanel === "size"}
+                    onClick={() => setOpenPanel(openPanel === "size" ? null : "size")}
+                  >
+                    <div className="grid grid-cols-3 gap-1 mt-2">
                       {([10, 20, 30] as CubeSize[]).map((s) => (
                         <button
                           key={s}
@@ -557,64 +511,17 @@ export default function Simulation() {
                         </button>
                       ))}
                     </div>
-                  </div>
+                  </ActionRow>
                 )}
 
-                {/* Connecter axis */}
-                {selected.kind === "connecter" && (
-                  <div>
-                    <label className="text-[11px] uppercase tracking-wide opacity-60">
-                      {ar ? "المحور" : "Axis"}
-                    </label>
-                    <div className="grid grid-cols-3 gap-1 mt-1">
-                      {(["x", "y", "z"] as ConAxis[]).map((a) => (
-                        <button
-                          key={a}
-                          onClick={() => updateItem(selected.id, { axis: a })}
-                          className="px-2 py-1.5 rounded text-xs border transition uppercase"
-                          style={{
-                            borderColor: "var(--card-border)",
-                            background:
-                              selected.axis === a ? "hsl(var(--accent) / 0.3)" : "transparent",
-                          }}
-                        >
-                          {a}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Color */}
-                <div>
-                  <label className="text-[11px] uppercase tracking-wide opacity-60">
-                    {ar ? "اللون" : "Color"}
-                  </label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <input
-                      type="color"
-                      value={selected.color}
-                      onChange={(e) => updateItem(selected.id, { color: e.target.value })}
-                      className="w-10 h-10 rounded cursor-pointer bg-transparent border"
-                      style={{ borderColor: "var(--card-border)" }}
-                    />
-                    <input
-                      type="text"
-                      value={selected.color}
-                      onChange={(e) => updateItem(selected.id, { color: e.target.value })}
-                      className="flex-1 px-2 py-1 rounded text-xs border bg-transparent"
-                      style={{ borderColor: "var(--card-border)" }}
-                    />
-                  </div>
-                </div>
-
-                {/* Rotation presets (cube only) */}
                 {selected.kind === "cube" && (
-                  <div>
-                    <label className="text-[11px] uppercase tracking-wide opacity-60">
-                      {ar ? "تدوير (Y)" : "Rotation (Y)"}
-                    </label>
-                    <div className="grid grid-cols-4 gap-1 mt-1">
+                  <ActionRow
+                    icon={<RotateCw className="w-3.5 h-3.5" />}
+                    label={ar ? "تدوير" : "Rotate"}
+                    open={openPanel === "rotate"}
+                    onClick={() => setOpenPanel(openPanel === "rotate" ? null : "rotate")}
+                  >
+                    <div className="grid grid-cols-4 gap-1 mt-2">
                       {[0, 90, 180, 270].map((d) => (
                         <button
                           key={d}
@@ -630,17 +537,66 @@ export default function Simulation() {
                         </button>
                       ))}
                     </div>
-                  </div>
+                  </ActionRow>
                 )}
 
-                {/* Position display */}
-                <div className="text-[11px] opacity-60">
-                  pos: {selected.position.map((n) => n.toFixed(2)).join(", ")}
+                {selected.kind === "connecter" && (
+                  <ActionRow
+                    icon={<Compass className="w-3.5 h-3.5" />}
+                    label={ar ? "المحور" : "Axis"}
+                    open={openPanel === "axis"}
+                    onClick={() => setOpenPanel(openPanel === "axis" ? null : "axis")}
+                  >
+                    <div className="grid grid-cols-3 gap-1 mt-2">
+                      {(["x", "y", "z"] as ConAxis[]).map((a) => (
+                        <button
+                          key={a}
+                          onClick={() => updateItem(selected.id, { axis: a })}
+                          className="px-2 py-1.5 rounded text-xs border transition uppercase"
+                          style={{
+                            borderColor: "var(--card-border)",
+                            background:
+                              selected.axis === a ? "hsl(var(--accent) / 0.3)" : "transparent",
+                          }}
+                        >
+                          {a}
+                        </button>
+                      ))}
+                    </div>
+                  </ActionRow>
+                )}
+
+                <ActionRow
+                  icon={<Palette className="w-3.5 h-3.5" />}
+                  label={ar ? "اللون" : "Color"}
+                  open={openPanel === "color"}
+                  onClick={() => setOpenPanel(openPanel === "color" ? null : "color")}
+                >
+                  <div className="flex items-center gap-2 mt-2">
+                    <input
+                      type="color"
+                      value={selected.color}
+                      onChange={(e) => updateItem(selected.id, { color: e.target.value })}
+                      className="w-10 h-10 rounded cursor-pointer bg-transparent border"
+                      style={{ borderColor: "var(--card-border)" }}
+                    />
+                    <input
+                      type="text"
+                      value={selected.color}
+                      onChange={(e) => updateItem(selected.id, { color: e.target.value })}
+                      className="flex-1 px-2 py-1 rounded text-xs border bg-transparent"
+                      style={{ borderColor: "var(--card-border)" }}
+                    />
+                  </div>
+                </ActionRow>
+
+                <div className="text-[11px] opacity-60 pt-1">
+                  pos: {selected.position.map((n) => n.toFixed(1)).join(", ")} cm
                 </div>
 
                 <button
                   onClick={removeSelected}
-                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs border border-red-500/40 text-red-400 hover:bg-red-500/10 transition"
+                  className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs border border-red-500/40 text-red-400 hover:bg-red-500/10 transition mt-2"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   {ar ? "حذف" : "Delete"}
@@ -659,33 +615,43 @@ export default function Simulation() {
               >
                 {ar ? "تفريغ المشهد" : "Clear scene"}
               </button>
-              <button
-                onClick={() => addCube(nextSize)}
-                className="w-full mt-2 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs border hover:bg-accent/20 transition"
-                style={{ borderColor: "var(--card-border)" }}
-              >
-                <Plus className="w-3.5 h-3.5" />
-                {ar ? `أضف مكعب ${nextSize} سم` : `Add ${nextSize} cm cube`}
-              </button>
-              <div className="grid grid-cols-3 gap-1 mt-2">
-                {([10, 20, 30] as CubeSize[]).map((s) => (
-                  <button
-                    key={s}
-                    onClick={() => setNextSize(s)}
-                    className="px-2 py-1 rounded text-[11px] border transition"
-                    style={{
-                      borderColor: "var(--card-border)",
-                      background: nextSize === s ? "hsl(var(--accent) / 0.25)" : "transparent",
-                    }}
-                  >
-                    {s}
-                  </button>
-                ))}
-              </div>
             </div>
           </aside>
         </div>
       </div>
     </Layout>
+  );
+}
+
+function ActionRow({
+  icon,
+  label,
+  open,
+  onClick,
+  children,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  open: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      className="rounded-lg border"
+      style={{ borderColor: "var(--card-border)" }}
+    >
+      <button
+        onClick={onClick}
+        className="w-full flex items-center justify-between px-3 py-2 text-xs"
+      >
+        <span className="flex items-center gap-2">
+          {icon}
+          {label}
+        </span>
+        <span className="opacity-50">{open ? "−" : "+"}</span>
+      </button>
+      {open && <div className="px-3 pb-3">{children}</div>}
+    </div>
   );
 }

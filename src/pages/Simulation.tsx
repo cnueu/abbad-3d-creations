@@ -411,7 +411,7 @@ export default function Simulation() {
             </Button>
             <div className="pt-3 mt-3 border-t text-xs text-muted-foreground space-y-1">
               <p>↔ {t("Drag to move", "اسحب للتحريك")}</p>
-              <p>⌨ {t("Arrows = X/Z (10 cm)", "أسهم = X/Z (١٠ سم)")}</p>
+              <p>⌨ {t("Arrows = X/Z (5 cm)", "أسهم = X/Z (٥ سم)")}</p>
               <p>Q / E {t("= Down / Up", "= أسفل / أعلى")}</p>
               <p>R {t("Rotate", "تدوير")}</p>
               <p>Del {t("Delete", "حذف")}</p>

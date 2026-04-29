@@ -32,8 +32,8 @@ interface SimItem {
   color: string;
 }
 
-const NUDGE = 10; // cm
-const PRESET_COLORS = ["#e8c547", "#5b8def", "#ef6f6c", "#7ed957", "#b07cff", "#f6f6f6", "#2c2c2c"];
+const NUDGE = 5; // cm
+const PRESET_COLORS = ["#d9c6a3", "#b8a37e", "#8a8a8a", "#5a5a5a", "#a47148", "#c89b6c", "#6e4a2b", "#9aa3ad"];
 
 function useObjGeom(url: string) {
   const obj = useLoader(OBJLoader, url);

@@ -502,7 +502,7 @@ export default function Simulation() {
                   <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, 0, -NUDGE)}>↑</Button>
                   <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, NUDGE, 0)} title="Up">⤴</Button>
                   <Button size="sm" variant="outline" onClick={() => nudgeSelected(-NUDGE, 0, 0)}>←</Button>
-                  <span className="text-[10px] text-muted-foreground self-center text-center">10cm</span>
+                  <span className="text-[10px] text-muted-foreground self-center text-center">5cm</span>
                   <Button size="sm" variant="outline" onClick={() => nudgeSelected(NUDGE, 0, 0)}>→</Button>
                   <span />
                   <Button size="sm" variant="outline" onClick={() => nudgeSelected(0, 0, NUDGE)}>↓</Button>

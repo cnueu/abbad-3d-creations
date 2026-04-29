@@ -10,15 +10,39 @@ import { Product } from "@/data/products";
 function useCenteredGeom(url: string) {
   const obj = useLoader(OBJLoader, url);
   return useMemo(() => {
-    // Merge all child meshes into one centered geometry.
-    let geom: THREE.BufferGeometry | null = null;
+    // Collect ALL meshes from the OBJ (Blender often exports multiple sub-meshes
+    // per object). Previously only the first was kept, which made the cube look
+    // broken / hollow on the web while it appeared correct in Blender.
+    const meshes: THREE.Mesh[] = [];
+    obj.updateMatrixWorld(true);
     obj.traverse((child) => {
-      if ((child as THREE.Mesh).isMesh) {
-        const g = ((child as THREE.Mesh).geometry as THREE.BufferGeometry).clone();
-        geom = geom ?? g; // first mesh wins; both files are single-mesh exports
-      }
+      const m = child as THREE.Mesh;
+      if (m.isMesh && m.geometry) meshes.push(m);
     });
-    if (!geom) return null;
+    if (meshes.length === 0) return null;
+
+    // Bake each mesh's world transform into its geometry, then concatenate
+    // into a single non-indexed position buffer. We deliberately drop the
+    // OBJ's normals (the file ships with far fewer normals than vertices,
+    // which produces the warped shading the user is seeing) and recompute
+    // clean per-vertex normals below.
+    const positions: number[] = [];
+    for (const m of meshes) {
+      const g = (m.geometry as THREE.BufferGeometry).clone();
+      g.applyMatrix4(m.matrixWorld);
+      const nonIndexed = g.index ? g.toNonIndexed() : g;
+      const pos = nonIndexed.getAttribute("position") as THREE.BufferAttribute;
+      for (let i = 0; i < pos.count; i++) {
+        positions.push(pos.getX(i), pos.getY(i), pos.getZ(i));
+      }
+    }
+
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    // Recompute normals so faces shade like they do in Blender's viewport.
+    geom.computeVertexNormals();
+
+    // Center on origin.
     geom.computeBoundingBox();
     const bb = geom.boundingBox!;
     const c = new THREE.Vector3();

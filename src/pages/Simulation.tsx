@@ -393,8 +393,8 @@ export default function Simulation() {
           <h1 className="text-2xl font-bold">{t("Simulation Platform", "منصة المحاكاة")}</h1>
           <p className="text-sm text-muted-foreground">
             {t(
-              "Drag to move on the floor. Use the on-screen arrows or arrow keys / Q-E for up & down. Each step is 10 cm.",
-              "اسحب للتحريك على الأرضية. استخدم الأسهم على الشاشة أو لوحة المفاتيح، و Q/E للأعلى والأسفل. كل خطوة ١٠ سم."
+              "Drag to move on the floor. Use the on-screen arrows or arrow keys / Q-E for up & down. Each step is 5 cm.",
+              "اسحب للتحريك على الأرضية. استخدم الأسهم على الشاشة أو لوحة المفاتيح، و Q/E للأعلى والأسفل. كل خطوة ٥ سم."
             )}
           </p>
         </div>

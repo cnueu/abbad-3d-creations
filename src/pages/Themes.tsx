@@ -27,76 +27,55 @@ type Theme = {
   fontDisplay?: string;
 };
 
+// All themes share the Mercury Hg base (black / steel / silver).
+// Only the cube accent color changes — that's the "10%" pop that breaks the room.
+const MERCURY = {
+  base: "#0d0d0f",
+  secondary: "#9aa0a8",
+  text: "#f5f7fa",
+  textMuted: "#9aa0a8",
+} as const;
+
 const THEMES: Theme[] = [
   {
-    id: "saudi",
-    name: { en: "Saudi Heritage", ar: "التراث السعودي" },
-    tagline: {
-      en: "Hejaz · Najd · Eastern Province",
-      ar: "الحجاز · نجد · الشرقية",
-    },
-    base: "#f3e9d2",       // Najdi sand 60
-    secondary: "#7a3b2e",  // Hejazi rawshan brown 30
-    accent: "#0e6e5a",     // Eastern palm green 10
-    text: "#2a1b10",
-    textMuted: "#5a4530",
-    cubeColor: "#c08a4a",
+    id: "desert",
+    name: { en: "Mercury · Desert", ar: "زئبق · صحراء" },
+    tagline: { en: "Saudi dune sand on chrome", ar: "رمل الكثبان على الكروم" },
+    ...MERCURY,
+    accent: "#e2b97a",
+    cubeColor: "#e2b97a",
   },
   {
-    id: "mercury",
-    name: { en: "Mercury Hg", ar: "زئبق Hg" },
-    tagline: {
-      en: "Liquid chrome · steel · light",
-      ar: "كروم سائل · فولاذ · ضوء",
-    },
-    base: "#0d0d0f",
-    secondary: "#9aa0a8",
-    accent: "#e8ecf1",
-    text: "#f5f7fa",
-    textMuted: "#9aa0a8",
-    cubeColor: "#c8ccd2",
+    id: "scream",
+    name: { en: "Mercury · Scream", ar: "زئبق · صرخة" },
+    tagline: { en: "Pure neon red, 255/0/0", ar: "أحمر نيون صافي" },
+    ...MERCURY,
+    accent: "#ff0033",
+    cubeColor: "#ff0033",
   },
   {
-    id: "dusk",
-    name: { en: "Desert Dusk", ar: "غسق الصحراء" },
-    tagline: {
-      en: "Sunset over the empty quarter",
-      ar: "غروب فوق الربع الخالي",
-    },
-    base: "#1a0f1f",       // deep plum 60
-    secondary: "#4a2640",  // dusk violet 30
-    accent: "#ff8a5b",     // burnt orange 10
-    text: "#f7e8d8",
-    textMuted: "#c8a892",
-    cubeColor: "#ff8a5b",
+    id: "cyan",
+    name: { en: "Mercury · Voltage", ar: "زئبق · فولت" },
+    tagline: { en: "Electric cyan on steel", ar: "سماوي كهربائي على الفولاذ" },
+    ...MERCURY,
+    accent: "#00f0ff",
+    cubeColor: "#00f0ff",
   },
   {
-    id: "pearl",
-    name: { en: "Pearl Diver", ar: "غوّاص اللؤلؤ" },
-    tagline: {
-      en: "Gulf depths · pearl · coral",
-      ar: "أعماق الخليج · لؤلؤ · مرجان",
-    },
-    base: "#0a2540",       // deep gulf blue 60
-    secondary: "#1a4f7a",  // mid blue 30
-    accent: "#f3e3c3",     // pearl 10
-    text: "#eaf2ff",
-    textMuted: "#9ab5d0",
-    cubeColor: "#f3e3c3",
+    id: "acid",
+    name: { en: "Mercury · Acid", ar: "زئبق · حمضي" },
+    tagline: { en: "Toxic lime on chrome", ar: "ليموني سام على الكروم" },
+    ...MERCURY,
+    accent: "#c6ff00",
+    cubeColor: "#c6ff00",
   },
   {
-    id: "oasis",
-    name: { en: "Emerald Oasis", ar: "واحة الزمرد" },
-    tagline: {
-      en: "Date palm · gold · still water",
-      ar: "نخيل · ذهب · ماء ساكن",
-    },
-    base: "#0f2a22",       // deep oasis green 60
-    secondary: "#1e5340",  // palm green 30
-    accent: "#d4a548",     // gold 10
-    text: "#f1f8f3",
-    textMuted: "#9bbfaf",
-    cubeColor: "#d4a548",
+    id: "magenta",
+    name: { en: "Mercury · Hyper", ar: "زئبق · هايبر" },
+    tagline: { en: "Hot magenta pop", ar: "ماجنتا حارّ" },
+    ...MERCURY,
+    accent: "#ff00aa",
+    cubeColor: "#ff00aa",
   },
 ];
 

@@ -17,6 +17,7 @@ import {
   Languages,
   Home as HomeIcon,
   Boxes,
+  Palette,
 } from "lucide-react";
 import { useLang } from "@/i18n/LanguageContext";
 
@@ -71,6 +72,7 @@ export function AppSidebar({
     },
     { id: "ai", label: lang === "ar" ? "الذكاء" : "AI", icon: Cpu, to: "/studio" },
     { id: "sim", label: lang === "ar" ? "منصة المحاكاة" : "Simulation", icon: Boxes, to: "/simulation" },
+    { id: "themes", label: lang === "ar" ? "معرض الثيمات" : "Themes", icon: Palette, to: "/themes" },
     { id: "pay", label: lang === "ar" ? "الدفع" : "Pay", icon: Wallet, to: "/checkout" },
     { id: "partners", label: lang === "ar" ? "الشراكات" : "Partners", icon: Handshake, to: "/partners" },
     { id: "about", label: lang === "ar" ? "من نحن" : "About", icon: Info, to: "/about" },

@@ -243,6 +243,211 @@ function Swatch({ label, color, ring }: { label: string; color: string; ring: st
   );
 }
 
+// ===== All-cubes showcase: 5 cubes (one per theme accent) re-arranged in 5 layouts =====
+
+type Pos = { x: number; y: number; scale: number; rot: number };
+
+// Each layout returns positions (in % of container) + scale + rotation for the 5 cubes.
+const LAYOUTS: { id: string; name: { en: string; ar: string }; positions: Pos[] }[] = [
+  {
+    id: "line",
+    name: { en: "Line-up", ar: "صفّ" },
+    positions: [
+      { x: 10, y: 50, scale: 0.7, rot: 0 },
+      { x: 30, y: 50, scale: 0.7, rot: 0 },
+      { x: 50, y: 50, scale: 0.7, rot: 0 },
+      { x: 70, y: 50, scale: 0.7, rot: 0 },
+      { x: 90, y: 50, scale: 0.7, rot: 0 },
+    ],
+  },
+  {
+    id: "circle",
+    name: { en: "Orbit", ar: "مدار" },
+    positions: Array.from({ length: 5 }, (_, i) => {
+      const a = (i / 5) * Math.PI * 2 - Math.PI / 2;
+      return { x: 50 + Math.cos(a) * 32, y: 50 + Math.sin(a) * 32, scale: 0.65, rot: (i * 72) % 360 };
+    }),
+  },
+  {
+    id: "cross",
+    name: { en: "Plus", ar: "زائد" },
+    positions: [
+      { x: 50, y: 50, scale: 0.85, rot: 0 },
+      { x: 50, y: 18, scale: 0.6, rot: 0 },
+      { x: 82, y: 50, scale: 0.6, rot: 0 },
+      { x: 50, y: 82, scale: 0.6, rot: 0 },
+      { x: 18, y: 50, scale: 0.6, rot: 0 },
+    ],
+  },
+  {
+    id: "tower",
+    name: { en: "Tower", ar: "برج" },
+    positions: [
+      { x: 50, y: 86, scale: 0.95, rot: 0 },
+      { x: 50, y: 68, scale: 0.8, rot: 12 },
+      { x: 50, y: 50, scale: 0.68, rot: 24 },
+      { x: 50, y: 33, scale: 0.56, rot: 36 },
+      { x: 50, y: 17, scale: 0.45, rot: 48 },
+    ],
+  },
+  {
+    id: "stagger",
+    name: { en: "Cascade", ar: "تتابع" },
+    positions: [
+      { x: 18, y: 22, scale: 0.55, rot: -8 },
+      { x: 34, y: 38, scale: 0.65, rot: 4 },
+      { x: 50, y: 54, scale: 0.75, rot: 0 },
+      { x: 66, y: 70, scale: 0.65, rot: -4 },
+      { x: 82, y: 86, scale: 0.55, rot: 8 },
+    ],
+  },
+];
+
+function ShowcaseSection() {
+  const { lang } = useLang();
+  const [layoutIdx, setLayoutIdx] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setLayoutIdx((i) => (i + 1) % LAYOUTS.length), 3800);
+    return () => clearInterval(id);
+  }, []);
+
+  const current = LAYOUTS[layoutIdx];
+
+  return (
+    <section
+      className="relative min-h-screen flex flex-col items-center justify-center snap-start overflow-hidden"
+      style={{ background: MERCURY.base, color: MERCURY.text }}
+      aria-label="All themes showcase"
+    >
+      {/* ambient glows from each accent */}
+      <div className="absolute inset-0 pointer-events-none">
+        {THEMES.map((t, i) => (
+          <motion.div
+            key={t.id}
+            className="absolute rounded-full blur-3xl"
+            style={{
+              width: 380,
+              height: 380,
+              background: `${t.accent}22`,
+              left: `${current.positions[i].x}%`,
+              top: `${current.positions[i].y}%`,
+              translateX: "-50%",
+              translateY: "-50%",
+            }}
+            animate={{
+              left: `${current.positions[i].x}%`,
+              top: `${current.positions[i].y}%`,
+            }}
+            transition={{ duration: 1.4, ease: [0.22, 1, 0.36, 1] }}
+          />
+        ))}
+      </div>
+
+      {/* Header */}
+      <div className="relative z-10 text-center px-6 pt-24">
+        <span
+          className="inline-flex items-center gap-2 text-[11px] tracking-[0.3em] uppercase mb-4 px-3 py-1.5 rounded-full border backdrop-blur-md"
+          style={{ borderColor: `${MERCURY.secondary}66`, color: MERCURY.text, background: `${MERCURY.secondary}33` }}
+        >
+          <Shuffle className="w-3.5 h-3.5" />
+          {lang === "ar" ? "كل الثيمات معاً" : "All themes together"}
+        </span>
+        <h2
+          className="font-display text-4xl md:text-6xl font-bold mb-3"
+          style={{
+            backgroundImage: `linear-gradient(135deg, #ffffff, #d8dde3, #8a8f96, #e8ecf1, #ffffff)`,
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+        >
+          {lang === "ar" ? "خمسة مكعبات · خمسة ترتيبات" : "Five Cubes · Five Arrangements"}
+        </h2>
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={current.id}
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.4 }}
+            className="text-sm tracking-[0.3em] uppercase"
+            style={{ color: MERCURY.textMuted }}
+          >
+            {String(layoutIdx + 1).padStart(2, "0")} · {lang === "ar" ? current.name.ar : current.name.en}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+
+      {/* Stage */}
+      <div className="relative w-full max-w-5xl aspect-[16/10] mx-auto my-6">
+        {THEMES.map((t, i) => {
+          const p = current.positions[i];
+          return (
+            <motion.div
+              key={t.id}
+              className="absolute"
+              style={{
+                width: "26%",
+                aspectRatio: "1 / 1",
+                translateX: "-50%",
+                translateY: "-50%",
+              }}
+              animate={{
+                left: `${p.x}%`,
+                top: `${p.y}%`,
+                scale: p.scale,
+                rotate: p.rot,
+              }}
+              transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div
+                className="absolute inset-0 rounded-full blur-2xl -z-10"
+                style={{ background: `${t.accent}55` }}
+              />
+              <Product3D product={PRODUCTS[0]} autoRotate shinyWood colorOverride={t.cubeColor} />
+            </motion.div>
+          );
+        })}
+      </div>
+
+      {/* Layout selector dots */}
+      <div className="relative z-10 flex flex-wrap items-center justify-center gap-2 pb-10 px-6">
+        {LAYOUTS.map((l, i) => {
+          const active = i === layoutIdx;
+          return (
+            <button
+              key={l.id}
+              onClick={() => setLayoutIdx(i)}
+              className="px-4 py-2 rounded-full text-xs tracking-[0.2em] uppercase border transition-all"
+              style={{
+                borderColor: active ? "#f5f7fa" : `${MERCURY.secondary}55`,
+                background: active ? `${MERCURY.secondary}44` : "transparent",
+                color: active ? MERCURY.text : MERCURY.textMuted,
+              }}
+            >
+              {lang === "ar" ? l.name.ar : l.name.en}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Accent legend */}
+      <div className="relative z-10 flex flex-wrap items-center justify-center gap-4 pb-12 px-6">
+        {THEMES.map((t) => (
+          <div key={t.id} className="flex items-center gap-2 text-xs" style={{ color: MERCURY.textMuted }}>
+            <span
+              className="inline-block w-3 h-3 rounded-full"
+              style={{ background: t.accent, boxShadow: `0 0 12px ${t.accent}aa` }}
+            />
+            {lang === "ar" ? t.name.ar : t.name.en}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function Themes() {
   const { lang } = useLang();
   return (
@@ -254,13 +459,14 @@ export default function Themes() {
           </h2>
           <p className="text-sm text-foreground/65 max-w-xl mx-auto">
             {lang === "ar"
-              ? "مرّر للأسفل بين خمسة ثيمات مختلفة لاختيار اتجاه الهوية البصرية."
-              : "Scroll through five palette directions and pick the one that fits."}
+              ? "مرّر للأسفل بين خمسة ثيمات مختلفة، ثم شاهدها كلها مجتمعة في النهاية."
+              : "Scroll through five palette directions, then see them all combined at the end."}
           </p>
         </div>
         {THEMES.map((th, i) => (
           <ThemeSection key={th.id} theme={th} index={i} />
         ))}
+        <ShowcaseSection />
       </div>
     </Layout>
   );

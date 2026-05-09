@@ -81,7 +81,7 @@ const THEMES: Theme[] = [
 
 function ThemeSection({ theme, index }: { theme: Theme; index: number }) {
   const { lang } = useLang();
-  const isLight = theme.id === "saudi";
+  const isLight = false;
 
   return (
     <section

@@ -4,130 +4,126 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ABBAD design system — preserved from user's original styles */
+/* ABBAD design system — Chrome / Liquid Metal palette
+   Only black (#131312), silver, and white. */
 @layer base {
   :root,
   [data-theme="dark"] {
-    /* Backgrounds — updated per design spec */
-    --bg-root: 187 33% 5%;          /* #080F10 */
-    --bg-sidebar: 180 4% 10%;       /* #171919 (navigation) */
-    --bg-main: 187 33% 5%;          /* #080F10 */
-    --bg-section-alt: 180 4% 10%;   /* #171919 */
+    /* Backgrounds — deep modern black */
+    --bg-root: 60 4% 8%;            /* #131312 */
+    --bg-sidebar: 60 3% 11%;        /* slightly lifted black */
+    --bg-main: 60 4% 8%;
+    --bg-section-alt: 60 3% 13%;
 
-    /* Accents — switched from green to gold */
-    --green-100: 45 75% 78%;        /* light gold */
-    --green-200: 45 80% 65%;
-    --green-300: 45 80% 52%;        /* primary gold */
-    --green-400: 42 78% 42%;
-    --green-500: 40 75% 32%;        /* deep gold */
+    /* Accent ramp — chrome / silver (kept under --green-* names for compat) */
+    --green-100: 0 0% 96%;          /* near-white shine */
+    --green-200: 220 8% 82%;        /* bright silver */
+    --green-300: 220 6% 70%;        /* primary chrome */
+    --green-400: 220 5% 50%;        /* mid steel */
+    --green-500: 220 5% 30%;        /* deep steel */
 
-    /* Card glass — kept as raw rgba via custom utilities */
-    --text-primary: 210 6% 92%;
-    --text-secondary: 45 20% 78%;
-    --text-muted: 45 8% 60%;
-    --text-accent: 45 80% 65%;
+    --text-primary: 0 0% 96%;
+    --text-secondary: 220 6% 80%;
+    --text-muted: 220 4% 60%;
+    --text-accent: 0 0% 92%;
     --divider: 0 0% 100%;
 
     /* Shadcn semantic mapping */
-    --background: 187 33% 5%;
-    --foreground: 210 6% 92%;
-    --card: 180 4% 10%;
-    --card-foreground: 210 6% 92%;
-    --popover: 180 4% 10%;
-    --popover-foreground: 210 6% 92%;
-    --primary: 45 80% 52%;
-    --primary-foreground: 187 33% 5%;
-    --secondary: 45 75% 78%;
-    --secondary-foreground: 187 33% 5%;
-    --muted: 180 4% 14%;
-    --muted-foreground: 45 8% 60%;
-    --accent: 45 80% 65%;
-    --accent-foreground: 187 33% 5%;
+    --background: 60 4% 8%;
+    --foreground: 0 0% 96%;
+    --card: 60 3% 11%;
+    --card-foreground: 0 0% 96%;
+    --popover: 60 3% 11%;
+    --popover-foreground: 0 0% 96%;
+    --primary: 220 8% 85%;
+    --primary-foreground: 60 4% 8%;
+    --secondary: 220 5% 30%;
+    --secondary-foreground: 0 0% 96%;
+    --muted: 60 3% 15%;
+    --muted-foreground: 220 4% 65%;
+    --accent: 220 8% 82%;
+    --accent-foreground: 60 4% 8%;
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 98%;
-    --border: 45 60% 32%;
-    --input: 180 4% 14%;
-    --ring: 45 80% 52%;
+    --border: 220 6% 28%;
+    --input: 60 3% 15%;
+    --ring: 220 8% 75%;
     --radius: 1rem;
 
-    /* Custom raw rgba tokens — gold tint */
-    --card-bg: rgba(23, 25, 25, 0.87);            /* #171919 @ 87% */
-    --card-bg-hover: rgba(120, 102, 55, 0.52);
-    --card-border: rgba(212, 175, 55, 0.28);
-    --card-border-hover: rgba(212, 175, 55, 0.55);
-    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(180, 140, 40, 0.18);
-    --card-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(212, 175, 55, 0.28);
+    /* Glass / chrome surfaces */
+    --card-bg: rgba(24, 24, 24, 0.78);
+    --card-bg-hover: rgba(40, 42, 46, 0.85);
+    --card-border: rgba(220, 224, 230, 0.18);
+    --card-border-hover: rgba(240, 244, 250, 0.45);
+    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(200, 210, 220, 0.06);
+    --card-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.65), 0 4px 16px rgba(220, 230, 240, 0.18);
     --glass-border: rgba(255, 255, 255, 0.10);
-    --green-glass: rgba(212, 175, 55, 0.18);
+    --green-glass: rgba(220, 224, 230, 0.10);
 
-    /* Background uses a middle radial blend from #3E3E3E -> #DEDEDE per spec,
-       layered subtly behind the dark base so the brand surface stays dark. */
-    --gradient-radial: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(222, 222, 222, 0.10), rgba(62, 62, 62, 0.10) 60%, transparent 80%);
-    --gradient-hero: linear-gradient(135deg, rgba(212, 175, 55, 0.30), rgba(255, 220, 130, 0.10));
-    --gradient-text: linear-gradient(135deg, #f4d97a 0%, #d4af37 50%, #a8801a 100%);
+    --gradient-radial: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(220, 226, 232, 0.10), rgba(40, 44, 50, 0.10) 60%, transparent 80%);
+    --gradient-hero: linear-gradient(135deg, rgba(230, 234, 240, 0.30), rgba(255, 255, 255, 0.10));
+    /* Liquid chrome text shimmer: white → silver → steel → white */
+    --gradient-text: linear-gradient(135deg, #ffffff 0%, #d8dde3 25%, #8a8f96 55%, #e8ecf1 80%, #ffffff 100%);
   }
 
   [data-theme="light"] {
-    /* Light mode — warm gray base with same gold accents as dark mode.
-       Background uses a centered white radial fading to gray (mirrors dark mode). */
-    --bg-root: 220 6% 68%;
-    --bg-sidebar: 220 5% 74%;
-    --bg-main: 220 6% 70%;
-    --bg-section-alt: 220 6% 64%;
+    /* Light mode — polished white / silver with the same chrome accents */
+    --bg-root: 220 10% 94%;
+    --bg-sidebar: 220 10% 97%;
+    --bg-main: 220 10% 94%;
+    --bg-section-alt: 220 8% 90%;
 
-    --background: 220 6% 68%;
-    --foreground: 220 14% 18%;
-    --card: 220 8% 76%;
-    --card-foreground: 220 14% 18%;
-    --popover: 220 8% 78%;
-    --popover-foreground: 220 14% 18%;
+    --background: 220 10% 94%;
+    --foreground: 60 4% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 60 4% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 60 4% 10%;
 
-    --primary: 42 78% 38%;
+    --primary: 220 8% 25%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 45 70% 50%;
-    --secondary-foreground: 220 14% 18%;
-    --muted: 220 6% 76%;
-    --muted-foreground: 220 12% 28%;
-    --accent: 42 80% 38%;
+    --secondary: 220 6% 70%;
+    --secondary-foreground: 60 4% 10%;
+    --muted: 220 8% 88%;
+    --muted-foreground: 220 6% 30%;
+    --accent: 220 8% 30%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 70% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 6% 60%;
-    --input: 220 6% 80%;
-    --ring: 42 78% 38%;
+    --border: 220 8% 70%;
+    --input: 220 10% 96%;
+    --ring: 220 8% 30%;
 
-    /* Gold accent ramp (matches dark mode) — darkened for legibility on light bg */
-    --green-100: 45 75% 55%;
-    --green-200: 45 78% 45%;
-    --green-300: 42 80% 38%;
-    --green-400: 40 78% 32%;
-    --green-500: 38 75% 26%;
+    --green-100: 220 6% 30%;
+    --green-200: 220 6% 45%;
+    --green-300: 220 6% 60%;
+    --green-400: 220 6% 75%;
+    --green-500: 220 8% 88%;
 
-    --text-primary: 220 14% 18%;
-    --text-secondary: 220 12% 26%;
-    --text-muted: 220 10% 36%;
-    --text-accent: 42 80% 34%;
-    --divider: 220 10% 50%;
+    --text-primary: 60 4% 10%;
+    --text-secondary: 220 6% 25%;
+    --text-muted: 220 6% 40%;
+    --text-accent: 60 4% 10%;
+    --divider: 220 6% 60%;
 
-    --card-bg: rgba(222, 222, 222, 0.78);
-    --card-bg-hover: rgba(232, 232, 232, 0.92);
-    --card-border: rgba(60, 50, 20, 0.22);
-    --card-border-hover: rgba(160, 120, 30, 0.45);
-    --card-shadow: 0 10px 28px rgba(20, 20, 20, 0.14), 0 2px 8px rgba(0, 0, 0, 0.08);
-    --card-shadow-hover: 0 22px 52px rgba(20, 20, 20, 0.20), 0 6px 16px rgba(180, 140, 40, 0.18);
-    --glass-border: rgba(60, 50, 20, 0.18);
-    --green-glass: rgba(212, 175, 55, 0.20);
+    --card-bg: rgba(255, 255, 255, 0.78);
+    --card-bg-hover: rgba(255, 255, 255, 0.95);
+    --card-border: rgba(20, 20, 20, 0.14);
+    --card-border-hover: rgba(20, 20, 20, 0.34);
+    --card-shadow: 0 10px 28px rgba(20, 20, 20, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
+    --card-shadow-hover: 0 22px 52px rgba(20, 20, 20, 0.16), 0 6px 16px rgba(20, 20, 20, 0.10);
+    --glass-border: rgba(20, 20, 20, 0.14);
+    --green-glass: rgba(20, 20, 20, 0.06);
 
-    --gradient-text: linear-gradient(135deg, #8a6618 0%, #b88c1f 50%, #d4af37 100%);
+    --gradient-text: linear-gradient(135deg, #1a1a1a 0%, #6b7079 50%, #1a1a1a 100%);
   }
   [data-theme="light"] body {
     background:
-      radial-gradient(ellipse 70% 55% at 50% 40%, rgba(255, 255, 255, 0.65), rgba(222, 222, 222, 0.20) 55%, transparent 80%),
-      radial-gradient(ellipse 100% 80% at 50% 50%, rgba(180, 186, 192, 0.30), transparent 70%),
+      radial-gradient(ellipse 70% 55% at 50% 40%, rgba(255, 255, 255, 0.85), rgba(225, 228, 232, 0.30) 55%, transparent 80%),
+      radial-gradient(ellipse 100% 80% at 50% 50%, rgba(190, 195, 202, 0.30), transparent 70%),
       hsl(var(--bg-root)) !important;
     background-attachment: fixed !important;
   }
-  /* Header surface for light mode so nav links remain readable */
   [data-theme="light"] .abbad-header {
     background: hsl(var(--bg-sidebar) / 0.85) !important;
     border-bottom-color: hsl(var(--border)) !important;
@@ -145,8 +141,8 @@
     font-family: 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
     background:
-      radial-gradient(ellipse 70% 55% at 50% 40%, rgba(222, 222, 222, 0.12), rgba(62, 62, 62, 0.10) 55%, transparent 80%),
-      rgba(8, 15, 16, 0.87),
+      radial-gradient(ellipse 70% 55% at 50% 40%, rgba(220, 226, 232, 0.10), rgba(20, 22, 24, 0.30) 55%, transparent 80%),
+      radial-gradient(ellipse 100% 80% at 50% 100%, rgba(60, 64, 70, 0.40), transparent 70%),
       hsl(var(--bg-root));
     background-attachment: fixed;
   }
@@ -188,19 +184,21 @@
   }
   .text-gradient {
     background: var(--gradient-text);
+    background-size: 200% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    animation: chrome-shine 8s linear infinite;
   }
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-medium transition-all;
-    background: linear-gradient(135deg, hsl(var(--green-300)), hsl(var(--green-200)));
-    color: hsl(var(--bg-root));
-    box-shadow: 0 8px 24px rgba(180, 140, 40, 0.35);
+    background: linear-gradient(135deg, #f5f7fa 0%, #c8ccd2 50%, #8a8f96 100%);
+    color: #131312;
+    box-shadow: 0 8px 24px rgba(180, 190, 200, 0.25), inset 0 1px 0 rgba(255,255,255,0.6);
   }
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(180, 140, 40, 0.5);
+    box-shadow: 0 12px 32px rgba(200, 210, 220, 0.40), inset 0 1px 0 rgba(255,255,255,0.7);
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-medium transition-all border;
@@ -221,7 +219,7 @@
   .input-field:focus {
     border-color: hsl(var(--green-200));
     background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 4px rgba(109, 184, 172, 0.12);
+    box-shadow: 0 0 0 4px rgba(220, 226, 232, 0.12);
   }
   .input-field::placeholder { color: hsl(var(--text-muted)); }
 }
@@ -234,11 +232,14 @@
 [data-theme="light"] .input-field:focus {
   background: #ffffff;
   border-color: hsl(var(--primary));
-  box-shadow: 0 0 0 4px rgba(45, 125, 111, 0.18);
+  box-shadow: 0 0 0 4px rgba(20, 20, 20, 0.12);
 }
 [data-theme="light"] .input-field::placeholder { color: hsl(var(--foreground) / 0.5); }
 [data-theme="light"] .btn-ghost { color: hsl(var(--foreground)); background: rgba(255,255,255,0.6); }
-[data-theme="light"] .btn-primary { color: #fff; }
+[data-theme="light"] .btn-primary {
+  background: linear-gradient(135deg, #2a2c30 0%, #1a1b1d 100%);
+  color: #ffffff;
+}
 
 /* Logo: source PNG is white-on-transparent. Invert to black on light theme. */
 [data-theme="light"] .abbad-logo-invert { filter: invert(1) brightness(0); }
@@ -261,7 +262,12 @@
 }
 .spin-slow { animation: spin-slow 30s linear infinite; }
 
+@keyframes chrome-shine {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(109, 184, 172, 0.3); border-radius: 8px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(109, 184, 172, 0.5); }
+::-webkit-scrollbar-thumb { background: rgba(220, 226, 232, 0.25); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(220, 226, 232, 0.45); }

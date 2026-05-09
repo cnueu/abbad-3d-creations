@@ -46,7 +46,7 @@ export default function Store() {
                       className="aspect-square w-full relative overflow-hidden flex items-center justify-center"
                       style={{
                         background:
-                          "conic-gradient(from 90deg at 50% 50%, #d9c6a3, #a47148, #8a8a8a, #c89b6c, #6e4a2b, #9aa3ad, #d9c6a3)",
+                          "conic-gradient(from 90deg at 50% 50%, #ffffff, #c8ccd2, #6b7079, #131312, #6b7079, #c8ccd2, #ffffff)",
                       }}
                     >
                       <div className="w-20 h-20 rounded-full bg-background/85 backdrop-blur-md flex items-center justify-center shadow-lg">

@@ -18,26 +18,26 @@ export interface Product {
   minQty?: number;
 }
 
-// Natural palette: sand, gray, wood, metal tones.
+// Chrome / silver / black / white palette only.
 const CUBE_COLORS: { hex: string; en: string; ar: string }[] = [
-  { hex: "#d9c6a3", en: "Sand",        ar: "رملي" },
-  { hex: "#b8a37e", en: "Warm Sand",   ar: "رملي دافئ" },
-  { hex: "#8a8a8a", en: "Stone Gray",  ar: "رمادي حجري" },
-  { hex: "#5a5a5a", en: "Graphite",    ar: "غرافيت" },
-  { hex: "#a47148", en: "Walnut Wood", ar: "خشب جوز" },
-  { hex: "#c89b6c", en: "Oak Wood",    ar: "خشب بلوط" },
-  { hex: "#6e4a2b", en: "Dark Wood",   ar: "خشب داكن" },
-  { hex: "#9aa3ad", en: "Brushed Metal", ar: "معدن مصقول" },
+  { hex: "#131312", en: "Obsidian Black", ar: "أسود عميق" },
+  { hex: "#2b2c2e", en: "Graphite",       ar: "غرافيت" },
+  { hex: "#6b7079", en: "Steel",          ar: "فولاذ" },
+  { hex: "#9aa0a8", en: "Brushed Silver", ar: "فضي مصقول" },
+  { hex: "#c8ccd2", en: "Liquid Chrome",  ar: "كروم سائل" },
+  { hex: "#e8ecf1", en: "Polished Silver", ar: "فضي لامع" },
+  { hex: "#f5f7fa", en: "Pearl White",    ar: "أبيض لؤلؤي" },
+  { hex: "#ffffff", en: "Pure White",     ar: "أبيض نقي" },
 ];
 
 // Connecter color combinations — match the cube palette.
 const CONNECTER_COLORS: { hex: string; en: string; ar: string }[] = [
-  { hex: "#d9c6a3", en: "Sand",         ar: "رملي" },
-  { hex: "#8a8a8a", en: "Stone Gray",   ar: "رمادي حجري" },
-  { hex: "#a47148", en: "Walnut Wood",  ar: "خشب جوز" },
-  { hex: "#c89b6c", en: "Oak Wood",     ar: "خشب بلوط" },
-  { hex: "#6e4a2b", en: "Dark Wood",    ar: "خشب داكن" },
-  { hex: "#9aa3ad", en: "Brushed Metal", ar: "معدن مصقول" },
+  { hex: "#131312", en: "Obsidian Black", ar: "أسود عميق" },
+  { hex: "#6b7079", en: "Steel",          ar: "فولاذ" },
+  { hex: "#9aa0a8", en: "Brushed Silver", ar: "فضي مصقول" },
+  { hex: "#c8ccd2", en: "Liquid Chrome",  ar: "كروم سائل" },
+  { hex: "#e8ecf1", en: "Polished Silver", ar: "فضي لامع" },
+  { hex: "#ffffff", en: "Pure White",     ar: "أبيض نقي" },
 ];
 
 function makeCubes(size: 10 | 20 | 30, price: number): Product[] {

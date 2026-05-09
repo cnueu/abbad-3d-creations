@@ -5,9 +5,9 @@ import { OrbitControls, ContactShadows, Environment, Bounds, Edges } from "@reac
 // Color theme post-processing — recolors voxel cubes without re-running the AI.
 export type ColorTheme = "original" | "walnut" | "sand" | "mono";
 
-const MONO_PALETTE = ["#a47148", "#7a5230", "#5a3a1f", "#c9a17a", "#8b6a4a", "#3d2514"];
-const WALNUT_PALETTE = ["#5a3a1f", "#7a5230", "#3d2514", "#8b6a4a", "#a47148", "#2d1a0e"];
-const SAND_PALETTE = ["#d9c8a8", "#c4ad82", "#a89272", "#8a7558", "#6e5a40", "#e8dcc4"];
+const MONO_PALETTE = ["#ffffff", "#e8ecf1", "#c8ccd2", "#9aa0a8", "#6b7079", "#131312"];
+const WALNUT_PALETTE = ["#131312", "#2b2c2e", "#3a3b3e", "#1a1b1d", "#0a0a0a", "#404246"];
+const SAND_PALETTE = ["#f5f7fa", "#e8ecf1", "#d4d8de", "#c8ccd2", "#b0b5bc", "#9aa0a8"];
 
 function themedColor(original: string, theme: ColorTheme, idx: number): string {
   if (theme === "original") return original;

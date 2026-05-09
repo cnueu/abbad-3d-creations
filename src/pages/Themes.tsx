@@ -2,9 +2,10 @@ import { Layout } from "@/components/Layout";
 import { Product3D } from "@/components/Product3D";
 import { PRODUCTS } from "@/data/products";
 import { useLang } from "@/i18n/LanguageContext";
-import { motion } from "framer-motion";
-import { ArrowRight, Box, Sparkles, MapPin, ShoppingBag } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Box, Sparkles, MapPin, ShoppingBag, Shuffle } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 /**
  * Themes preview page — five full-height sections, each a re-skin of the

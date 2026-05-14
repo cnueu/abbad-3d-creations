@@ -13,7 +13,6 @@ import About from "./pages/About";
 import Partners from "./pages/Partners";
 import Notifications from "./pages/Notifications";
 import Simulation from "./pages/Simulation";
-import Themes from "./pages/Themes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,7 +34,6 @@ const App = () => (
             <Route path="/partners" element={<Partners />} />
             <Route path="/notifications" element={<Notifications />} />
             <Route path="/simulation" element={<Simulation />} />
-            <Route path="/themes" element={<Themes />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

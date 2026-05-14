@@ -298,10 +298,10 @@ export default function Studio() {
                   {ar ? "ثيم اللون" : "Color theme"}
                 </span>
                 {([
-                  { id: "original", label: ar ? "كروم" : "Chrome", swatches: ["#ffffff", "#c8ccd2", "#6b7079"] },
-                  { id: "walnut", label: ar ? "أسود" : "Obsidian", swatches: ["#131312", "#2b2c2e", "#6b7079"] },
-                  { id: "sand", label: ar ? "فضي" : "Silver", swatches: ["#e8ecf1", "#c8ccd2", "#9aa0a8"] },
-                  { id: "mono", label: ar ? "أحادي" : "Mono", swatches: ["#ffffff", "#6b7079", "#131312"] },
+                  { id: "original", label: ar ? "الأصلي" : "Original", swatches: ["#e08a5b", "#5b7fc7", "#9b6ec7"] },
+                  { id: "walnut", label: ar ? "خشب الجوز" : "Walnut", swatches: ["#5a3a1f", "#7a5230", "#3d2514"] },
+                  { id: "sand", label: ar ? "رملي" : "Sand", swatches: ["#d9c8a8", "#a89272", "#6e5a40"] },
+                  { id: "mono", label: ar ? "أحادي" : "Mono", swatches: ["#a47148", "#5a3a1f", "#c9a17a"] },
                 ] as { id: ColorTheme; label: string; swatches: string[] }[]).map((opt) => (
                   <button
                     key={opt.id}
@@ -354,12 +354,12 @@ export default function Studio() {
                 <div>
                   <div className="text-[10px] tracking-[0.2em] uppercase text-foreground/45 mb-2">{t.studio.pieces}</div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                    <Stat label={`${t.studio.cubes} 50${t.common.cm}`} value={result.breakdown[50] || 0} swatch="#131312" />
-                    <Stat label={`${t.studio.cubes} 40${t.common.cm}`} value={result.breakdown[40] || 0} swatch="#2b2c2e" />
-                    <Stat label={`${t.studio.cubes} 30${t.common.cm}`} value={result.breakdown[30] || 0} swatch="#6b7079" />
-                    <Stat label={`${t.studio.cubes} 20${t.common.cm}`} value={result.breakdown[20] || 0} swatch="#9aa0a8" />
-                    <Stat label={`${t.studio.cubes} 10${t.common.cm}`} value={result.breakdown[10] || 0} swatch="#c8ccd2" />
-                    <Stat label={t.studio.sheets} value={result.sheetsRealLife} sub={ar ? "حقيقية" : "real-life"} swatch="#e8ecf1" />
+                    <Stat label={`${t.studio.cubes} 50${t.common.cm}`} value={result.breakdown[50] || 0} swatch="#3a4a6b" />
+                    <Stat label={`${t.studio.cubes} 40${t.common.cm}`} value={result.breakdown[40] || 0} swatch="#5b7fc7" />
+                    <Stat label={`${t.studio.cubes} 30${t.common.cm}`} value={result.breakdown[30] || 0} swatch="#9b6ec7" />
+                    <Stat label={`${t.studio.cubes} 20${t.common.cm}`} value={result.breakdown[20] || 0} swatch="#e08a5b" />
+                    <Stat label={`${t.studio.cubes} 10${t.common.cm}`} value={result.breakdown[10] || 0} swatch="#6db8ac" />
+                    <Stat label={t.studio.sheets} value={result.sheetsRealLife} sub={ar ? "حقيقية" : "real-life"} swatch="#a8d5cc" />
                   </div>
                   <div className="mt-3 text-sm text-foreground/70 flex items-center justify-between">
                     <span>{t.studio.total}</span>

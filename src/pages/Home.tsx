@@ -22,7 +22,7 @@ export default function Home() {
           aria-hidden
         >
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(92vw,860px)] h-[min(92vw,860px)] opacity-100">
-            <Product3D product={PRODUCTS[0]} autoRotate shinyWood colorOverride="#c8ccd2" />
+            <Product3D product={PRODUCTS[0]} autoRotate shinyWood colorOverride="#5a3a1f" />
           </div>
           {/* Soft edge vignette only — keeps cube crisp and in front */}
           <div

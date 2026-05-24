@@ -423,6 +423,8 @@ export default function Studio() {
             </div>
           </section>
         )}
+
+        <ThemesSection ar={ar} />
       </div>
 
       <ProductDetail product={selected} onClose={() => setSelected(null)} />

@@ -467,6 +467,14 @@ function ThemesSection({ ar }: { ar: boolean }) {
     setLoading(true);
     setImageUrl(null);
     setLastTheme(value);
+
+    // Najdi theme uses a curated reference image instead of AI generation.
+    if (/^(najdi|نجدي)$/i.test(value)) {
+      setImageUrl(najdiImage);
+      setLoading(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase.functions.invoke("generate-theme", {
         body: { theme: value, lang: ar ? "ar" : "en" },

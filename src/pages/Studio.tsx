@@ -11,6 +11,7 @@ import { suggestProducts, Product } from "@/data/products";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import najdiImage from "@/assets/theme-najdi.png";
+import medievalImage from "@/assets/theme-medieval.png";
 
 interface Result {
   cubes: PlacedCube[];
@@ -469,9 +470,14 @@ function ThemesSection({ ar }: { ar: boolean }) {
     setImageUrl(null);
     setLastTheme(value);
 
-    // Najdi theme uses a curated reference image instead of AI generation.
+    // Curated reference images for specific themes (skip AI generation).
     if (/^(najdi|نجدي)$/i.test(value)) {
       setImageUrl(najdiImage);
+      setLoading(false);
+      return;
+    }
+    if (/^(medieval|قروسطي|العصور الوسطى)$/i.test(value.trim())) {
+      setImageUrl(medievalImage);
       setLoading(false);
       return;
     }

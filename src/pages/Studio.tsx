@@ -423,6 +423,8 @@ export default function Studio() {
             </div>
           </section>
         )}
+
+        <ThemesSection ar={ar} />
       </div>
 
       <ProductDetail product={selected} onClose={() => setSelected(null)} />
@@ -440,5 +442,117 @@ function Stat({ label, value, sub, swatch }: { label: string; value: string | nu
       <div className="font-display text-2xl font-bold text-foreground">{value}</div>
       {sub && <div className="text-[11px] text-foreground/60 mt-0.5">{sub}</div>}
     </div>
+  );
+}
+
+// ── THEMES SECTION ────────────────────────────────────────────
+// User types a theme (e.g. "Najdi", "Medieval") → Lovable AI image
+// generates a theatre stage scene built entirely in Abaad blocks.
+function ThemesSection({ ar }: { ar: boolean }) {
+  const [theme, setTheme] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [lastTheme, setLastTheme] = useState("");
+
+  const PRESETS = ar
+    ? ["نجدي", "حجازي", "عسيري", "قروسطي", "فضاء", "غابة سحرية"]
+    : ["Najdi", "Hijazi", "Asiri", "Medieval", "Sci-Fi", "Enchanted Forest"];
+
+  async function generate(t?: string) {
+    const value = (t ?? theme).trim();
+    if (!value) {
+      toast.error(ar ? "اكتب اسم الثيم" : "Type a theme name");
+      return;
+    }
+    setLoading(true);
+    setImageUrl(null);
+    setLastTheme(value);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-theme", {
+        body: { theme: value, lang: ar ? "ar" : "en" },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      setImageUrl((data as any).imageUrl);
+    } catch (e: any) {
+      toast.error(e?.message || (ar ? "تعذّر التوليد" : "Generation failed"));
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function download() {
+    if (!imageUrl) return;
+    const a = document.createElement("a");
+    a.href = imageUrl;
+    a.download = `abaad-theme-${lastTheme.replace(/\s+/g, "-").toLowerCase()}.png`;
+    a.click();
+  }
+
+  return (
+    <section className="mt-20">
+      <div className="flex items-center gap-3 mb-2">
+        <Palette className="w-5 h-5 text-foreground/70" />
+        <h2 className="font-display text-3xl">{ar ? "الثيمات" : "Themes"}</h2>
+      </div>
+      <p className="text-sm text-foreground/65 mb-6 max-w-2xl">
+        {ar
+          ? "اكتب أي ثيم تريده لمسرحك وسيُولّد الذكاء الاصطناعي صورة لخشبة المسرح مبنية بالكامل من مكعبات أبعاد."
+          : "Type any theme for your theatre and AI will generate a stage scene built entirely from Abaad blocks."}
+      </p>
+
+      <div className="rounded-2xl p-5 border border-[color:var(--card-border)]" style={{ background: "var(--card-bg)" }}>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
+            placeholder={ar ? "مثال: نجدي" : "e.g. Najdi"}
+            className="flex-1 rounded-xl px-4 py-3 bg-background border border-[color:var(--card-border)] outline-none focus:ring-2 focus:ring-foreground/20 text-foreground"
+          />
+          <button onClick={() => generate()} disabled={loading} className="btn-primary px-6">
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
+            {loading ? (ar ? "جارٍ التوليد..." : "Generating...") : (ar ? "توليد" : "Generate")}
+          </button>
+        </div>
+
+        <div className="flex flex-wrap gap-2 mt-4">
+          {PRESETS.map((p) => (
+            <button
+              key={p}
+              onClick={() => { setTheme(p); generate(p); }}
+              disabled={loading}
+              className="text-xs px-3 py-1.5 rounded-full border border-[color:var(--card-border)] hover:bg-foreground/5 transition disabled:opacity-50"
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-5 rounded-xl overflow-hidden border border-[color:var(--card-border)] bg-background/50 aspect-video flex items-center justify-center">
+          {loading && (
+            <div className="flex flex-col items-center gap-3 text-foreground/60">
+              <Loader2 className="w-8 h-8 animate-spin" />
+              <div className="text-sm">{ar ? "يبني المشهد بالمكعبات..." : "Building scene from blocks..."}</div>
+            </div>
+          )}
+          {!loading && imageUrl && (
+            <img src={imageUrl} alt={`${lastTheme} theme in Abaad blocks`} className="w-full h-full object-cover" />
+          )}
+          {!loading && !imageUrl && (
+            <div className="text-sm text-foreground/40 px-6 text-center">
+              {ar ? "ستظهر الصورة هنا بعد التوليد" : "Your generated theme scene will appear here"}
+            </div>
+          )}
+        </div>
+
+        {imageUrl && !loading && (
+          <button onClick={download} className="btn-ghost mt-4">
+            <Download className="w-4 h-4" />
+            {ar ? "تحميل الصورة" : "Download image"}
+          </button>
+        )}
+      </div>
+    </section>
   );
 }

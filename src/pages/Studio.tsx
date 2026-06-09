@@ -133,7 +133,7 @@ export default function Studio() {
     if (modelUrl) {
       const a = document.createElement("a");
       a.href = modelUrl;
-      a.download = "abaad_model.gltf";
+      a.download = "model_voxel.obj";
       a.click();
       return;
     }

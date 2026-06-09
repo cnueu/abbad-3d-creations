@@ -112,11 +112,15 @@ export default function Studio() {
             : "Convert the uploaded reference image into a detailed 3D voxel sculpture that closely matches it.",
           lang,
           imageDataUrl,
-          detailLevel: "intricate",
+          detailLevel: "balanced",
         },
       });
-      if (error) throw new Error(error.message || "Generation failed");
-      if (!data?.cubes?.length) throw new Error(ar ? "تعذّر التوليد" : "Generation failed");
+      if (error) {
+        console.error("generate-design error", error);
+        throw new Error((error as any)?.context?.error || error.message || "Generation failed");
+      }
+      if ((data as any)?.error) throw new Error((data as any).error);
+      if (!data?.cubes?.length) throw new Error(ar ? "تعذّر التوليد — حاول مرة أخرى" : "Generation returned no cubes");
 
       if (modelUrl) { URL.revokeObjectURL(modelUrl); setModelUrl(null); }
       setResult(data as Result);

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
 import { motion } from "framer-motion";
-import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks, Upload, Wand2, ShoppingCart, Gauge } from "lucide-react";
+import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks, Upload, Wand2, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GeneratedScene, buildObj, PlacedCube, Slide, ColorTheme } from "@/components/GeneratedScene";
 import { ExternalGltfViewer } from "@/components/ExternalGltfViewer";
@@ -57,10 +57,6 @@ export default function Studio() {
   const [uses, setUses] = useState(0);
   const [theme, setTheme] = useState<ColorTheme>("original");
   const [glassy, setGlassy] = useState(false);
-  // ── DETAIL LEVEL ──────────────────────────────────────────────
-  // Controls how many cubes the AI is asked to produce. Sent to the
-  // edge function as `detailLevel`. Edit labels here to retune UX.
-  const [detail, setDetail] = useState<"simple" | "balanced" | "intricate">("balanced");
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -117,62 +113,63 @@ export default function Studio() {
       });
       if (!res.ok) throw new Error(`Server ${res.status}: ${await res.text().catch(() => "")}`);
 
-      const contentType = res.headers.get("content-type") || "";
+      const buf = await res.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+
+      // Detect GLB (magic "glTF") vs JSON GLTF.
+      const isGlb = bytes.length > 4 && bytes[0] === 0x67 && bytes[1] === 0x6c && bytes[2] === 0x54 && bytes[3] === 0x46;
       let finalBlob: Blob;
 
-      if (contentType.includes("application/json") || contentType.includes("gltf+json") || contentType === "") {
-        // GLTF JSON references external .bin buffers — fetch & inline them as data URIs
-        const text = await res.text();
-        let gltf: any;
-        try {
-          gltf = JSON.parse(text);
-        } catch {
-          finalBlob = new Blob([text], { type: "model/gltf-binary" });
-          gltf = null;
-        }
-        if (gltf && Array.isArray(gltf.buffers)) {
-          const bases = [
-            EXTERNAL_GENERATE_URL,
-            new URL(".", EXTERNAL_GENERATE_URL).toString(),
-            new URL("/", EXTERNAL_GENERATE_URL).toString(),
-          ];
-          for (const buf of gltf.buffers) {
-            if (!buf.uri || buf.uri.startsWith("data:")) continue;
-            let fetched: ArrayBuffer | null = null;
-            let lastErr = "";
-            for (const base of bases) {
-              try {
-                const bUrl = new URL(buf.uri, base).toString();
-                const r = await fetch(bUrl, { headers: { "ngrok-skip-browser-warning": "1" } });
-                if (r.ok) {
-                  fetched = await r.arrayBuffer();
-                  break;
-                }
-                lastErr = `${r.status} at ${bUrl}`;
-              } catch (err: any) {
-                lastErr = err?.message || String(err);
-              }
-            }
-            if (!fetched) throw new Error(`Failed to fetch buffer ${buf.uri}: ${lastErr}`);
-            // Convert to base64 data URI
-            let binary = "";
-            const bytes = new Uint8Array(fetched);
-            const chunk = 0x8000;
-            for (let i = 0; i < bytes.length; i += chunk) {
-              binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + chunk)) as any);
-            }
-            buf.uri = `data:application/octet-stream;base64,${btoa(binary)}`;
-          }
-          finalBlob = new Blob([JSON.stringify(gltf)], { type: "model/gltf+json" });
-        } else if (!finalBlob!) {
-          finalBlob = new Blob([text], { type: "model/gltf+json" });
-        }
+      if (isGlb) {
+        finalBlob = new Blob([buf], { type: "model/gltf-binary" });
       } else {
-        finalBlob = await res.blob();
+        // Parse JSON, fetch any external .bin buffers/images and inline them.
+        const text = new TextDecoder().decode(buf);
+        const gltf = JSON.parse(text);
+        const baseUrl = EXTERNAL_GENERATE_URL.replace(/\/[^/]*$/, "/");
+        const toDataUri = async (uri: string, mime: string) => {
+          const candidates = [
+            new URL(uri, baseUrl).toString(),
+            new URL(uri, EXTERNAL_GENERATE_URL).toString(),
+          ];
+          for (const u of candidates) {
+            try {
+              const r = await fetch(u, { headers: { "ngrok-skip-browser-warning": "1" } });
+              if (!r.ok) continue;
+              const ab = await r.arrayBuffer();
+              let bin = "";
+              const u8 = new Uint8Array(ab);
+              const chunk = 0x8000;
+              for (let i = 0; i < u8.length; i += chunk) {
+                bin += String.fromCharCode.apply(null, Array.from(u8.subarray(i, i + chunk)) as any);
+              }
+              return `data:${mime};base64,${btoa(bin)}`;
+            } catch { /* try next */ }
+          }
+          throw new Error(`Could not load referenced file: ${uri}`);
+        };
+
+        if (Array.isArray(gltf.buffers)) {
+          for (const b of gltf.buffers) {
+            if (b.uri && !b.uri.startsWith("data:")) {
+              b.uri = await toDataUri(b.uri, "application/octet-stream");
+            }
+          }
+        }
+        if (Array.isArray(gltf.images)) {
+          for (const im of gltf.images) {
+            if (im.uri && !im.uri.startsWith("data:")) {
+              const ext = (im.uri.split(".").pop() || "png").toLowerCase();
+              const mime = ext === "jpg" || ext === "jpeg" ? "image/jpeg" : `image/${ext}`;
+              im.uri = await toDataUri(im.uri, mime);
+            }
+          }
+        }
+        finalBlob = new Blob([JSON.stringify(gltf)], { type: "model/gltf+json" });
       }
 
       if (modelUrl) URL.revokeObjectURL(modelUrl);
-      const url = URL.createObjectURL(finalBlob!);
+      const url = URL.createObjectURL(finalBlob);
       setModelUrl(url);
       setResult(null);
       setUses(bumpUses());
@@ -233,19 +230,17 @@ export default function Studio() {
               {ar ? "كيف تستخدم الاستوديو" : "How to use the Studio"}
             </h2>
           </div>
-          <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+          <ol className="grid sm:grid-cols-3 gap-3 mb-5">
             {(ar
               ? [
                   { icon: Upload, t: "ارفع صورة", d: "صورة واضحة لما تريد بناءه (أقل من 4 ميغا)." },
-                  { icon: Gauge, t: "اختر مستوى التفاصيل", d: "بسيط أسرع، معقّد يعطي تفاصيل أكثر." },
-                  { icon: Wand2, t: "اضغط توليد", d: "ينتج تصميم مكعبات ٣D مع كشف الكميات." },
-                  { icon: ShoppingCart, t: "نزّل أو اطلب", d: "حمّل ملف .obj أو اطلب القطع من المتجر." },
+                  { icon: Wand2, t: "اضغط توليد", d: "ينتج مجسّم ٣D تفاعلي يمكنك تدويره." },
+                  { icon: ShoppingCart, t: "نزّل أو اطلب", d: "حمّل ملف المجسم أو اطلب القطع من المتجر." },
                 ]
               : [
                   { icon: Upload, t: "Upload an image", d: "A clear photo of what you want to build (< 4MB)." },
-                  { icon: Gauge, t: "Pick a detail level", d: "Simple is faster — Intricate adds more pieces." },
-                  { icon: Wand2, t: "Hit Generate", d: "You get a 3D cube design with full piece counts." },
-                  { icon: ShoppingCart, t: "Download or order", d: "Save the .obj file or order the pieces from the store." },
+                  { icon: Wand2, t: "Hit Generate", d: "Get an interactive 3D model you can rotate." },
+                  { icon: ShoppingCart, t: "Download or order", d: "Save the model file or order the pieces from the store." },
                 ]
             ).map((s, i) => (
               <li key={i} className="rounded-2xl p-4 border border-[color:var(--card-border)] bg-[hsl(var(--accent))]/5 flex gap-3">
@@ -333,34 +328,6 @@ export default function Studio() {
               )}
             </div>
 
-            {/* ── DETAIL LEVEL SELECTOR ────────────────────────────────
-                Sent to backend as `detailLevel` in the generate body. */}
-            <div>
-              <span className="block text-[11px] tracking-[0.18em] uppercase text-foreground/55 mb-2">
-                {ar ? "مستوى التفاصيل" : "Detail level"}
-              </span>
-              <div className="grid grid-cols-3 gap-2">
-                {([
-                  { id: "simple", label: ar ? "بسيط" : "Simple", hint: "~150" },
-                  { id: "balanced", label: ar ? "متوازن" : "Balanced", hint: "~300" },
-                  { id: "intricate", label: ar ? "معقّد" : "Intricate", hint: "~500" },
-                ] as const).map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setDetail(opt.id)}
-                    className={`px-2 py-2 rounded-xl text-xs border transition flex flex-col items-center gap-0.5 ${
-                      detail === opt.id
-                        ? "border-[hsl(var(--accent))] bg-[hsl(var(--accent))]/15 text-foreground"
-                        : "border-[color:var(--card-border)] text-foreground/65 hover:bg-white/[0.04]"
-                    }`}
-                  >
-                    <span className="font-semibold">{opt.label}</span>
-                    <span className="text-[10px] text-foreground/45">{opt.hint} {ar ? "مكعب" : "cubes"}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
 
             <button onClick={generate} disabled={loading || !pickedFile || remaining <= 0} className="btn-primary w-full disabled:opacity-60">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}

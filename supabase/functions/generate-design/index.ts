@@ -192,9 +192,9 @@ async function callModel(
   userContent: any,
 ): Promise<{ text: string; modelUsed: string } | null> {
   const candidates = [
-    "google/gemini-2.5-pro",        // primary — best reasoning for complex voxel art
-    "openai/gpt-5",                 // strong fallback
-    "google/gemini-2.5-flash",      // last resort
+    "google/gemini-2.5-flash",      // primary — fast + multimodal, fits edge timeout
+    "google/gemini-3-flash-preview",// fallback
+    "google/gemini-2.5-pro",        // last resort, slow but strongest
   ];
   for (const model of candidates) {
     try {

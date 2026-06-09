@@ -332,7 +332,7 @@ export default function Studio() {
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
               {modelUrl ? (
-                <ExternalGltfViewer url={modelUrl} />
+                <ExternalObjViewer url={modelUrl} />
               ) : result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
               ) : (

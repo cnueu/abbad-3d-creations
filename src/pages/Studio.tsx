@@ -335,9 +335,7 @@ export default function Studio() {
             )}
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
-              {modelUrl ? (
-                <ExternalObjViewer url={modelUrl} />
-              ) : result ? (
+              {result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-foreground/40 text-sm">
@@ -345,13 +343,6 @@ export default function Studio() {
                 </div>
               )}
             </div>
-
-            {modelUrl && !result && (
-              <button onClick={downloadObj} className="btn-ghost w-full">
-                <Download className="w-4 h-4" />
-                {ar ? "تحميل ملف .obj" : "Download .obj"}
-              </button>
-            )}
 
             {result && (
               <motion.div

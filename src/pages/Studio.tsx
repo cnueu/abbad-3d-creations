@@ -341,14 +341,23 @@ export default function Studio() {
             )}
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
-              {result ? (
+              {modelUrl ? (
+                <ExternalObjViewer url={modelUrl} />
+              ) : result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-foreground/40 text-sm">
-                  {loading ? (ar ? "جاري توليد المجسم..." : "Generating 3D model...") : t.studio.result}
+                  {loading ? (ar ? "جاري توليد المجسم... (٣-٨ دقائق)" : "Generating 3D model... (3-8 min)") : t.studio.result}
                 </div>
               )}
             </div>
+
+            {modelUrl && (
+              <button onClick={downloadObj} className="btn-ghost w-full">
+                <Download className="w-4 h-4" />
+                {ar ? "تحميل model_voxel.obj" : "Download model_voxel.obj"}
+              </button>
+            )}
 
             {result && (
               <motion.div

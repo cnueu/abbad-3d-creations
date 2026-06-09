@@ -5,7 +5,6 @@ import { motion } from "framer-motion";
 import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks, Upload, Wand2, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GeneratedScene, buildObj, PlacedCube, Slide, ColorTheme } from "@/components/GeneratedScene";
-import { ExternalObjViewer } from "@/components/ExternalObjViewer";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";
 import { suggestProducts, Product } from "@/data/products";
@@ -13,9 +12,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import najdiImage from "@/assets/theme-najdi.png";
 import medievalImage from "@/assets/theme-medieval.png";
-
-// External 3D-generation backend (user's ngrok endpoint). Returns a .gltf blob.
-const EXTERNAL_GENERATE_URL = "https://squatted-probation-underdone.ngrok-free.dev/generate-3d/";
 
 interface Result {
   cubes: PlacedCube[];

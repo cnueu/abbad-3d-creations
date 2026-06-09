@@ -112,9 +112,64 @@ export default function Studio() {
         headers: { "ngrok-skip-browser-warning": "1" },
       });
       if (!res.ok) throw new Error(`Server ${res.status}: ${await res.text().catch(() => "")}`);
-      const blob = await res.blob();
+
+      const buf = await res.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+
+      // Detect GLB (magic "glTF") vs JSON GLTF.
+      const isGlb = bytes.length > 4 && bytes[0] === 0x67 && bytes[1] === 0x6c && bytes[2] === 0x54 && bytes[3] === 0x46;
+      let finalBlob: Blob;
+
+      if (isGlb) {
+        finalBlob = new Blob([buf], { type: "model/gltf-binary" });
+      } else {
+        // Parse JSON, fetch any external .bin buffers/images and inline them.
+        const text = new TextDecoder().decode(buf);
+        const gltf = JSON.parse(text);
+        const baseUrl = EXTERNAL_GENERATE_URL.replace(/\/[^/]*$/, "/");
+        const toDataUri = async (uri: string, mime: string) => {
+          const candidates = [
+            new URL(uri, baseUrl).toString(),
+            new URL(uri, EXTERNAL_GENERATE_URL).toString(),
+          ];
+          for (const u of candidates) {
+            try {
+              const r = await fetch(u, { headers: { "ngrok-skip-browser-warning": "1" } });
+              if (!r.ok) continue;
+              const ab = await r.arrayBuffer();
+              let bin = "";
+              const u8 = new Uint8Array(ab);
+              const chunk = 0x8000;
+              for (let i = 0; i < u8.length; i += chunk) {
+                bin += String.fromCharCode.apply(null, Array.from(u8.subarray(i, i + chunk)) as any);
+              }
+              return `data:${mime};base64,${btoa(bin)}`;
+            } catch { /* try next */ }
+          }
+          throw new Error(`Could not load referenced file: ${uri}`);
+        };
+
+        if (Array.isArray(gltf.buffers)) {
+          for (const b of gltf.buffers) {
+            if (b.uri && !b.uri.startsWith("data:")) {
+              b.uri = await toDataUri(b.uri, "application/octet-stream");
+            }
+          }
+        }
+        if (Array.isArray(gltf.images)) {
+          for (const im of gltf.images) {
+            if (im.uri && !im.uri.startsWith("data:")) {
+              const ext = (im.uri.split(".").pop() || "png").toLowerCase();
+              const mime = ext === "jpg" || ext === "jpeg" ? "image/jpeg" : `image/${ext}`;
+              im.uri = await toDataUri(im.uri, mime);
+            }
+          }
+        }
+        finalBlob = new Blob([JSON.stringify(gltf)], { type: "model/gltf+json" });
+      }
+
       if (modelUrl) URL.revokeObjectURL(modelUrl);
-      const url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(finalBlob);
       setModelUrl(url);
       setResult(null);
       setUses(bumpUses());

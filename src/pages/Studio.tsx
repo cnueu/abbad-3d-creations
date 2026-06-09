@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks, Upload, Wand2, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GeneratedScene, buildObj, PlacedCube, Slide, ColorTheme } from "@/components/GeneratedScene";
-import { ExternalGltfViewer } from "@/components/ExternalGltfViewer";
+import { ExternalObjViewer } from "@/components/ExternalObjViewer";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";
 import { suggestProducts, Product } from "@/data/products";
@@ -113,60 +113,9 @@ export default function Studio() {
       });
       if (!res.ok) throw new Error(`Server ${res.status}: ${await res.text().catch(() => "")}`);
 
-      const buf = await res.arrayBuffer();
-      const bytes = new Uint8Array(buf);
-
-      // Detect GLB (magic "glTF") vs JSON GLTF.
-      const isGlb = bytes.length > 4 && bytes[0] === 0x67 && bytes[1] === 0x6c && bytes[2] === 0x54 && bytes[3] === 0x46;
-      let finalBlob: Blob;
-
-      if (isGlb) {
-        finalBlob = new Blob([buf], { type: "model/gltf-binary" });
-      } else {
-        // Parse JSON, fetch any external .bin buffers/images and inline them.
-        const text = new TextDecoder().decode(buf);
-        const gltf = JSON.parse(text);
-        const baseUrl = EXTERNAL_GENERATE_URL.replace(/\/[^/]*$/, "/");
-        const toDataUri = async (uri: string, mime: string) => {
-          const candidates = [
-            new URL(uri, baseUrl).toString(),
-            new URL(uri, EXTERNAL_GENERATE_URL).toString(),
-          ];
-          for (const u of candidates) {
-            try {
-              const r = await fetch(u, { headers: { "ngrok-skip-browser-warning": "1" } });
-              if (!r.ok) continue;
-              const ab = await r.arrayBuffer();
-              let bin = "";
-              const u8 = new Uint8Array(ab);
-              const chunk = 0x8000;
-              for (let i = 0; i < u8.length; i += chunk) {
-                bin += String.fromCharCode.apply(null, Array.from(u8.subarray(i, i + chunk)) as any);
-              }
-              return `data:${mime};base64,${btoa(bin)}`;
-            } catch { /* try next */ }
-          }
-          throw new Error(`Could not load referenced file: ${uri}`);
-        };
-
-        if (Array.isArray(gltf.buffers)) {
-          for (const b of gltf.buffers) {
-            if (b.uri && !b.uri.startsWith("data:")) {
-              b.uri = await toDataUri(b.uri, "application/octet-stream");
-            }
-          }
-        }
-        if (Array.isArray(gltf.images)) {
-          for (const im of gltf.images) {
-            if (im.uri && !im.uri.startsWith("data:")) {
-              const ext = (im.uri.split(".").pop() || "png").toLowerCase();
-              const mime = ext === "jpg" || ext === "jpeg" ? "image/jpeg" : `image/${ext}`;
-              im.uri = await toDataUri(im.uri, mime);
-            }
-          }
-        }
-        finalBlob = new Blob([JSON.stringify(gltf)], { type: "model/gltf+json" });
-      }
+      // Server returns a voxelized .obj (text/plain, model_voxel.obj).
+      const objText = await res.text();
+      const finalBlob = new Blob([objText], { type: "text/plain" });
 
       if (modelUrl) URL.revokeObjectURL(modelUrl);
       const url = URL.createObjectURL(finalBlob);
@@ -184,7 +133,7 @@ export default function Studio() {
     if (modelUrl) {
       const a = document.createElement("a");
       a.href = modelUrl;
-      a.download = "abaad_model.gltf";
+      a.download = "model_voxel.obj";
       a.click();
       return;
     }
@@ -383,7 +332,7 @@ export default function Studio() {
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
               {modelUrl ? (
-                <ExternalGltfViewer url={modelUrl} />
+                <ExternalObjViewer url={modelUrl} />
               ) : result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
               ) : (
@@ -396,7 +345,7 @@ export default function Studio() {
             {modelUrl && !result && (
               <button onClick={downloadObj} className="btn-ghost w-full">
                 <Download className="w-4 h-4" />
-                {ar ? "تحميل ملف .gltf" : "Download .gltf"}
+                {ar ? "تحميل ملف .obj" : "Download .obj"}
               </button>
             )}
 

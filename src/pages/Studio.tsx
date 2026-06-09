@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks, Upload, Wand2, ShoppingCart, Gauge } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GeneratedScene, buildObj, PlacedCube, Slide, ColorTheme } from "@/components/GeneratedScene";
+import { ExternalGltfViewer } from "@/components/ExternalGltfViewer";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";
 import { suggestProducts, Product } from "@/data/products";
@@ -12,6 +13,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import najdiImage from "@/assets/theme-najdi.png";
 import medievalImage from "@/assets/theme-medieval.png";
+
+// External 3D-generation backend (user's ngrok endpoint). Returns a .gltf blob.
+const EXTERNAL_GENERATE_URL = "https://squatted-probation-underdone.ngrok-free.dev/generate-3d/";
 
 interface Result {
   cubes: PlacedCube[];
@@ -47,6 +51,8 @@ export default function Studio() {
   const [result, setResult] = useState<Result | null>(null);
   const [selected, setSelected] = useState<Product | null>(null);
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
+  const [pickedFile, setPickedFile] = useState<File | null>(null);
+  const [modelUrl, setModelUrl] = useState<string | null>(null);
   const [authed, setAuthed] = useState(false);
   const [uses, setUses] = useState(0);
   const [theme, setTheme] = useState<ColorTheme>("original");
@@ -75,13 +81,16 @@ export default function Studio() {
       toast.error(ar ? "الصورة أكبر من 4 ميغا" : "Image must be < 4MB");
       return;
     }
+    setPickedFile(f);
     const reader = new FileReader();
     reader.onload = () => setImageDataUrl(reader.result as string);
     reader.readAsDataURL(f);
   }
 
+  // Sends the uploaded image as multipart/form-data (field name `file`) to the
+  // external 3D backend, then renders the returned .gltf in an interactive viewer.
   async function generate() {
-    if (!imageDataUrl) {
+    if (!pickedFile) {
       toast.error(ar ? "ارفع صورة لما تريد بناءه" : "Upload a photo to build from");
       return;
     }
@@ -99,12 +108,19 @@ export default function Studio() {
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-design", {
-        // `detailLevel` is read by supabase/functions/generate-design/index.ts
-        body: { shapeName: "reference", width: 2, height: 2, depth: 2, purpose: "", lang, imageDataUrl, detailLevel: detail },
+      const fd = new FormData();
+      fd.append("file", pickedFile);
+      const res = await fetch(EXTERNAL_GENERATE_URL, {
+        method: "POST",
+        body: fd,
+        headers: { "ngrok-skip-browser-warning": "1" },
       });
-      if (error) throw error;
-      setResult(data as Result);
+      if (!res.ok) throw new Error(`Server ${res.status}: ${await res.text().catch(() => "")}`);
+      const blob = await res.blob();
+      if (modelUrl) URL.revokeObjectURL(modelUrl);
+      const url = URL.createObjectURL(blob);
+      setModelUrl(url);
+      setResult(null);
       setUses(bumpUses());
     } catch (e: any) {
       toast.error(e.message || "Failed");
@@ -114,6 +130,13 @@ export default function Studio() {
   }
 
   function downloadObj() {
+    if (modelUrl) {
+      const a = document.createElement("a");
+      a.href = modelUrl;
+      a.download = "abaad_model.gltf";
+      a.click();
+      return;
+    }
     if (!result) return;
     const obj = buildObj(result.cubes, result.slides);
     const blob = new Blob([obj], { type: "text/plain" });
@@ -234,7 +257,7 @@ export default function Studio() {
                   <img src={imageDataUrl} alt="reference" className="w-full h-64 object-cover" />
                   <button
                     type="button"
-                    onClick={() => setImageDataUrl(null)}
+                    onClick={() => { setImageDataUrl(null); setPickedFile(null); }}
                     className="absolute top-2 end-2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80"
                     aria-label="remove"
                   >
@@ -285,7 +308,7 @@ export default function Studio() {
               </div>
             </div>
 
-            <button onClick={generate} disabled={loading || !imageDataUrl || remaining <= 0} className="btn-primary w-full disabled:opacity-60">
+            <button onClick={generate} disabled={loading || !pickedFile || remaining <= 0} className="btn-primary w-full disabled:opacity-60">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {loading ? t.studio.generating : t.studio.generate}
             </button>
@@ -338,14 +361,23 @@ export default function Studio() {
             )}
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
-              {result ? (
+              {modelUrl ? (
+                <ExternalGltfViewer url={modelUrl} />
+              ) : result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-foreground/40 text-sm">
-                  {t.studio.result}
+                  {loading ? (ar ? "جاري توليد المجسم..." : "Generating 3D model...") : t.studio.result}
                 </div>
               )}
             </div>
+
+            {modelUrl && !result && (
+              <button onClick={downloadObj} className="btn-ghost w-full">
+                <Download className="w-4 h-4" />
+                {ar ? "تحميل ملف .gltf" : "Download .gltf"}
+              </button>
+            )}
 
             {result && (
               <motion.div

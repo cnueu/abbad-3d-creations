@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks, Upload, Wand2, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GeneratedScene, buildObj, PlacedCube, Slide, ColorTheme } from "@/components/GeneratedScene";
+import { ExternalObjViewer } from "@/components/ExternalObjViewer";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";
 import { suggestProducts, Product } from "@/data/products";
@@ -12,6 +13,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import najdiImage from "@/assets/theme-najdi.png";
 import medievalImage from "@/assets/theme-medieval.png";
+
+// External Hunyuan3D-2.1 + voxelizer backend (Kaggle/ngrok).
+// Returns multipart/form-data with field `file`, replies with a text/plain .obj.
+const EXTERNAL_GENERATE_URL = "https://squatted-probation-underdone.ngrok-free.dev/generate-3d/";
 
 interface Result {
   cubes: PlacedCube[];
@@ -79,9 +84,8 @@ export default function Studio() {
     reader.readAsDataURL(f);
   }
 
-  // Voxelizes the uploaded image using Lovable AI (Gemini 2.5 Pro) via the
-  // `generate-design` edge function. Returns voxel cubes + counts to render
-  // in the interactive 3D scene — no external server required.
+  // Sends the uploaded image to the external Hunyuan3D server as multipart/form-data
+  // under field name `file`, then renders the returned .obj voxel mesh in the viewer.
   async function generate() {
     if (!pickedFile) {
       toast.error(ar ? "ارفع صورة لما تريد بناءه" : "Upload a photo to build from");
@@ -101,36 +105,34 @@ export default function Studio() {
     }
     setLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke("generate-design", {
-        body: {
-          shapeName: ar ? "المجسم من الصورة" : "Subject from the image",
-          width: 1.6,
-          height: 1.6,
-          depth: 1.6,
-          purpose: ar
-            ? "حوّل الصورة المرفوعة إلى نحت فوكسل ثلاثي الأبعاد دقيق يطابق الصورة قدر الإمكان."
-            : "Convert the uploaded reference image into a detailed 3D voxel sculpture that closely matches it.",
-          lang,
-          imageDataUrl,
-          detailLevel: "balanced",
-        },
-      });
-      if (error) {
-        console.error("generate-design error", error);
-        throw new Error((error as any)?.context?.error || error.message || "Generation failed");
-      }
-      if ((data as any)?.error) throw new Error((data as any).error);
-      if (!data?.cubes?.length) throw new Error(ar ? "تعذّر التوليد — حاول مرة أخرى" : "Generation returned no cubes");
+      const fd = new FormData();
+      fd.append("file", pickedFile);
 
-      if (modelUrl) { URL.revokeObjectURL(modelUrl); setModelUrl(null); }
-      setResult(data as Result);
+      const res = await fetch(EXTERNAL_GENERATE_URL, {
+        method: "POST",
+        body: fd,
+        headers: { "ngrok-skip-browser-warning": "1" },
+      });
+      if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        throw new Error(`Server ${res.status}: ${txt.slice(0, 200) || res.statusText}`);
+      }
+
+      // Server returns a voxelized .obj as text/plain (model_voxel.obj).
+      const objText = await res.text();
+      if (!objText || objText.length < 20) {
+        throw new Error(ar ? "الملف المُستلم فارغ" : "Received empty model file");
+      }
+      const blob = new Blob([objText], { type: "text/plain" });
+
+      if (modelUrl) URL.revokeObjectURL(modelUrl);
+      const url = URL.createObjectURL(blob);
+      setModelUrl(url);
+      setResult(null);
       setUses(bumpUses());
-      toast.success(
-        ar
-          ? `تم التوليد · ${data.totalCubes} مكعب`
-          : `Generated · ${data.totalCubes} cubes`
-      );
+      toast.success(ar ? "تم استلام المجسم" : "3D model received");
     } catch (e: any) {
+      console.error("generate error", e);
       toast.error(e.message || "Failed");
     } finally {
       setLoading(false);
@@ -339,14 +341,23 @@ export default function Studio() {
             )}
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
-              {result ? (
+              {modelUrl ? (
+                <ExternalObjViewer url={modelUrl} />
+              ) : result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-foreground/40 text-sm">
-                  {loading ? (ar ? "جاري توليد المجسم..." : "Generating 3D model...") : t.studio.result}
+                  {loading ? (ar ? "جاري توليد المجسم... (٣-٨ دقائق)" : "Generating 3D model... (3-8 min)") : t.studio.result}
                 </div>
               )}
             </div>
+
+            {modelUrl && (
+              <button onClick={downloadObj} className="btn-ghost w-full">
+                <Download className="w-4 h-4" />
+                {ar ? "تحميل model_voxel.obj" : "Download model_voxel.obj"}
+              </button>
+            )}
 
             {result && (
               <motion.div

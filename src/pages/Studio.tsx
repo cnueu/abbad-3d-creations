@@ -273,34 +273,6 @@ export default function Studio() {
               )}
             </div>
 
-            {/* ── DETAIL LEVEL SELECTOR ────────────────────────────────
-                Sent to backend as `detailLevel` in the generate body. */}
-            <div>
-              <span className="block text-[11px] tracking-[0.18em] uppercase text-foreground/55 mb-2">
-                {ar ? "مستوى التفاصيل" : "Detail level"}
-              </span>
-              <div className="grid grid-cols-3 gap-2">
-                {([
-                  { id: "simple", label: ar ? "بسيط" : "Simple", hint: "~150" },
-                  { id: "balanced", label: ar ? "متوازن" : "Balanced", hint: "~300" },
-                  { id: "intricate", label: ar ? "معقّد" : "Intricate", hint: "~500" },
-                ] as const).map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setDetail(opt.id)}
-                    className={`px-2 py-2 rounded-xl text-xs border transition flex flex-col items-center gap-0.5 ${
-                      detail === opt.id
-                        ? "border-[hsl(var(--accent))] bg-[hsl(var(--accent))]/15 text-foreground"
-                        : "border-[color:var(--card-border)] text-foreground/65 hover:bg-white/[0.04]"
-                    }`}
-                  >
-                    <span className="font-semibold">{opt.label}</span>
-                    <span className="text-[10px] text-foreground/45">{opt.hint} {ar ? "مكعب" : "cubes"}</span>
-                  </button>
-                ))}
-              </div>
-            </div>
 
             <button onClick={generate} disabled={loading || !pickedFile || remaining <= 0} className="btn-primary w-full disabled:opacity-60">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}

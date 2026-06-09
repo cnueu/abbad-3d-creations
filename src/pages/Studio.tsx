@@ -108,10 +108,17 @@ export default function Studio() {
       const fd = new FormData();
       fd.append("file", pickedFile);
 
-      const res = await fetch(EXTERNAL_GENERATE_URL, {
+      // Route through our edge function proxy to avoid the upstream CORS issue.
+      const { data: { session } } = await supabase.auth.getSession();
+      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+      const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/proxy-3d`, {
         method: "POST",
         body: fd,
-        headers: { "ngrok-skip-browser-warning": "1" },
+        headers: {
+          apikey: SUPABASE_ANON,
+          Authorization: `Bearer ${session?.access_token ?? SUPABASE_ANON}`,
+        },
       });
       if (!res.ok) {
         const txt = await res.text().catch(() => "");

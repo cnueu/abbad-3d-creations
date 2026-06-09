@@ -2,3 +2,6 @@ project_id = "rjmjumzmndqwvnsapwqi"
 
 [functions.generate-theme]
 verify_jwt = false
+
+[functions.proxy-3d]
+verify_jwt = false

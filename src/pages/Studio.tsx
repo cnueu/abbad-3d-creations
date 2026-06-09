@@ -345,7 +345,7 @@ export default function Studio() {
             {modelUrl && !result && (
               <button onClick={downloadObj} className="btn-ghost w-full">
                 <Download className="w-4 h-4" />
-                {ar ? "تحميل ملف .gltf" : "Download .gltf"}
+                {ar ? "تحميل ملف .obj" : "Download .obj"}
               </button>
             )}
 

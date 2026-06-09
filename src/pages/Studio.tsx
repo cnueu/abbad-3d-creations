@@ -116,9 +116,63 @@ export default function Studio() {
         headers: { "ngrok-skip-browser-warning": "1" },
       });
       if (!res.ok) throw new Error(`Server ${res.status}: ${await res.text().catch(() => "")}`);
-      const blob = await res.blob();
+
+      const contentType = res.headers.get("content-type") || "";
+      let finalBlob: Blob;
+
+      if (contentType.includes("application/json") || contentType.includes("gltf+json") || contentType === "") {
+        // GLTF JSON references external .bin buffers — fetch & inline them as data URIs
+        const text = await res.text();
+        let gltf: any;
+        try {
+          gltf = JSON.parse(text);
+        } catch {
+          finalBlob = new Blob([text], { type: "model/gltf-binary" });
+          gltf = null;
+        }
+        if (gltf && Array.isArray(gltf.buffers)) {
+          const bases = [
+            EXTERNAL_GENERATE_URL,
+            new URL(".", EXTERNAL_GENERATE_URL).toString(),
+            new URL("/", EXTERNAL_GENERATE_URL).toString(),
+          ];
+          for (const buf of gltf.buffers) {
+            if (!buf.uri || buf.uri.startsWith("data:")) continue;
+            let fetched: ArrayBuffer | null = null;
+            let lastErr = "";
+            for (const base of bases) {
+              try {
+                const bUrl = new URL(buf.uri, base).toString();
+                const r = await fetch(bUrl, { headers: { "ngrok-skip-browser-warning": "1" } });
+                if (r.ok) {
+                  fetched = await r.arrayBuffer();
+                  break;
+                }
+                lastErr = `${r.status} at ${bUrl}`;
+              } catch (err: any) {
+                lastErr = err?.message || String(err);
+              }
+            }
+            if (!fetched) throw new Error(`Failed to fetch buffer ${buf.uri}: ${lastErr}`);
+            // Convert to base64 data URI
+            let binary = "";
+            const bytes = new Uint8Array(fetched);
+            const chunk = 0x8000;
+            for (let i = 0; i < bytes.length; i += chunk) {
+              binary += String.fromCharCode.apply(null, Array.from(bytes.subarray(i, i + chunk)) as any);
+            }
+            buf.uri = `data:application/octet-stream;base64,${btoa(binary)}`;
+          }
+          finalBlob = new Blob([JSON.stringify(gltf)], { type: "model/gltf+json" });
+        } else if (!finalBlob!) {
+          finalBlob = new Blob([text], { type: "model/gltf+json" });
+        }
+      } else {
+        finalBlob = await res.blob();
+      }
+
       if (modelUrl) URL.revokeObjectURL(modelUrl);
-      const url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(finalBlob!);
       setModelUrl(url);
       setResult(null);
       setUses(bumpUses());

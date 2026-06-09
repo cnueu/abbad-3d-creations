@@ -83,8 +83,9 @@ export default function Studio() {
     reader.readAsDataURL(f);
   }
 
-  // Sends the uploaded image as multipart/form-data (field name `file`) to the
-  // external 3D backend, then renders the returned .gltf in an interactive viewer.
+  // Voxelizes the uploaded image using Lovable AI (Gemini 2.5 Pro) via the
+  // `generate-design` edge function. Returns voxel cubes + counts to render
+  // in the interactive 3D scene — no external server required.
   async function generate() {
     if (!pickedFile) {
       toast.error(ar ? "ارفع صورة لما تريد بناءه" : "Upload a photo to build from");
@@ -104,24 +105,31 @@ export default function Studio() {
     }
     setLoading(true);
     try {
-      const fd = new FormData();
-      fd.append("file", pickedFile);
-      const res = await fetch(EXTERNAL_GENERATE_URL, {
-        method: "POST",
-        body: fd,
-        headers: { "ngrok-skip-browser-warning": "1" },
+      const { data, error } = await supabase.functions.invoke("generate-design", {
+        body: {
+          shapeName: ar ? "المجسم من الصورة" : "Subject from the image",
+          width: 1.6,
+          height: 1.6,
+          depth: 1.6,
+          purpose: ar
+            ? "حوّل الصورة المرفوعة إلى نحت فوكسل ثلاثي الأبعاد دقيق يطابق الصورة قدر الإمكان."
+            : "Convert the uploaded reference image into a detailed 3D voxel sculpture that closely matches it.",
+          lang,
+          imageDataUrl,
+          detailLevel: "intricate",
+        },
       });
-      if (!res.ok) throw new Error(`Server ${res.status}: ${await res.text().catch(() => "")}`);
+      if (error) throw new Error(error.message || "Generation failed");
+      if (!data?.cubes?.length) throw new Error(ar ? "تعذّر التوليد" : "Generation failed");
 
-      // Server returns a voxelized .obj (text/plain, model_voxel.obj).
-      const objText = await res.text();
-      const finalBlob = new Blob([objText], { type: "text/plain" });
-
-      if (modelUrl) URL.revokeObjectURL(modelUrl);
-      const url = URL.createObjectURL(finalBlob);
-      setModelUrl(url);
-      setResult(null);
+      if (modelUrl) { URL.revokeObjectURL(modelUrl); setModelUrl(null); }
+      setResult(data as Result);
       setUses(bumpUses());
+      toast.success(
+        ar
+          ? `تم التوليد · ${data.totalCubes} مكعب`
+          : `Generated · ${data.totalCubes} cubes`
+      );
     } catch (e: any) {
       toast.error(e.message || "Failed");
     } finally {

@@ -257,7 +257,7 @@ export default function Studio() {
                   <img src={imageDataUrl} alt="reference" className="w-full h-64 object-cover" />
                   <button
                     type="button"
-                    onClick={() => setImageDataUrl(null)}
+                    onClick={() => { setImageDataUrl(null); setPickedFile(null); }}
                     className="absolute top-2 end-2 w-8 h-8 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80"
                     aria-label="remove"
                   >
@@ -308,7 +308,7 @@ export default function Studio() {
               </div>
             </div>
 
-            <button onClick={generate} disabled={loading || !imageDataUrl || remaining <= 0} className="btn-primary w-full disabled:opacity-60">
+            <button onClick={generate} disabled={loading || !pickedFile || remaining <= 0} className="btn-primary w-full disabled:opacity-60">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {loading ? t.studio.generating : t.studio.generate}
             </button>
@@ -361,14 +361,23 @@ export default function Studio() {
             )}
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
-              {result ? (
+              {modelUrl ? (
+                <ExternalGltfViewer url={modelUrl} />
+              ) : result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-foreground/40 text-sm">
-                  {t.studio.result}
+                  {loading ? (ar ? "جاري توليد المجسم..." : "Generating 3D model...") : t.studio.result}
                 </div>
               )}
             </div>
+
+            {modelUrl && !result && (
+              <button onClick={downloadObj} className="btn-ghost w-full">
+                <Download className="w-4 h-4" />
+                {ar ? "تحميل ملف .gltf" : "Download .gltf"}
+              </button>
+            )}
 
             {result && (
               <motion.div

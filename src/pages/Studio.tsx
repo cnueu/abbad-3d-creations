@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks, Upload, Wand2, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GeneratedScene, buildObj, PlacedCube, Slide, ColorTheme } from "@/components/GeneratedScene";
-import { ExternalGltfViewer } from "@/components/ExternalGltfViewer";
+import { ExternalObjViewer } from "@/components/ExternalObjViewer";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";
 import { suggestProducts, Product } from "@/data/products";

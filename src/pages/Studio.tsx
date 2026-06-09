@@ -175,19 +175,17 @@ export default function Studio() {
               {ar ? "كيف تستخدم الاستوديو" : "How to use the Studio"}
             </h2>
           </div>
-          <ol className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+          <ol className="grid sm:grid-cols-3 gap-3 mb-5">
             {(ar
               ? [
                   { icon: Upload, t: "ارفع صورة", d: "صورة واضحة لما تريد بناءه (أقل من 4 ميغا)." },
-                  { icon: Gauge, t: "اختر مستوى التفاصيل", d: "بسيط أسرع، معقّد يعطي تفاصيل أكثر." },
-                  { icon: Wand2, t: "اضغط توليد", d: "ينتج تصميم مكعبات ٣D مع كشف الكميات." },
-                  { icon: ShoppingCart, t: "نزّل أو اطلب", d: "حمّل ملف .obj أو اطلب القطع من المتجر." },
+                  { icon: Wand2, t: "اضغط توليد", d: "ينتج مجسّم ٣D تفاعلي يمكنك تدويره." },
+                  { icon: ShoppingCart, t: "نزّل أو اطلب", d: "حمّل ملف المجسم أو اطلب القطع من المتجر." },
                 ]
               : [
                   { icon: Upload, t: "Upload an image", d: "A clear photo of what you want to build (< 4MB)." },
-                  { icon: Gauge, t: "Pick a detail level", d: "Simple is faster — Intricate adds more pieces." },
-                  { icon: Wand2, t: "Hit Generate", d: "You get a 3D cube design with full piece counts." },
-                  { icon: ShoppingCart, t: "Download or order", d: "Save the .obj file or order the pieces from the store." },
+                  { icon: Wand2, t: "Hit Generate", d: "Get an interactive 3D model you can rotate." },
+                  { icon: ShoppingCart, t: "Download or order", d: "Save the model file or order the pieces from the store." },
                 ]
             ).map((s, i) => (
               <li key={i} className="rounded-2xl p-4 border border-[color:var(--card-border)] bg-[hsl(var(--accent))]/5 flex gap-3">

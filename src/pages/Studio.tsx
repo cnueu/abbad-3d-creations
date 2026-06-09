@@ -57,10 +57,6 @@ export default function Studio() {
   const [uses, setUses] = useState(0);
   const [theme, setTheme] = useState<ColorTheme>("original");
   const [glassy, setGlassy] = useState(false);
-  // ── DETAIL LEVEL ──────────────────────────────────────────────
-  // Controls how many cubes the AI is asked to produce. Sent to the
-  // edge function as `detailLevel`. Edit labels here to retune UX.
-  const [detail, setDetail] = useState<"simple" | "balanced" | "intricate">("balanced");
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

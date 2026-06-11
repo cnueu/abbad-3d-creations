@@ -60,6 +60,9 @@ export default function Studio() {
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [pickedFile, setPickedFile] = useState<File | null>(null);
   const [modelUrl, setModelUrl] = useState<string | null>(null);
+  const [modelKind, setModelKind] = useState<"glb" | "obj">("glb");
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState<string>("");
   const [authed, setAuthed] = useState(false);
   const [uses, setUses] = useState(0);
   const [theme, setTheme] = useState<ColorTheme>("original");

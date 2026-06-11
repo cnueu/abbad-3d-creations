@@ -21,7 +21,7 @@ import medievalImage from "@/assets/theme-medieval.png";
 //                GET  /status/{id}  -> { status: "pending"|"processing"|"done"|"error", ... }
 //                GET  /result/{id}  -> GLB (or OBJ) binary
 const EXTERNAL_BASE = "https://squatted-probation-underdone.ngrok-free.app";
-const NGROK_HEADERS = { "ngrok-skip-browser-warning": "1" } as const;
+const NGROK_HEADERS = { "ngrok-skip-browser-warning": "true" } as const;
 const EXPECTED_DURATION_MS = 6 * 60 * 1000; // ~6 minutes
 
 interface Result {

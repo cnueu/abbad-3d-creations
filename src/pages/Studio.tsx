@@ -6,6 +6,8 @@ import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks, 
 import { Link } from "react-router-dom";
 import { GeneratedScene, buildObj, PlacedCube, Slide, ColorTheme } from "@/components/GeneratedScene";
 import { ExternalObjViewer } from "@/components/ExternalObjViewer";
+import { ExternalGltfViewer } from "@/components/ExternalGltfViewer";
+import { Progress } from "@/components/ui/progress";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";
 import { suggestProducts, Product } from "@/data/products";
@@ -15,8 +17,12 @@ import najdiImage from "@/assets/theme-najdi.png";
 import medievalImage from "@/assets/theme-medieval.png";
 
 // External Hunyuan3D-2.1 + voxelizer backend (Kaggle/ngrok).
-// Returns multipart/form-data with field `file`, replies with a text/plain .obj.
-const EXTERNAL_GENERATE_URL = "https://squatted-probation-underdone.ngrok-free.dev/generate-3d/";
+// Async job API: POST /generate-3d/ -> { job_id }
+//                GET  /status/{id}  -> { status: "pending"|"processing"|"done"|"error", ... }
+//                GET  /result/{id}  -> GLB (or OBJ) binary
+const EXTERNAL_BASE = "https://squatted-probation-underdone.ngrok-free.dev";
+const NGROK_HEADERS = { "ngrok-skip-browser-warning": "1" } as const;
+const EXPECTED_DURATION_MS = 6 * 60 * 1000; // ~6 minutes
 
 interface Result {
   cubes: PlacedCube[];
@@ -54,6 +60,9 @@ export default function Studio() {
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [pickedFile, setPickedFile] = useState<File | null>(null);
   const [modelUrl, setModelUrl] = useState<string | null>(null);
+  const [modelKind, setModelKind] = useState<"glb" | "obj">("glb");
+  const [progress, setProgress] = useState(0);
+  const [statusText, setStatusText] = useState<string>("");
   const [authed, setAuthed] = useState(false);
   const [uses, setUses] = useState(0);
   const [theme, setTheme] = useState<ColorTheme>("original");
@@ -84,8 +93,10 @@ export default function Studio() {
     reader.readAsDataURL(f);
   }
 
-  // Sends the uploaded image to the external Hunyuan3D server as multipart/form-data
-  // under field name `file`, then renders the returned .obj voxel mesh in the viewer.
+  // Polling-based generation:
+  // 1) POST /generate-3d/ (multipart `file`) -> { job_id }
+  // 2) Poll GET /status/{id} every 5s while showing a 0->100% progress estimated over EXPECTED_DURATION_MS
+  // 3) When status === "done", fetch GET /result/{id} as a binary blob (GLB by default, OBJ fallback)
   async function generate() {
     if (!pickedFile) {
       toast.error(ar ? "ارفع صورة لما تريد بناءه" : "Upload a photo to build from");
@@ -104,44 +115,94 @@ export default function Studio() {
       return;
     }
     setLoading(true);
+    setProgress(0);
+    setStatusText(ar ? "إرسال الصورة..." : "Uploading image...");
+
+    const startedAt = Date.now();
+    const progressTimer = window.setInterval(() => {
+      const elapsed = Date.now() - startedAt;
+      // Cap auto-progress at 95% — final 5% is set when result arrives.
+      const pct = Math.min(95, (elapsed / EXPECTED_DURATION_MS) * 100);
+      setProgress(pct);
+    }, 1000);
+
     try {
+      // 1) Submit job
       const fd = new FormData();
       fd.append("file", pickedFile);
-
-      // Route through our edge function proxy to avoid the upstream CORS issue.
-      const { data: { session } } = await supabase.auth.getSession();
-      const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
-      const SUPABASE_ANON = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
-      const res = await fetch(`${SUPABASE_URL}/functions/v1/proxy-3d`, {
+      const submit = await fetch(`${EXTERNAL_BASE}/generate-3d/`, {
         method: "POST",
         body: fd,
-        headers: {
-          apikey: SUPABASE_ANON,
-          Authorization: `Bearer ${session?.access_token ?? SUPABASE_ANON}`,
-        },
+        headers: { ...NGROK_HEADERS },
       });
-      if (!res.ok) {
-        const txt = await res.text().catch(() => "");
-        throw new Error(`Server ${res.status}: ${txt.slice(0, 200) || res.statusText}`);
+      if (!submit.ok) {
+        const txt = await submit.text().catch(() => "");
+        throw new Error(`Server ${submit.status}: ${txt.slice(0, 200) || submit.statusText}`);
+      }
+      const submitJson = await submit.json().catch(() => ({} as any));
+      const jobId: string | undefined =
+        submitJson.job_id ?? submitJson.id ?? submitJson.jobId ?? submitJson.task_id;
+      if (!jobId) throw new Error("No job_id returned from server");
+
+      setStatusText(ar ? "جاري التوليد..." : "Generating...");
+
+      // 2) Poll status every 5s
+      const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+      let done = false;
+      let attempts = 0;
+      const maxAttempts = 12 * 15; // ~15 minutes safety
+      while (!done) {
+        attempts++;
+        if (attempts > maxAttempts) throw new Error("Generation timed out");
+        await sleep(5000);
+        const sres = await fetch(`${EXTERNAL_BASE}/status/${jobId}`, { headers: { ...NGROK_HEADERS } });
+        if (!sres.ok) continue; // transient — keep polling
+        const sjson = await sres.json().catch(() => ({} as any));
+        const status: string = String(sjson.status ?? sjson.state ?? "").toLowerCase();
+        if (status === "done" || status === "completed" || status === "success" || status === "finished") {
+          done = true;
+          break;
+        }
+        if (status === "error" || status === "failed") {
+          throw new Error(sjson.error || sjson.message || "Generation failed");
+        }
+        if (sjson.progress != null) {
+          const p = Number(sjson.progress);
+          if (!Number.isNaN(p)) setProgress(Math.min(95, p <= 1 ? p * 100 : p));
+        }
       }
 
-      // Server returns a voxelized .obj as text/plain (model_voxel.obj).
-      const objText = await res.text();
-      if (!objText || objText.length < 20) {
-        throw new Error(ar ? "الملف المُستلم فارغ" : "Received empty model file");
-      }
-      const blob = new Blob([objText], { type: "text/plain" });
+      // 3) Fetch result
+      setStatusText(ar ? "تحميل النموذج..." : "Fetching model...");
+      const rres = await fetch(`${EXTERNAL_BASE}/result/${jobId}`, { headers: { ...NGROK_HEADERS } });
+      if (!rres.ok) throw new Error(`Result ${rres.status}`);
+      const ct = (rres.headers.get("content-type") || "").toLowerCase();
+      const buf = await rres.arrayBuffer();
+      if (!buf.byteLength) throw new Error(ar ? "الملف المُستلم فارغ" : "Empty model file");
+
+      // Detect format: GLB starts with magic "glTF"
+      const head = new Uint8Array(buf.slice(0, 4));
+      const isGlb =
+        ct.includes("model/gltf-binary") ||
+        ct.includes("glb") ||
+        (head[0] === 0x67 && head[1] === 0x6c && head[2] === 0x54 && head[3] === 0x46);
+      const kind: "glb" | "obj" = isGlb ? "glb" : "obj";
+      const blob = new Blob([buf], { type: isGlb ? "model/gltf-binary" : "text/plain" });
 
       if (modelUrl) URL.revokeObjectURL(modelUrl);
       const url = URL.createObjectURL(blob);
       setModelUrl(url);
+      setModelKind(kind);
       setResult(null);
+      setProgress(100);
+      setStatusText("");
       setUses(bumpUses());
       toast.success(ar ? "تم استلام المجسم" : "3D model received");
     } catch (e: any) {
       console.error("generate error", e);
       toast.error(e.message || "Failed");
     } finally {
+      window.clearInterval(progressTimer);
       setLoading(false);
     }
   }
@@ -150,7 +211,7 @@ export default function Studio() {
     if (modelUrl) {
       const a = document.createElement("a");
       a.href = modelUrl;
-      a.download = "model_voxel.obj";
+      a.download = modelKind === "glb" ? "model.glb" : "model_voxel.obj";
       a.click();
       return;
     }
@@ -349,12 +410,27 @@ export default function Studio() {
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
               {modelUrl ? (
-                <ExternalObjViewer url={modelUrl} />
+                modelKind === "glb" ? (
+                  <ExternalGltfViewer url={modelUrl} />
+                ) : (
+                  <ExternalObjViewer url={modelUrl} />
+                )
               ) : result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
+              ) : loading ? (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-4 px-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-[hsl(var(--accent))]" />
+                  <div className="text-sm text-foreground/70">
+                    {statusText || (ar ? "جاري التوليد... (٥-٧ دقائق)" : "Generating... (5-7 min)")}
+                  </div>
+                  <div className="w-full max-w-sm">
+                    <Progress value={progress} />
+                    <div className="text-[11px] text-foreground/50 mt-1 text-center">{Math.round(progress)}%</div>
+                  </div>
+                </div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-foreground/40 text-sm">
-                  {loading ? (ar ? "جاري توليد المجسم... (٣-٨ دقائق)" : "Generating 3D model... (3-8 min)") : t.studio.result}
+                  {t.studio.result}
                 </div>
               )}
             </div>
@@ -362,7 +438,9 @@ export default function Studio() {
             {modelUrl && (
               <button onClick={downloadObj} className="btn-ghost w-full">
                 <Download className="w-4 h-4" />
-                {ar ? "تحميل model_voxel.obj" : "Download model_voxel.obj"}
+                {ar
+                  ? modelKind === "glb" ? "تحميل model.glb" : "تحميل model_voxel.obj"
+                  : modelKind === "glb" ? "Download model.glb" : "Download model_voxel.obj"}
               </button>
             )}
 

@@ -20,7 +20,7 @@ import medievalImage from "@/assets/theme-medieval.png";
 // Async job API: POST /generate-3d/ -> { job_id }
 //                GET  /status/{id}  -> { status: "pending"|"processing"|"done"|"error", ... }
 //                GET  /result/{id}  -> GLB (or OBJ) binary
-const EXTERNAL_BASE = "https://squatted-probation-underdone.ngrok-free.dev";
+const EXTERNAL_BASE = "https://squatted-probation-underdone.ngrok-free.app";
 const NGROK_HEADERS = { "ngrok-skip-browser-warning": "1" } as const;
 const EXPECTED_DURATION_MS = 6 * 60 * 1000; // ~6 minutes
 

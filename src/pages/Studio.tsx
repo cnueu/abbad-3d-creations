@@ -22,7 +22,7 @@ import medievalImage from "@/assets/theme-medieval.png";
 //                GET  /result/{id}  -> GLB (or OBJ) binary
 const EXTERNAL_BASE = "https://squatted-probation-underdone.ngrok-free.dev";
 const NGROK_HEADERS = { "ngrok-skip-browser-warning": "true" } as const;
-const EXPECTED_DURATION_MS = 6 * 60 * 1000; // ~6 minutes
+const EXPECTED_DURATION_MS = 7 * 60 * 1000; // ~7 minutes
 
 interface Result {
   cubes: PlacedCube[];

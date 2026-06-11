@@ -6,6 +6,8 @@ import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks, 
 import { Link } from "react-router-dom";
 import { GeneratedScene, buildObj, PlacedCube, Slide, ColorTheme } from "@/components/GeneratedScene";
 import { ExternalObjViewer } from "@/components/ExternalObjViewer";
+import { ExternalGltfViewer } from "@/components/ExternalGltfViewer";
+import { Progress } from "@/components/ui/progress";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";
 import { suggestProducts, Product } from "@/data/products";
@@ -15,8 +17,12 @@ import najdiImage from "@/assets/theme-najdi.png";
 import medievalImage from "@/assets/theme-medieval.png";
 
 // External Hunyuan3D-2.1 + voxelizer backend (Kaggle/ngrok).
-// Returns multipart/form-data with field `file`, replies with a text/plain .obj.
-const EXTERNAL_GENERATE_URL = "https://squatted-probation-underdone.ngrok-free.dev/generate-3d/";
+// Async job API: POST /generate-3d/ -> { job_id }
+//                GET  /status/{id}  -> { status: "pending"|"processing"|"done"|"error", ... }
+//                GET  /result/{id}  -> GLB (or OBJ) binary
+const EXTERNAL_BASE = "https://squatted-probation-underdone.ngrok-free.dev";
+const NGROK_HEADERS = { "ngrok-skip-browser-warning": "1" } as const;
+const EXPECTED_DURATION_MS = 6 * 60 * 1000; // ~6 minutes
 
 interface Result {
   cubes: PlacedCube[];

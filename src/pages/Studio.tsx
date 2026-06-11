@@ -410,12 +410,27 @@ export default function Studio() {
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
               {modelUrl ? (
-                <ExternalObjViewer url={modelUrl} />
+                modelKind === "glb" ? (
+                  <ExternalGltfViewer url={modelUrl} />
+                ) : (
+                  <ExternalObjViewer url={modelUrl} />
+                )
               ) : result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
+              ) : loading ? (
+                <div className="w-full h-full flex flex-col items-center justify-center gap-4 px-8">
+                  <Loader2 className="w-6 h-6 animate-spin text-[hsl(var(--accent))]" />
+                  <div className="text-sm text-foreground/70">
+                    {statusText || (ar ? "جاري التوليد... (٥-٧ دقائق)" : "Generating... (5-7 min)")}
+                  </div>
+                  <div className="w-full max-w-sm">
+                    <Progress value={progress} />
+                    <div className="text-[11px] text-foreground/50 mt-1 text-center">{Math.round(progress)}%</div>
+                  </div>
+                </div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-foreground/40 text-sm">
-                  {loading ? (ar ? "جاري توليد المجسم... (٣-٨ دقائق)" : "Generating 3D model... (3-8 min)") : t.studio.result}
+                  {t.studio.result}
                 </div>
               )}
             </div>
@@ -423,7 +438,9 @@ export default function Studio() {
             {modelUrl && (
               <button onClick={downloadObj} className="btn-ghost w-full">
                 <Download className="w-4 h-4" />
-                {ar ? "تحميل model_voxel.obj" : "Download model_voxel.obj"}
+                {ar
+                  ? modelKind === "glb" ? "تحميل model.glb" : "تحميل model_voxel.obj"
+                  : modelKind === "glb" ? "Download model.glb" : "Download model_voxel.obj"}
               </button>
             )}
 

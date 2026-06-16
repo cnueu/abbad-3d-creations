@@ -199,6 +199,12 @@ export default function Studio() {
               ? (ar ? `في قائمة الانتظار (الموقع ${qp})...` : `In queue (position ${qp})...`)
               : (ar ? "في قائمة الانتظار..." : "In queue...")
           );
+        } else if (status === "generating_shape") {
+          setStatusText(ar ? "توليد الشكل ثلاثي الأبعاد..." : "Generating 3D shape...");
+        } else if (status === "generating_texture") {
+          setStatusText(ar ? "توليد الألوان والخامة..." : "Generating colors & texture...");
+        } else if (status === "converting") {
+          setStatusText(ar ? "تحويل إلى فوكسل..." : "Converting to voxels...");
         } else if (status === "processing") {
           setStatusText(ar ? "جاري التوليد..." : "Generating...");
         }

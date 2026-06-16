@@ -389,6 +389,70 @@ export default function Studio() {
               )}
             </div>
 
+            {/* Physical dimensions */}
+            <div>
+              <span className="block text-[11px] tracking-[0.18em] uppercase text-foreground/55 mb-2">
+                {ar ? "الأبعاد الفيزيائية (متر)" : "Physical dimensions (m)"}
+              </span>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { label: ar ? "العرض" : "Width", value: widthM, set: setWidthM },
+                  { label: ar ? "الارتفاع" : "Height", value: heightM, set: setHeightM },
+                  { label: ar ? "العمق" : "Depth", value: depthM, set: setDepthM },
+                ]).map((f) => (
+                  <label key={f.label} className="flex flex-col gap-1">
+                    <span className="text-[10px] text-foreground/55">{f.label}</span>
+                    <input
+                      type="number"
+                      min={0.1}
+                      step={0.1}
+                      value={f.value}
+                      onChange={(e) => f.set(parseFloat(e.target.value) || 0)}
+                      className="rounded-lg px-3 py-2 bg-background border border-[color:var(--card-border)] text-sm outline-none focus:ring-2 focus:ring-foreground/20"
+                    />
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Voxel size */}
+            <div>
+              <label className="flex flex-col gap-1">
+                <span className="text-[11px] tracking-[0.18em] uppercase text-foreground/55">
+                  {ar ? "حجم المكعب (سم)" : "Voxel size (cm)"}
+                </span>
+                <input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={voxelSizeCm}
+                  onChange={(e) => setVoxelSizeCm(parseFloat(e.target.value) || 0)}
+                  className="rounded-lg px-3 py-2 bg-background border border-[color:var(--card-border)] text-sm outline-none focus:ring-2 focus:ring-foreground/20"
+                />
+              </label>
+            </div>
+
+            {/* Colored toggle */}
+            <div className="rounded-xl border border-[color:var(--card-border)] p-3 bg-[hsl(var(--accent))]/5">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={colored}
+                  onChange={(e) => setColored(e.target.checked)}
+                  className="w-4 h-4 accent-[hsl(var(--accent))]"
+                />
+                <span className="text-sm font-medium">
+                  {ar ? "تفعيل الألوان" : "Enable color"}
+                </span>
+              </label>
+              {colored && (
+                <div className="mt-2 text-[11px] text-amber-400/90 leading-relaxed">
+                  {ar
+                    ? "⚠ توليد الألوان يضيف ٥-٨ دقائق تقريباً لوقت المعالجة."
+                    : "⚠ Color generation adds approximately 5–8 extra minutes to processing time."}
+                </div>
+              )}
+            </div>
 
             <button onClick={generate} disabled={loading || !pickedFile || remaining <= 0} className="btn-primary w-full disabled:opacity-60">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}

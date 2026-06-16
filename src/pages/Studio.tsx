@@ -144,6 +144,11 @@ export default function Studio() {
       // 1) Submit job
       const fd = new FormData();
       fd.append("file", pickedFile);
+      fd.append("width_m", String(widthM));
+      fd.append("height_m", String(heightM));
+      fd.append("depth_m", String(depthM));
+      fd.append("voxel_size_cm", String(voxelSizeCm));
+      fd.append("colored", colored ? "true" : "false");
       const submit = await fetch(`${EXTERNAL_BASE}/generate-3d/`, {
         method: "POST",
         body: fd,

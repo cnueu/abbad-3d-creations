@@ -59,7 +59,22 @@ export default function Studio() {
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [pickedFile, setPickedFile] = useState<File | null>(null);
   const [modelUrl, setModelUrl] = useState<string | null>(null);
-  const [voxelStats, setVoxelStats] = useState<{ total_voxels?: number } | null>(null);
+  const [voxelStats, setVoxelStats] = useState<{
+    total_voxels?: number;
+    grid_x?: number;
+    grid_y?: number;
+    grid_z?: number;
+    colored?: boolean;
+    real_width_m?: number;
+    real_depth_m?: number;
+    real_height_m?: number;
+    vox_size_kb?: number;
+  } | null>(null);
+  const [widthM, setWidthM] = useState(6.4);
+  const [heightM, setHeightM] = useState(6.4);
+  const [depthM, setDepthM] = useState(6.4);
+  const [voxelSizeCm, setVoxelSizeCm] = useState(10);
+  const [colored, setColored] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState<string>("");
   const [authed, setAuthed] = useState(false);
@@ -129,6 +144,11 @@ export default function Studio() {
       // 1) Submit job
       const fd = new FormData();
       fd.append("file", pickedFile);
+      fd.append("width_m", String(widthM));
+      fd.append("height_m", String(heightM));
+      fd.append("depth_m", String(depthM));
+      fd.append("voxel_size_cm", String(voxelSizeCm));
+      fd.append("colored", colored ? "true" : "false");
       const submit = await fetch(`${EXTERNAL_BASE}/generate-3d/`, {
         method: "POST",
         body: fd,
@@ -179,6 +199,12 @@ export default function Studio() {
               ? (ar ? `في قائمة الانتظار (الموقع ${qp})...` : `In queue (position ${qp})...`)
               : (ar ? "في قائمة الانتظار..." : "In queue...")
           );
+        } else if (status === "generating_shape") {
+          setStatusText(ar ? "توليد الشكل ثلاثي الأبعاد..." : "Generating 3D shape...");
+        } else if (status === "generating_texture") {
+          setStatusText(ar ? "توليد الألوان والخامة..." : "Generating colors & texture...");
+        } else if (status === "converting") {
+          setStatusText(ar ? "تحويل إلى فوكسل..." : "Converting to voxels...");
         } else if (status === "processing") {
           setStatusText(ar ? "جاري التوليد..." : "Generating...");
         }
@@ -219,7 +245,7 @@ export default function Studio() {
     if (modelUrl) {
       const a = document.createElement("a");
       a.href = modelUrl;
-      a.download = "model.vox";
+      a.download = "voxel_model.vox";
       a.click();
       return;
     }
@@ -363,6 +389,70 @@ export default function Studio() {
               )}
             </div>
 
+            {/* Physical dimensions */}
+            <div>
+              <span className="block text-[11px] tracking-[0.18em] uppercase text-foreground/55 mb-2">
+                {ar ? "الأبعاد الفيزيائية (متر)" : "Physical dimensions (m)"}
+              </span>
+              <div className="grid grid-cols-3 gap-2">
+                {([
+                  { label: ar ? "العرض" : "Width", value: widthM, set: setWidthM },
+                  { label: ar ? "الارتفاع" : "Height", value: heightM, set: setHeightM },
+                  { label: ar ? "العمق" : "Depth", value: depthM, set: setDepthM },
+                ]).map((f) => (
+                  <label key={f.label} className="flex flex-col gap-1">
+                    <span className="text-[10px] text-foreground/55">{f.label}</span>
+                    <input
+                      type="number"
+                      min={0.1}
+                      step={0.1}
+                      value={f.value}
+                      onChange={(e) => f.set(parseFloat(e.target.value) || 0)}
+                      className="rounded-lg px-3 py-2 bg-background border border-[color:var(--card-border)] text-sm outline-none focus:ring-2 focus:ring-foreground/20"
+                    />
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Voxel size */}
+            <div>
+              <label className="flex flex-col gap-1">
+                <span className="text-[11px] tracking-[0.18em] uppercase text-foreground/55">
+                  {ar ? "حجم المكعب (سم)" : "Voxel size (cm)"}
+                </span>
+                <input
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={voxelSizeCm}
+                  onChange={(e) => setVoxelSizeCm(parseFloat(e.target.value) || 0)}
+                  className="rounded-lg px-3 py-2 bg-background border border-[color:var(--card-border)] text-sm outline-none focus:ring-2 focus:ring-foreground/20"
+                />
+              </label>
+            </div>
+
+            {/* Colored toggle */}
+            <div className="rounded-xl border border-[color:var(--card-border)] p-3 bg-[hsl(var(--accent))]/5">
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={colored}
+                  onChange={(e) => setColored(e.target.checked)}
+                  className="w-4 h-4 accent-[hsl(var(--accent))]"
+                />
+                <span className="text-sm font-medium">
+                  {ar ? "تفعيل الألوان" : "Enable color"}
+                </span>
+              </label>
+              {colored && (
+                <div className="mt-2 text-[11px] text-amber-400/90 leading-relaxed">
+                  {ar
+                    ? "⚠ توليد الألوان يضيف ٥-٨ دقائق تقريباً لوقت المعالجة."
+                    : "⚠ Color generation adds approximately 5–8 extra minutes to processing time."}
+                </div>
+              )}
+            </div>
 
             <button onClick={generate} disabled={loading || !pickedFile || remaining <= 0} className="btn-primary w-full disabled:opacity-60">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
@@ -537,17 +627,29 @@ export default function Studio() {
                 <h2 className="font-display text-2xl md:text-3xl font-bold">
                   {ar ? "النموذج الناتج" : "Generated model"}
                 </h2>
-                {voxelStats?.total_voxels != null && (
-                  <div className="text-xs text-foreground/60 mt-1">
-                    {ar
-                      ? `إجمالي الفوكسلات: ${voxelStats.total_voxels.toLocaleString()}`
-                      : `Total voxels: ${voxelStats.total_voxels.toLocaleString()}`}
+                {voxelStats && (
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-foreground/65">
+                    {voxelStats.total_voxels != null && (
+                      <span>{ar ? "الفوكسلات" : "Voxels"}: <b className="text-foreground/85">{voxelStats.total_voxels.toLocaleString()}</b></span>
+                    )}
+                    {voxelStats.grid_x != null && voxelStats.grid_y != null && voxelStats.grid_z != null && (
+                      <span>{ar ? "الشبكة" : "Grid"}: <b className="text-foreground/85">{voxelStats.grid_x}×{voxelStats.grid_y}×{voxelStats.grid_z}</b></span>
+                    )}
+                    {voxelStats.real_width_m != null && voxelStats.real_height_m != null && voxelStats.real_depth_m != null && (
+                      <span>{ar ? "الأبعاد" : "Size"}: <b className="text-foreground/85">{voxelStats.real_width_m}×{voxelStats.real_height_m}×{voxelStats.real_depth_m} m</b></span>
+                    )}
+                    {voxelStats.vox_size_kb != null && (
+                      <span>{ar ? "حجم الملف" : "File"}: <b className="text-foreground/85">{voxelStats.vox_size_kb} KB</b></span>
+                    )}
+                    {voxelStats.colored != null && (
+                      <span>{ar ? "ملوّن" : "Colored"}: <b className="text-foreground/85">{voxelStats.colored ? (ar ? "نعم" : "Yes") : (ar ? "لا" : "No")}</b></span>
+                    )}
                   </div>
                 )}
               </div>
               <button onClick={downloadObj} className="btn-ghost">
                 <Download className="w-4 h-4" />
-                {ar ? "تحميل model.vox" : "Download model.vox"}
+                {ar ? "تحميل voxel_model.vox" : "Download voxel_model.vox"}
               </button>
             </div>
             <div className="w-full h-[70vh] min-h-[480px] rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">

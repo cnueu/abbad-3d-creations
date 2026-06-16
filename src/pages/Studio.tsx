@@ -17,9 +17,9 @@ import najdiImage from "@/assets/theme-najdi.png";
 import medievalImage from "@/assets/theme-medieval.png";
 
 // External Hunyuan3D-2.1 + voxelizer backend (Kaggle/ngrok).
-// Async job API: POST /generate-3d/ -> { job_id }
-//                GET  /status/{id}  -> { status: "pending"|"processing"|"done"|"error", ... }
-//                GET  /result/{id}  -> GLB (or OBJ) binary
+// Async job API: POST /generate-3d/ -> { job_id, status, queue_pos }
+//                GET  /status/{id}  -> { status: "queued"|"processing"|"done"|"error", stats?, queue_pos? }
+//                GET  /result/{id}  -> .vox binary (application/octet-stream)
 const EXTERNAL_BASE = "https://squatted-probation-underdone.ngrok-free.dev";
 const NGROK_HEADERS = { "ngrok-skip-browser-warning": "true" } as const;
 const EXPECTED_DURATION_MS = 7 * 60 * 1000; // ~7 minutes
@@ -60,7 +60,7 @@ export default function Studio() {
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [pickedFile, setPickedFile] = useState<File | null>(null);
   const [modelUrl, setModelUrl] = useState<string | null>(null);
-  const [modelKind, setModelKind] = useState<"glb" | "obj">("glb");
+  const [voxelStats, setVoxelStats] = useState<{ total_voxels?: number } | null>(null);
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState<string>("");
   const [authed, setAuthed] = useState(false);
@@ -144,12 +144,18 @@ export default function Studio() {
         submitJson.job_id ?? submitJson.id ?? submitJson.jobId ?? submitJson.task_id;
       if (!jobId) throw new Error("No job_id returned from server");
 
-      setStatusText(ar ? "جاري التوليد..." : "Generating...");
+      const initialQueuePos = submitJson.queue_pos;
+      if (typeof initialQueuePos === "number" && initialQueuePos > 0) {
+        setStatusText(ar ? `في قائمة الانتظار (الموقع ${initialQueuePos})...` : `In queue (position ${initialQueuePos})...`);
+      } else {
+        setStatusText(ar ? "جاري التوليد..." : "Generating...");
+      }
 
       // 2) Poll status every 5s
       const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
       let done = false;
       let attempts = 0;
+      let finalStats: any = null;
       const maxAttempts = 12 * 15; // ~15 minutes safety
       while (!done) {
         attempts++;
@@ -160,11 +166,22 @@ export default function Studio() {
         const sjson = await sres.json().catch(() => ({} as any));
         const status: string = String(sjson.status ?? sjson.state ?? "").toLowerCase();
         if (status === "done" || status === "completed" || status === "success" || status === "finished") {
+          finalStats = sjson.stats ?? null;
           done = true;
           break;
         }
         if (status === "error" || status === "failed") {
           throw new Error(sjson.error || sjson.message || "Generation failed");
+        }
+        if (status === "queued") {
+          const qp = sjson.queue_pos;
+          setStatusText(
+            typeof qp === "number"
+              ? (ar ? `في قائمة الانتظار (الموقع ${qp})...` : `In queue (position ${qp})...`)
+              : (ar ? "في قائمة الانتظار..." : "In queue...")
+          );
+        } else if (status === "processing") {
+          setStatusText(ar ? "جاري التوليد..." : "Generating...");
         }
         if (sjson.progress != null) {
           const p = Number(sjson.progress);
@@ -172,32 +189,24 @@ export default function Studio() {
         }
       }
 
-      // 3) Fetch result
+      // 3) Fetch result (.vox binary)
       setStatusText(ar ? "تحميل النموذج..." : "Fetching model...");
       const rres = await fetch(`${EXTERNAL_BASE}/result/${jobId}`, { headers: { ...NGROK_HEADERS } });
       if (!rres.ok) throw new Error(`Result ${rres.status}`);
-      const ct = (rres.headers.get("content-type") || "").toLowerCase();
       const buf = await rres.arrayBuffer();
       if (!buf.byteLength) throw new Error(ar ? "الملف المُستلم فارغ" : "Empty model file");
 
-      // Detect format: GLB starts with magic "glTF"
-      const head = new Uint8Array(buf.slice(0, 4));
-      const isGlb =
-        ct.includes("model/gltf-binary") ||
-        ct.includes("glb") ||
-        (head[0] === 0x67 && head[1] === 0x6c && head[2] === 0x54 && head[3] === 0x46);
-      const kind: "glb" | "obj" = isGlb ? "glb" : "obj";
-      const blob = new Blob([buf], { type: isGlb ? "model/gltf-binary" : "text/plain" });
+      const blob = new Blob([buf], { type: "application/octet-stream" });
 
       if (modelUrl) URL.revokeObjectURL(modelUrl);
       const url = URL.createObjectURL(blob);
       setModelUrl(url);
-      setModelKind(kind);
+      setVoxelStats(finalStats);
       setResult(null);
       setProgress(100);
       setStatusText("");
       setUses(bumpUses());
-      toast.success(ar ? "تم استلام المجسم" : "3D model received");
+      toast.success(ar ? "تم استلام ملف الفوكسل (.vox)" : "Voxel file (.vox) received");
     } catch (e: any) {
       console.error("generate error", e);
       toast.error(e.message || "Failed");
@@ -211,7 +220,7 @@ export default function Studio() {
     if (modelUrl) {
       const a = document.createElement("a");
       a.href = modelUrl;
-      a.download = modelKind === "glb" ? "model.glb" : "model_voxel.obj";
+      a.download = "model.vox";
       a.click();
       return;
     }
@@ -410,11 +419,24 @@ export default function Studio() {
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
               {modelUrl ? (
-                modelKind === "glb" ? (
-                  <ExternalGltfViewer url={modelUrl} />
-                ) : (
-                  <ExternalObjViewer url={modelUrl} />
-                )
+                <div className="w-full h-full flex flex-col items-center justify-center gap-3 px-8 text-center">
+                  <div className="w-14 h-14 rounded-full bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))] flex items-center justify-center">
+                    <Sparkles className="w-7 h-7" />
+                  </div>
+                  <div className="text-base font-semibold">
+                    {ar ? "ملف الفوكسل (.vox) جاهز" : "Voxel file (.vox) is ready"}
+                  </div>
+                  {voxelStats?.total_voxels != null && (
+                    <div className="text-xs text-foreground/65">
+                      {ar ? `إجمالي الفوكسلات: ${voxelStats.total_voxels.toLocaleString()}` : `Total voxels: ${voxelStats.total_voxels.toLocaleString()}`}
+                    </div>
+                  )}
+                  <div className="text-[11px] text-foreground/50 max-w-sm">
+                    {ar
+                      ? "افتح الملف في MagicaVoxel أو أي عارض .vox للمعاينة والتعديل."
+                      : "Open in MagicaVoxel or any .vox viewer to preview and edit."}
+                  </div>
+                </div>
               ) : result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
               ) : loading ? (
@@ -438,9 +460,7 @@ export default function Studio() {
             {modelUrl && (
               <button onClick={downloadObj} className="btn-ghost w-full">
                 <Download className="w-4 h-4" />
-                {ar
-                  ? modelKind === "glb" ? "تحميل model.glb" : "تحميل model_voxel.obj"
-                  : modelKind === "glb" ? "Download model.glb" : "Download model_voxel.obj"}
+                {ar ? "تحميل model.vox" : "Download model.vox"}
               </button>
             )}
 

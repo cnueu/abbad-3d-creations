@@ -220,7 +220,7 @@ export default function Studio() {
     if (modelUrl) {
       const a = document.createElement("a");
       a.href = modelUrl;
-      a.download = modelKind === "glb" ? "model.glb" : "model_voxel.obj";
+      a.download = "model.vox";
       a.click();
       return;
     }

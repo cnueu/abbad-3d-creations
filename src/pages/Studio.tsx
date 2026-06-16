@@ -573,7 +573,7 @@ export default function Studio() {
               </div>
               <button onClick={downloadObj} className="btn-ghost">
                 <Download className="w-4 h-4" />
-                {ar ? "تحميل model.vox" : "Download model.vox"}
+                {ar ? "تحميل voxel_model.vox" : "Download voxel_model.vox"}
               </button>
             </div>
             <div className="w-full h-[70vh] min-h-[480px] rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">

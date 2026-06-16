@@ -17,9 +17,9 @@ import najdiImage from "@/assets/theme-najdi.png";
 import medievalImage from "@/assets/theme-medieval.png";
 
 // External Hunyuan3D-2.1 + voxelizer backend (Kaggle/ngrok).
-// Async job API: POST /generate-3d/ -> { job_id }
-//                GET  /status/{id}  -> { status: "pending"|"processing"|"done"|"error", ... }
-//                GET  /result/{id}  -> GLB (or OBJ) binary
+// Async job API: POST /generate-3d/ -> { job_id, status, queue_pos }
+//                GET  /status/{id}  -> { status: "queued"|"processing"|"done"|"error", stats?, queue_pos? }
+//                GET  /result/{id}  -> .vox binary (application/octet-stream)
 const EXTERNAL_BASE = "https://squatted-probation-underdone.ngrok-free.dev";
 const NGROK_HEADERS = { "ngrok-skip-browser-warning": "true" } as const;
 const EXPECTED_DURATION_MS = 7 * 60 * 1000; // ~7 minutes

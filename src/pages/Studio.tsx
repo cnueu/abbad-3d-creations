@@ -245,7 +245,7 @@ export default function Studio() {
     if (modelUrl) {
       const a = document.createElement("a");
       a.href = modelUrl;
-      a.download = "model.vox";
+      a.download = "voxel_model.vox";
       a.click();
       return;
     }

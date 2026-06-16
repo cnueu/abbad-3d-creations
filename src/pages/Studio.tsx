@@ -5,8 +5,7 @@ import { motion } from "framer-motion";
 import { Sparkles, Download, Loader2, ImagePlus, X, LogIn, Palette, ListChecks, Upload, Wand2, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { GeneratedScene, buildObj, PlacedCube, Slide, ColorTheme } from "@/components/GeneratedScene";
-import { ExternalObjViewer } from "@/components/ExternalObjViewer";
-import { ExternalGltfViewer } from "@/components/ExternalGltfViewer";
+import { VoxViewer } from "@/components/VoxViewer";
 import { Progress } from "@/components/ui/progress";
 import { ProductCard } from "@/components/ProductCard";
 import { ProductDetail } from "@/components/ProductDetail";
@@ -419,23 +418,18 @@ export default function Studio() {
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
               {modelUrl ? (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-3 px-8 text-center">
-                  <div className="w-14 h-14 rounded-full bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))] flex items-center justify-center">
-                    <Sparkles className="w-7 h-7" />
+                <div className="w-full h-full flex flex-col items-center justify-center gap-2 px-8 text-center">
+                  <div className="w-12 h-12 rounded-full bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))] flex items-center justify-center">
+                    <Sparkles className="w-6 h-6" />
                   </div>
-                  <div className="text-base font-semibold">
-                    {ar ? "ملف الفوكسل (.vox) جاهز" : "Voxel file (.vox) is ready"}
+                  <div className="text-sm font-semibold">
+                    {ar ? "النموذج جاهز للعرض أدناه" : "Model ready — view below"}
                   </div>
                   {voxelStats?.total_voxels != null && (
                     <div className="text-xs text-foreground/65">
                       {ar ? `إجمالي الفوكسلات: ${voxelStats.total_voxels.toLocaleString()}` : `Total voxels: ${voxelStats.total_voxels.toLocaleString()}`}
                     </div>
                   )}
-                  <div className="text-[11px] text-foreground/50 max-w-sm">
-                    {ar
-                      ? "افتح الملف في MagicaVoxel أو أي عارض .vox للمعاينة والتعديل."
-                      : "Open in MagicaVoxel or any .vox viewer to preview and edit."}
-                  </div>
                 </div>
               ) : result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
@@ -457,12 +451,6 @@ export default function Studio() {
               )}
             </div>
 
-            {modelUrl && (
-              <button onClick={downloadObj} className="btn-ghost w-full">
-                <Download className="w-4 h-4" />
-                {ar ? "تحميل model.vox" : "Download model.vox"}
-              </button>
-            )}
 
             {result && (
               <motion.div
@@ -531,6 +519,47 @@ export default function Studio() {
             )}
           </div>
         </div>
+
+        {/* ─────────────────────────────────────────────────────────────
+            FULL-WIDTH 3D PREVIEW for the generated .vox model
+           ───────────────────────────────────────────────────────────── */}
+        {modelUrl && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-10"
+          >
+            <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
+              <div>
+                <div className="text-[11px] tracking-[0.2em] uppercase text-foreground/55 mb-1">
+                  {ar ? "المعاينة ثلاثية الأبعاد" : "3D Preview"}
+                </div>
+                <h2 className="font-display text-2xl md:text-3xl font-bold">
+                  {ar ? "النموذج الناتج" : "Generated model"}
+                </h2>
+                {voxelStats?.total_voxels != null && (
+                  <div className="text-xs text-foreground/60 mt-1">
+                    {ar
+                      ? `إجمالي الفوكسلات: ${voxelStats.total_voxels.toLocaleString()}`
+                      : `Total voxels: ${voxelStats.total_voxels.toLocaleString()}`}
+                  </div>
+                )}
+              </div>
+              <button onClick={downloadObj} className="btn-ghost">
+                <Download className="w-4 h-4" />
+                {ar ? "تحميل model.vox" : "Download model.vox"}
+              </button>
+            </div>
+            <div className="w-full h-[70vh] min-h-[480px] rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
+              <VoxViewer url={modelUrl} />
+            </div>
+            <div className="mt-3 text-[11px] text-foreground/50 text-center">
+              {ar
+                ? "اسحب للتدوير · مرّر للتكبير · انقر بزرّين للتحريك"
+                : "Drag to rotate · scroll to zoom · right-drag to pan"}
+            </div>
+          </motion.section>
+        )}
 
         {result && suggested.length > 0 && (
           <section className="mt-14">

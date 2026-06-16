@@ -418,23 +418,18 @@ export default function Studio() {
 
             <div className="aspect-video rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
               {modelUrl ? (
-                <div className="w-full h-full flex flex-col items-center justify-center gap-3 px-8 text-center">
-                  <div className="w-14 h-14 rounded-full bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))] flex items-center justify-center">
-                    <Sparkles className="w-7 h-7" />
+                <div className="w-full h-full flex flex-col items-center justify-center gap-2 px-8 text-center">
+                  <div className="w-12 h-12 rounded-full bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))] flex items-center justify-center">
+                    <Sparkles className="w-6 h-6" />
                   </div>
-                  <div className="text-base font-semibold">
-                    {ar ? "ملف الفوكسل (.vox) جاهز" : "Voxel file (.vox) is ready"}
+                  <div className="text-sm font-semibold">
+                    {ar ? "النموذج جاهز للعرض أدناه" : "Model ready — view below"}
                   </div>
                   {voxelStats?.total_voxels != null && (
                     <div className="text-xs text-foreground/65">
                       {ar ? `إجمالي الفوكسلات: ${voxelStats.total_voxels.toLocaleString()}` : `Total voxels: ${voxelStats.total_voxels.toLocaleString()}`}
                     </div>
                   )}
-                  <div className="text-[11px] text-foreground/50 max-w-sm">
-                    {ar
-                      ? "افتح الملف في MagicaVoxel أو أي عارض .vox للمعاينة والتعديل."
-                      : "Open in MagicaVoxel or any .vox viewer to preview and edit."}
-                  </div>
                 </div>
               ) : result ? (
                 <GeneratedScene cubes={result.cubes} slides={result.slides} theme={theme} glassy={glassy} />
@@ -456,12 +451,6 @@ export default function Studio() {
               )}
             </div>
 
-            {modelUrl && (
-              <button onClick={downloadObj} className="btn-ghost w-full">
-                <Download className="w-4 h-4" />
-                {ar ? "تحميل model.vox" : "Download model.vox"}
-              </button>
-            )}
 
             {result && (
               <motion.div

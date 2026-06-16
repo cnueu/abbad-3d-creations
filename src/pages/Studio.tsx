@@ -627,11 +627,23 @@ export default function Studio() {
                 <h2 className="font-display text-2xl md:text-3xl font-bold">
                   {ar ? "النموذج الناتج" : "Generated model"}
                 </h2>
-                {voxelStats?.total_voxels != null && (
-                  <div className="text-xs text-foreground/60 mt-1">
-                    {ar
-                      ? `إجمالي الفوكسلات: ${voxelStats.total_voxels.toLocaleString()}`
-                      : `Total voxels: ${voxelStats.total_voxels.toLocaleString()}`}
+                {voxelStats && (
+                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-foreground/65">
+                    {voxelStats.total_voxels != null && (
+                      <span>{ar ? "الفوكسلات" : "Voxels"}: <b className="text-foreground/85">{voxelStats.total_voxels.toLocaleString()}</b></span>
+                    )}
+                    {voxelStats.grid_x != null && voxelStats.grid_y != null && voxelStats.grid_z != null && (
+                      <span>{ar ? "الشبكة" : "Grid"}: <b className="text-foreground/85">{voxelStats.grid_x}×{voxelStats.grid_y}×{voxelStats.grid_z}</b></span>
+                    )}
+                    {voxelStats.real_width_m != null && voxelStats.real_height_m != null && voxelStats.real_depth_m != null && (
+                      <span>{ar ? "الأبعاد" : "Size"}: <b className="text-foreground/85">{voxelStats.real_width_m}×{voxelStats.real_height_m}×{voxelStats.real_depth_m} m</b></span>
+                    )}
+                    {voxelStats.vox_size_kb != null && (
+                      <span>{ar ? "حجم الملف" : "File"}: <b className="text-foreground/85">{voxelStats.vox_size_kb} KB</b></span>
+                    )}
+                    {voxelStats.colored != null && (
+                      <span>{ar ? "ملوّن" : "Colored"}: <b className="text-foreground/85">{voxelStats.colored ? (ar ? "نعم" : "Yes") : (ar ? "لا" : "No")}</b></span>
+                    )}
                   </div>
                 )}
               </div>

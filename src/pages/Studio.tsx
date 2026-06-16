@@ -59,7 +59,22 @@ export default function Studio() {
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null);
   const [pickedFile, setPickedFile] = useState<File | null>(null);
   const [modelUrl, setModelUrl] = useState<string | null>(null);
-  const [voxelStats, setVoxelStats] = useState<{ total_voxels?: number } | null>(null);
+  const [voxelStats, setVoxelStats] = useState<{
+    total_voxels?: number;
+    grid_x?: number;
+    grid_y?: number;
+    grid_z?: number;
+    colored?: boolean;
+    real_width_m?: number;
+    real_depth_m?: number;
+    real_height_m?: number;
+    vox_size_kb?: number;
+  } | null>(null);
+  const [widthM, setWidthM] = useState(6.4);
+  const [heightM, setHeightM] = useState(6.4);
+  const [depthM, setDepthM] = useState(6.4);
+  const [voxelSizeCm, setVoxelSizeCm] = useState(10);
+  const [colored, setColored] = useState(false);
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState<string>("");
   const [authed, setAuthed] = useState(false);

@@ -520,6 +520,47 @@ export default function Studio() {
           </div>
         </div>
 
+        {/* ─────────────────────────────────────────────────────────────
+            FULL-WIDTH 3D PREVIEW for the generated .vox model
+           ───────────────────────────────────────────────────────────── */}
+        {modelUrl && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-10"
+          >
+            <div className="flex items-center justify-between gap-3 flex-wrap mb-4">
+              <div>
+                <div className="text-[11px] tracking-[0.2em] uppercase text-foreground/55 mb-1">
+                  {ar ? "المعاينة ثلاثية الأبعاد" : "3D Preview"}
+                </div>
+                <h2 className="font-display text-2xl md:text-3xl font-bold">
+                  {ar ? "النموذج الناتج" : "Generated model"}
+                </h2>
+                {voxelStats?.total_voxels != null && (
+                  <div className="text-xs text-foreground/60 mt-1">
+                    {ar
+                      ? `إجمالي الفوكسلات: ${voxelStats.total_voxels.toLocaleString()}`
+                      : `Total voxels: ${voxelStats.total_voxels.toLocaleString()}`}
+                  </div>
+                )}
+              </div>
+              <button onClick={downloadObj} className="btn-ghost">
+                <Download className="w-4 h-4" />
+                {ar ? "تحميل model.vox" : "Download model.vox"}
+              </button>
+            </div>
+            <div className="w-full h-[70vh] min-h-[480px] rounded-3xl glass-panel overflow-hidden bg-gradient-to-br from-[hsl(var(--accent))]/10 to-transparent">
+              <VoxViewer url={modelUrl} />
+            </div>
+            <div className="mt-3 text-[11px] text-foreground/50 text-center">
+              {ar
+                ? "اسحب للتدوير · مرّر للتكبير · انقر بزرّين للتحريك"
+                : "Drag to rotate · scroll to zoom · right-drag to pan"}
+            </div>
+          </motion.section>
+        )}
+
         {result && suggested.length > 0 && (
           <section className="mt-14">
             <h2 className="font-display text-2xl mb-5">{t.studio.suggested}</h2>

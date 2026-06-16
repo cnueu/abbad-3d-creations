@@ -144,12 +144,18 @@ export default function Studio() {
         submitJson.job_id ?? submitJson.id ?? submitJson.jobId ?? submitJson.task_id;
       if (!jobId) throw new Error("No job_id returned from server");
 
-      setStatusText(ar ? "جاري التوليد..." : "Generating...");
+      const initialQueuePos = submitJson.queue_pos;
+      if (typeof initialQueuePos === "number" && initialQueuePos > 0) {
+        setStatusText(ar ? `في قائمة الانتظار (الموقع ${initialQueuePos})...` : `In queue (position ${initialQueuePos})...`);
+      } else {
+        setStatusText(ar ? "جاري التوليد..." : "Generating...");
+      }
 
       // 2) Poll status every 5s
       const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
       let done = false;
       let attempts = 0;
+      let finalStats: any = null;
       const maxAttempts = 12 * 15; // ~15 minutes safety
       while (!done) {
         attempts++;
@@ -160,11 +166,22 @@ export default function Studio() {
         const sjson = await sres.json().catch(() => ({} as any));
         const status: string = String(sjson.status ?? sjson.state ?? "").toLowerCase();
         if (status === "done" || status === "completed" || status === "success" || status === "finished") {
+          finalStats = sjson.stats ?? null;
           done = true;
           break;
         }
         if (status === "error" || status === "failed") {
           throw new Error(sjson.error || sjson.message || "Generation failed");
+        }
+        if (status === "queued") {
+          const qp = sjson.queue_pos;
+          setStatusText(
+            typeof qp === "number"
+              ? (ar ? `في قائمة الانتظار (الموقع ${qp})...` : `In queue (position ${qp})...`)
+              : (ar ? "في قائمة الانتظار..." : "In queue...")
+          );
+        } else if (status === "processing") {
+          setStatusText(ar ? "جاري التوليد..." : "Generating...");
         }
         if (sjson.progress != null) {
           const p = Number(sjson.progress);
@@ -172,32 +189,24 @@ export default function Studio() {
         }
       }
 
-      // 3) Fetch result
+      // 3) Fetch result (.vox binary)
       setStatusText(ar ? "تحميل النموذج..." : "Fetching model...");
       const rres = await fetch(`${EXTERNAL_BASE}/result/${jobId}`, { headers: { ...NGROK_HEADERS } });
       if (!rres.ok) throw new Error(`Result ${rres.status}`);
-      const ct = (rres.headers.get("content-type") || "").toLowerCase();
       const buf = await rres.arrayBuffer();
       if (!buf.byteLength) throw new Error(ar ? "الملف المُستلم فارغ" : "Empty model file");
 
-      // Detect format: GLB starts with magic "glTF"
-      const head = new Uint8Array(buf.slice(0, 4));
-      const isGlb =
-        ct.includes("model/gltf-binary") ||
-        ct.includes("glb") ||
-        (head[0] === 0x67 && head[1] === 0x6c && head[2] === 0x54 && head[3] === 0x46);
-      const kind: "glb" | "obj" = isGlb ? "glb" : "obj";
-      const blob = new Blob([buf], { type: isGlb ? "model/gltf-binary" : "text/plain" });
+      const blob = new Blob([buf], { type: "application/octet-stream" });
 
       if (modelUrl) URL.revokeObjectURL(modelUrl);
       const url = URL.createObjectURL(blob);
       setModelUrl(url);
-      setModelKind(kind);
+      setVoxelStats(finalStats);
       setResult(null);
       setProgress(100);
       setStatusText("");
       setUses(bumpUses());
-      toast.success(ar ? "تم استلام المجسم" : "3D model received");
+      toast.success(ar ? "تم استلام ملف الفوكسل (.vox)" : "Voxel file (.vox) received");
     } catch (e: any) {
       console.error("generate error", e);
       toast.error(e.message || "Failed");

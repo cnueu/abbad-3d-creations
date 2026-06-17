@@ -21,7 +21,7 @@ import medievalImage from "@/assets/theme-medieval.png";
 //                GET  /result/{id}  -> .vox binary (application/octet-stream)
 const EXTERNAL_BASE = "https://squatted-probation-underdone.ngrok-free.dev";
 const NGROK_HEADERS = { "ngrok-skip-browser-warning": "true" } as const;
-const EXPECTED_DURATION_MS = 7 * 60 * 1000; // ~7 minutes
+const EXPECTED_DURATION_MS = 13 * 60 * 1000; // ~13 minutes (color generation)
 
 interface Result {
   cubes: PlacedCube[];

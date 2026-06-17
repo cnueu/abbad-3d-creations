@@ -323,22 +323,8 @@ export default function Studio() {
           </div>
         </section>
 
-        {/* Quota banner */}
-        <div className="mb-6 flex items-center justify-between gap-3 flex-wrap rounded-2xl px-5 py-3 border border-[color:var(--card-border)] glass-card">
-          <div className="text-sm">
-            <span className="text-foreground/65">
-              {ar ? "المتبقي اليوم:" : "Remaining today:"}
-            </span>{" "}
-            <span className="font-semibold text-[hsl(var(--accent))]">{remaining}</span>
-            <span className="text-foreground/45"> / {limit}</span>
-          </div>
-          {!authed && (
-            <Link to="/auth" className="text-xs inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[color:var(--card-border)] hover:bg-[hsl(var(--accent))]/10 transition">
-              <LogIn className="w-3.5 h-3.5" />
-              {ar ? `سجّل لتصل إلى ${USER_LIMIT}/يوم` : `Sign in for ${USER_LIMIT}/day`}
-            </Link>
-          )}
-        </div>
+        {/* Quota banner disabled temporarily — unlimited testing */}
+
 
         <div className="grid lg:grid-cols-5 gap-6">
           {/* Image-only input */}

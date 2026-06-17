@@ -430,7 +430,7 @@ export default function Studio() {
               )}
             </div>
 
-            <button onClick={generate} disabled={loading || !pickedFile || remaining <= 0} className="btn-primary w-full disabled:opacity-60">
+            <button onClick={generate} disabled={loading || !pickedFile} className="btn-primary w-full disabled:opacity-60">
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               {loading ? t.studio.generating : t.studio.generate}
             </button>

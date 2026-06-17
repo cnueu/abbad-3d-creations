@@ -116,18 +116,8 @@ export default function Studio() {
       toast.error(ar ? "ارفع صورة لما تريد بناءه" : "Upload a photo to build from");
       return;
     }
-    if (remaining <= 0) {
-      toast.error(
-        authed
-          ? ar
-            ? `وصلت إلى الحد اليومي (${USER_LIMIT}). جرّب غداً.`
-            : `You hit the daily limit (${USER_LIMIT}). Try again tomorrow.`
-          : ar
-            ? `وصلت إلى حد الزائر (${GUEST_LIMIT}). سجّل دخولك للحصول على ${USER_LIMIT}.`
-            : `Guest limit reached (${GUEST_LIMIT}). Sign in to get ${USER_LIMIT}/day.`
-      );
-      return;
-    }
+    // Limit disabled temporarily for testing
+
     setLoading(true);
     setProgress(0);
     setStatusText(ar ? "إرسال الصورة..." : "Uploading image...");

@@ -84,7 +84,7 @@ export const translations: { en: Dict; ar: Dict } = {
     },
     about: {
       title: "Who we are",
-      body: "Abaad (أبعاد، \"dimensions\") is a Saudi maker of precision modular building blocks. Two parts، a cube and a connecter، assemble into anything you can imagine, from a coffee-table sculpture to a full theater set.",
+      body: "Abaad (أبعاد، \"dimensions\") is a Saudi maker of precision modular building blocks. Two parts, a cube and a connecter, assemble into anything you can imagine, from a coffee-table sculpture to a full theater set.",
       incubatorLabel: "Incubated by",
       incubator: "Falak Business & Investment Company",
       mission: "Our mission",

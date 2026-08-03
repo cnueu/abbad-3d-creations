@@ -90,7 +90,7 @@ export default function Quote() {
     window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
       "Abaad, quote request"
     )}&body=${encodeURIComponent(body)}`;
-    toast.success(ar ? "تم تجهيز طلبك، أرفق صورك في البريد." : "Request prepared، attach your images in the email.");
+    toast.success(ar ? "تم تجهيز طلبك، أرفق صورك في البريد." : "Request prepared, attach your images in the email.");
   }
 
   return (
@@ -120,7 +120,7 @@ export default function Quote() {
                 {ar ? "١. صور المشروع" : "1. Project images"}
               </h2>
               <p className="text-xs text-foreground/60 mb-4">
-                {ar ? `حتى ${MAX_IMAGES} صور، رسومات، مخططات، أو مراجع بصرية.` : `Up to ${MAX_IMAGES} images، sketches, plans or visual references.`}
+                {ar ? `حتى ${MAX_IMAGES} صور، رسومات، مخططات، أو مراجع بصرية.` : `Up to ${MAX_IMAGES} images, sketches, plans or visual references.`}
               </p>
               <label className="block border border-dashed rounded-xl p-8 text-center cursor-pointer hover:bg-[hsl(var(--accent))]/8 transition"
                 style={{ borderColor: "var(--card-border)" }}>
@@ -198,7 +198,7 @@ export default function Quote() {
                       borderColor: customColor ? "hsl(var(--accent))" : "var(--card-border)",
                       background: customColor ? "hsl(var(--accent) / 0.15)" : "transparent",
                     }}>
-                    {customColor ? (ar ? "نعم" : "Yes") : (ar ? "لا، ألوان قياسية" : "No، standard colors")}
+                    {customColor ? (ar ? "نعم" : "Yes") : (ar ? "لا، ألوان قياسية" : "No, standard colors")}
                   </button>
                 </div>
               </div>

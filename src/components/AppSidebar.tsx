@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
   Bell,
-  Info,
   Handshake,
   ChevronLeft,
   ChevronRight,
@@ -25,13 +24,9 @@ interface NavItem {
   to: string;
 }
 
-/** 4-point star, now the light/dark theme toggle button. */
-function FourPointStar({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
-      <path d="M12 1.5 L13.6 9.2 L21.5 12 L13.6 14.8 L12 22.5 L10.4 14.8 L2.5 12 L10.4 9.2 Z" />
-    </svg>
-  );
+/** The Abaad cube mark, used as the icon for the "About" ("من نحن") menu entry. */
+function AbaadMark({ className = "" }: { className?: string }) {
+  return <Logo variant="icon" className={className} />;
 }
 
 // SIDEBAR NAVIGATION, add or remove a page in the `items` array below.
@@ -58,7 +53,7 @@ export function AppSidebar({
     { id: "quote", label: lang === "ar" ? "طلب سعر" : "Request a quote", icon: FileText, to: "/quote" },
     { id: "partners", label: lang === "ar" ? "الشراكات" : "Partners", icon: Handshake, to: "/partners" },
     { id: "notif", label: lang === "ar" ? "الإشعارات" : "Notifications", icon: Bell, to: "/notifications" },
-    { id: "about", label: lang === "ar" ? "من نحن" : "About", icon: Info, to: "/about" },
+    { id: "about", label: lang === "ar" ? "من نحن" : "About", icon: AbaadMark, to: "/about" },
   ];
 
   const isPathActive = (to: string) => {

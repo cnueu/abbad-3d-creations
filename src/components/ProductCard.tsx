@@ -10,40 +10,31 @@ interface Props {
   index?: number;
 }
 
-// Glassy shiny preview — matches the homepage rotating-cube aesthetic.
-// Uses each product's real color but gives it the polished, deep, reflective
-// look (radial highlight + colored bloom + inset shadows). Real 3D loads on hover.
-function StaticPreview({ product }: { product: Product }) {
-  const c = product.color;
+// Glassy shiny preview — matches the homepage rotating-piece aesthetic.
+// Real 3D loads on hover to keep the grid light.
+function StaticPreview({ color }: { color: string }) {
   return (
     <div
       className="w-full h-full flex items-center justify-center relative"
       style={{
-        // Outer fade uses the theme background so light mode doesn't get a
-        // black corner. Inner stops still use the product color for the bloom.
-        background: `radial-gradient(ellipse at 30% 20%, ${c}ee 0%, ${c}aa 35%, ${c}66 70%, hsl(var(--bg-main)) 100%)`,
+        background: `radial-gradient(ellipse at 30% 20%, ${color}ee 0%, ${color}aa 35%, ${color}55 70%, hsl(var(--bg-main)) 100%)`,
       }}
     >
-      {/* soft top sheen */}
       <div
         aria-hidden
         className="absolute inset-0 pointer-events-none"
-        style={{
-          background:
-            "radial-gradient(ellipse at 50% -10%, rgba(255,255,255,0.18) 0%, transparent 55%)",
-        }}
+        style={{ background: "radial-gradient(ellipse at 50% -10%, rgba(255,255,255,0.18) 0%, transparent 55%)" }}
       />
       <div
         className="w-24 h-24 rounded-2xl"
         style={{
-          background: `linear-gradient(135deg, ${c} 0%, ${c}cc 50%, ${c}77 100%)`,
+          background: `linear-gradient(135deg, ${color} 0%, ${color}cc 50%, ${color}77 100%)`,
           boxShadow: [
-            `0 18px 40px ${c}55`,
+            `0 18px 40px ${color}55`,
             "inset 0 -10px 24px rgba(0,0,0,0.35)",
             "inset 0 10px 22px rgba(255,255,255,0.22)",
             "0 0 0 1px rgba(255,255,255,0.08)",
           ].join(", "),
-          backdropFilter: "blur(2px)",
         }}
       />
     </div>
@@ -53,14 +44,11 @@ function StaticPreview({ product }: { product: Product }) {
 export function ProductCard({ product, onClick, index = 0 }: Props) {
   const [hover, setHover] = useState(false);
   const { t, lang } = useLang();
-  const title =
-    product.kind === "cube"
-      ? lang === "ar" ? "مكعب" : "Cube"
-      : t.store.sheetTitle;
+  const title = lang === "ar" ? product.name.ar : product.name.en;
   const subtitle =
-    product.kind === "cube"
+    product.kind === "cube" || product.kind === "cube-smooth"
       ? `${product.size} × ${product.size} × ${product.size} ${t.common.cm}`
-      : `${product.dims.y} × ${product.dims.x} × ${product.dims.z} ${t.common.cm}`;
+      : `${product.dims.x} × ${product.dims.y} × ${product.dims.z} ${t.common.cm}`;
 
   return (
     <motion.button
@@ -79,29 +67,21 @@ export function ProductCard({ product, onClick, index = 0 }: Props) {
         {hover ? (
           <Product3D product={product} autoRotate interactive shinyWood />
         ) : (
-          <StaticPreview product={product} />
+          <StaticPreview color={product.color} />
         )}
+        <span className="absolute top-3 start-3 text-[10px] tracking-[0.14em] uppercase px-2 py-1 rounded-full bg-background/70 border border-[color:var(--card-border)] text-foreground/75">
+          {lang === "ar" ? `الجيل ${product.generation}` : `Gen ${product.generation}`}
+        </span>
       </div>
       <div className="px-4 pt-4 pb-5">
-        <div className="flex items-center gap-2 mb-1">
-          <span className="w-3 h-3 rounded-full ring-2 ring-foreground/15" style={{ background: product.color }} />
-          <h3 className="font-display text-lg font-semibold text-foreground">{title}</h3>
-        </div>
-        <p className="text-xs text-foreground/65 mb-1">{subtitle}</p>
-        <p className="text-[11px] text-foreground/50 mb-2">
-          {lang === "ar" ? product.colorName.ar : product.colorName.en}
-        </p>
-        {product.kind === "cube" && (
-          <p className="text-[10px] text-[hsl(var(--accent))]/90 mb-3">
-            {lang === "ar" ? "✓ موصِّلات مجاناً مع كل مكعب" : "✓ Free connecters included"}
-          </p>
-        )}
+        <h3 className="font-display text-base font-semibold text-foreground mb-1 leading-snug">{title}</h3>
+        <p className="text-xs text-foreground/65 mb-2">{subtitle}</p>
         <div className="flex items-center justify-between">
           <span className="text-[11px] tracking-wider uppercase text-foreground/55">
-            {t.store.material}: {product.materials.join(" , ")}
+            {product.materials.join(" · ")}
           </span>
-          <span className="text-sm font-semibold text-[hsl(var(--accent))]">
-            {product.price} {t.common.sar}
+          <span className="text-[11px] font-medium text-[hsl(var(--accent))]">
+            {lang === "ar" ? "ألوان مخصصة" : "Custom colors"}
           </span>
         </div>
       </div>

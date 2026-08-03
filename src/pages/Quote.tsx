@@ -122,7 +122,7 @@ export default function Quote() {
               <p className="text-xs text-foreground/60 mb-4">
                 {ar ? `حتى ${MAX_IMAGES} صور، رسومات، مخططات، أو مراجع بصرية.` : `Up to ${MAX_IMAGES} images، sketches, plans or visual references.`}
               </p>
-              <label className="block border border-dashed rounded-xl p-8 text-center cursor-pointer hover:bg-[hsl(var(--accent))]/8 transition",
+              <label className="block border border-dashed rounded-xl p-8 text-center cursor-pointer hover:bg-[hsl(var(--accent))]/8 transition"
                 style={{ borderColor: "var(--card-border)" }}>
                 <input type="file" accept="image/*" multiple className="hidden" onChange={(e) => addImages(e.target.files)} />
                 <Upload className="w-6 h-6 mx-auto mb-2 text-foreground/50" />
@@ -177,7 +177,7 @@ export default function Quote() {
                   </label>
                   <div className="flex gap-2">
                     {([2, 1] as const).map((g) => (
-                      <button key={g} onClick={() => setGen(g)} type="button",
+                      <button key={g} onClick={() => setGen(g)} type="button"
                         className="flex-1 px-3 py-2.5 rounded-xl text-sm border transition"
                         style={{
                           borderColor: gen === g ? "hsl(var(--accent))" : "var(--card-border)",

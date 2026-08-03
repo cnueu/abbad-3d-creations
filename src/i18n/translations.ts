@@ -214,7 +214,7 @@ export const translations: { en: Dict; ar: Dict } = {
       faqTitle: "Frequently asked",
       faq: [
         { q: "Do you ship outside Saudi Arabia?", a: "Currently we ship within KSA only. International partnerships are evaluated case by case." },
-        { q: "Can builds be reused?", a: "Yes. Every build can be disassembled and reassembled into a new shape, that's the core of the system." }
+        { q: "Can builds be reused?", a: "Yes. Every build can be disassembled and reassembled into a new shape, that's the core of the system." },
         { q: "What materials are available?", a: "Wood and PLA today, with more bio-based finishes coming. Custom colors are supported." },
         { q: "Do you offer bulk pricing?", a: "Yes, schools, universities, theaters, and brands get partner pricing tiers." }
       ],
@@ -460,7 +460,7 @@ export const translations: { en: Dict; ar: Dict } = {
       faqTitle: "أسئلة متكررة",
       faq: [
         { q: "هل تشحنون خارج السعودية؟", a: "حاليًا نشحن داخل المملكة فقط. الشراكات الدولية تُدرس حالة بحالة." },
-        { q: "هل يمكن إعادة استخدام التركيبات؟", a: "نعم. كل تركيب يمكن فكّه وإعادة تجميعه في شكل جديد، هذا جوهر النظام." }
+        { q: "هل يمكن إعادة استخدام التركيبات؟", a: "نعم. كل تركيب يمكن فكّه وإعادة تجميعه في شكل جديد، هذا جوهر النظام." },
         { q: "ما المواد المتاحة؟", a: "خشب وPLA حاليًا، ومواد حيوية إضافية قادمة. الألوان المخصصة مدعومة." },
         { q: "هل يوجد تسعير بالجملة؟", a: "نعم، للمدارس والجامعات والمسارح والعلامات تسعير شراكة خاص." }
       ],

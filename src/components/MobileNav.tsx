@@ -12,6 +12,7 @@ import {
   Home as HomeIcon,
   FileText,
   Briefcase,
+  Sparkles,
 } from "lucide-react";
 import { useLang } from "@/i18n/LanguageContext";
 import { Logo } from "./Logo";

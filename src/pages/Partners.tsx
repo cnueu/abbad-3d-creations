@@ -44,7 +44,7 @@ export default function Partners() {
             {p.why.map((w: string, i: number) => (
               <li
                 key={i}
-                className="flex gap-3 text-base text-foreground/80 p-4 rounded-2xl border border-[color:var(--card-border)]",
+                className="flex gap-3 text-base text-foreground/80 p-4 rounded-2xl border border-[color:var(--card-border)]"
                 style={{ background: "var(--card-bg)" }}
               >
                 <CheckCircle2 className="w-5 h-5 text-[hsl(var(--accent))] shrink-0 mt-0.5" />
@@ -109,7 +109,7 @@ export default function Partners() {
             {p.process.map((s: { step: string; title: string; body: string }, i: number) => (
               <div
                 key={i}
-                className="rounded-2xl p-5 border border-[color:var(--card-border)]",
+                className="rounded-2xl p-5 border border-[color:var(--card-border)]"
                 style={{ background: "var(--card-bg)" }}
               >
                 <div className="text-[11px] tracking-[0.22em] text-[hsl(var(--accent))] mb-2">{s.step}</div>
@@ -132,7 +132,7 @@ export default function Partners() {
             {p.faq.map((item: { q: string; a: string }, i: number) => (
               <details
                 key={i}
-                className="rounded-2xl border border-[color:var(--card-border)] p-4",
+                className="rounded-2xl border border-[color:var(--card-border)] p-4"
                 style={{ background: "var(--card-bg)" }}
               >
                 <summary className="cursor-pointer font-medium text-sm md:text-base">{item.q}</summary>
@@ -164,13 +164,13 @@ export default function Partners() {
               />
               <input
                 required
-                type="email",
+                type="email"
                 placeholder={p.contactEmail}
                 className="px-4 py-3 rounded-xl bg-background/50 border border-[color:var(--card-border)] text-sm focus:outline-none focus:border-[hsl(var(--accent))]"
               />
               <select
                 required
-                defaultValue="",
+                defaultValue=""
                 className="px-4 py-3 rounded-xl bg-background/50 border border-[color:var(--card-border)] text-sm focus:outline-none focus:border-[hsl(var(--accent))] sm:col-span-2"
               >
                 <option value="" disabled>{p.contactType}</option>

@@ -135,7 +135,7 @@ export default function Quote() {
                       <img src={im.url} alt={`Reference ${i + 1}`} className="w-full h-full object-cover" />
                       <button
                         onClick={() => setImages((p) => p.filter((_, j) => j !== i))}
-                        className="absolute top-1 end-1 w-6 h-6 rounded-full bg-background/80 flex items-center justify-center",
+                        className="absolute top-1 end-1 w-6 h-6 rounded-full bg-background/80 flex items-center justify-center"
                         aria-label="Remove image"
                       >
                         <X className="w-3 h-3" />
@@ -178,7 +178,7 @@ export default function Quote() {
                   <div className="flex gap-2">
                     {([2, 1] as const).map((g) => (
                       <button key={g} onClick={() => setGen(g)} type="button",
-                        className="flex-1 px-3 py-2.5 rounded-xl text-sm border transition",
+                        className="flex-1 px-3 py-2.5 rounded-xl text-sm border transition"
                         style={{
                           borderColor: gen === g ? "hsl(var(--accent))" : "var(--card-border)",
                           background: gen === g ? "hsl(var(--accent) / 0.15)" : "transparent",
@@ -193,7 +193,7 @@ export default function Quote() {
                     <Palette className="w-3 h-3" />{ar ? "لون مخصص" : "Custom color"}
                   </label>
                   <button type="button" onClick={() => setCustomColor(!customColor)}
-                    className="w-full px-3 py-2.5 rounded-xl text-sm border transition",
+                    className="w-full px-3 py-2.5 rounded-xl text-sm border transition"
                     style={{
                       borderColor: customColor ? "hsl(var(--accent))" : "var(--card-border)",
                       background: customColor ? "hsl(var(--accent) / 0.15)" : "transparent",

@@ -21,14 +21,14 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2.0, duration: 1.2 }}
-          className="absolute inset-0 pointer-events-none",
+          className="absolute inset-0 pointer-events-none"
           aria-hidden
         >
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(92vw,860px)] h-[min(92vw,860px)]">
             <Product3D product={hero} autoRotate shinyWood colorOverride="#075056" />
           </div>
           <div
-            className="absolute inset-0",
+            className="absolute inset-0"
             style={{
               background:
                 "radial-gradient(ellipse at center, transparent 55%, hsl(var(--bg-root) / 0.35) 90%, hsl(var(--bg-root) / 0.7) 100%)",
@@ -99,7 +99,7 @@ export default function Home() {
             className="glass-card rounded-2xl p-6"
           >
             <div
-              className="w-11 h-11 rounded-xl flex items-center justify-center mb-4",
+              className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
               style={{ background: "hsl(var(--accent) / 0.16)" }}
             >
               <Icon className="w-5 h-5 text-[hsl(var(--accent))]" />
@@ -142,8 +142,8 @@ function HomeProductCard({
   const [hover, setHover] = useState(false);
   return (
     <Link
-      to="/store",
-      className="glass-card rounded-2xl overflow-hidden group block",
+      to="/store"
+      className="glass-card rounded-2xl overflow-hidden group block"
       style={{ animationDelay: `${i * 0.08}s` }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
@@ -155,13 +155,13 @@ function HomeProductCard({
           <Product3D product={p} autoRotate />
         ) : (
           <div
-            className="w-full h-full flex items-center justify-center",
+            className="w-full h-full flex items-center justify-center"
             style={{
               background: `radial-gradient(ellipse at 30% 20%, ${p.color}dd 0%, ${p.color}88 45%, hsl(var(--bg-main)) 100%)`,
             }}
           >
             <div
-              className="w-16 h-16 rounded-2xl",
+              className="w-16 h-16 rounded-2xl"
               style={{
                 background: `linear-gradient(135deg, ${p.color} 0%, ${p.color}bb 60%, ${p.color}66 100%)`,
                 boxShadow: `0 14px 34px ${p.color}55, inset 0 -8px 22px rgba(0,0,0,0.30), inset 0 8px 20px rgba(255,255,255,0.20)`,

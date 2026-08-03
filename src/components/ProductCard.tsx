@@ -15,18 +15,18 @@ interface Props {
 function StaticPreview({ color }: { color: string }) {
   return (
     <div
-      className="w-full h-full flex items-center justify-center relative",
+      className="w-full h-full flex items-center justify-center relative"
       style={{
         background: `radial-gradient(ellipse at 30% 20%, ${color}ee 0%, ${color}aa 35%, ${color}55 70%, hsl(var(--bg-main)) 100%)`,
       }}
     >
       <div
         aria-hidden
-        className="absolute inset-0 pointer-events-none",
+        className="absolute inset-0 pointer-events-none"
         style={{ background: "radial-gradient(ellipse at 50% -10%, rgba(255,255,255,0.18) 0%, transparent 55%)" }}
       />
       <div
-        className="w-24 h-24 rounded-2xl",
+        className="w-24 h-24 rounded-2xl"
         style={{
           background: `linear-gradient(135deg, ${color} 0%, ${color}cc 50%, ${color}77 100%)`,
           boxShadow: [

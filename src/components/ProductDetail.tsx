@@ -29,7 +29,7 @@ export function ProductDetail({ product, onClose }: Props) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[120] flex items-end md:items-center justify-center bg-black/70 backdrop-blur-sm p-4",
+          className="fixed inset-0 z-[120] flex items-end md:items-center justify-center bg-black/70 backdrop-blur-sm p-4"
           onClick={onClose}
         >
           <motion.div
@@ -46,7 +46,7 @@ export function ProductDetail({ product, onClose }: Props) {
             <div className="p-7 md:p-9 relative">
               <button
                 onClick={onClose}
-                className="absolute top-5 end-5 w-9 h-9 rounded-full border border-[color:var(--card-border)] flex items-center justify-center hover:bg-[hsl(var(--accent))]/15 transition",
+                className="absolute top-5 end-5 w-9 h-9 rounded-full border border-[color:var(--card-border)] flex items-center justify-center hover:bg-[hsl(var(--accent))]/15 transition"
                 aria-label="Close"
               >
                 <X className="w-4 h-4" />
@@ -87,7 +87,7 @@ export function ProductDetail({ product, onClose }: Props) {
                         onClick={() => setHex(c.hex)}
                         title={lang === "ar" ? c.ar : c.en}
                         aria-label={lang === "ar" ? c.ar : c.en}
-                        className="w-8 h-8 rounded-full transition-transform hover:scale-110",
+                        className="w-8 h-8 rounded-full transition-transform hover:scale-110"
                         style={{
                           background: c.hex,
                           boxShadow: hex.toLowerCase() === c.hex.toLowerCase()
@@ -99,18 +99,18 @@ export function ProductDetail({ product, onClose }: Props) {
                   </div>
                   <div className="flex items-center gap-3">
                     <input
-                      type="color",
+                      type="color"
                       value={hex}
                       onChange={(e) => setHex(e.target.value)}
-                      className="w-12 h-12 rounded-xl border border-[color:var(--card-border)] bg-transparent cursor-pointer",
+                      className="w-12 h-12 rounded-xl border border-[color:var(--card-border)] bg-transparent cursor-pointer"
                       aria-label="Pick color"
                     />
                     <input
-                      type="text",
+                      type="text"
                       value={hex}
                       onChange={(e) => setHex(e.target.value)}
-                      className="input-field flex-1 font-mono text-sm uppercase",
-                      dir="ltr",
+                      className="input-field flex-1 font-mono text-sm uppercase"
+                      dir="ltr"
                       maxLength={7}
                     />
                   </div>

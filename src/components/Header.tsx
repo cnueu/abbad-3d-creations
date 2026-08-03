@@ -34,7 +34,7 @@ export function Header() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6 }}
-            className="fixed inset-0 z-[90] pointer-events-none",
+            className="fixed inset-0 z-[90] pointer-events-none"
             style={{
               background:
                 "radial-gradient(ellipse at center, hsl(var(--bg-main)) 0%, hsl(var(--bg-root)) 70%)",
@@ -57,7 +57,7 @@ export function Header() {
         style={introDone ? { height: "72px" } : undefined}
       >
         <Link
-          to="/",
+          to="/"
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center pointer-events-auto"
         >
           <motion.div

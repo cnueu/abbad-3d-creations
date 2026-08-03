@@ -68,7 +68,7 @@ export function AppSidebar({
 
   return (
     <aside
-      className="abbad-sidebar relative h-screen flex flex-col border-r transition-[width] duration-300 ease-in-out shrink-0",
+      className="abbad-sidebar relative h-screen flex flex-col border-r transition-[width] duration-300 ease-in-out shrink-0"
       style={{
         width: collapsed ? 60 : 220,
         background: "hsl(var(--bg-sidebar) / 0.9)",
@@ -80,8 +80,8 @@ export function AppSidebar({
       {/* Brand. The theme toggle lives at the bottom of the sidebar, not here. */}
       <div className="relative flex items-center gap-2.5 px-4 pt-5 pb-4 min-h-[72px] overflow-hidden">
         <Link
-          to="/",
-          className="overflow-hidden transition-opacity",
+          to="/"
+          className="overflow-hidden transition-opacity"
           style={{ opacity: collapsed ? 0 : 1 }}
         >
           <Logo variant="name" className="h-9 w-auto object-contain" />
@@ -90,7 +90,7 @@ export function AppSidebar({
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute end-2.5 top-1/2 -translate-y-1/2 w-[26px] h-[26px] rounded-full flex items-center justify-center border border-[color:var(--card-border)] hover:bg-[hsl(var(--accent))]/20 transition-colors",
+          className="absolute end-2.5 top-1/2 -translate-y-1/2 w-[26px] h-[26px] rounded-full flex items-center justify-center border border-[color:var(--card-border)] hover:bg-[hsl(var(--accent))]/20 transition-colors"
           style={{ background: "hsl(var(--bg-main))" }}
           aria-label="Toggle sidebar"
         >
@@ -102,8 +102,8 @@ export function AppSidebar({
       {!collapsed && (
         <div className="px-3 mb-3">
           <Link
-            to="/quote",
-            className="block rounded-xl p-3 border text-[11px] leading-snug transition-colors",
+            to="/quote"
+            className="block rounded-xl p-3 border text-[11px] leading-snug transition-colors"
             style={{
               borderColor: "var(--card-border)",
               background: "linear-gradient(135deg, hsl(var(--green-500) / 0.45), hsl(var(--green-300) / 0.18))",
@@ -122,7 +122,7 @@ export function AppSidebar({
       )}
 
       <div
-        className="px-4 mb-2 text-[10px] font-semibold tracking-[0.15em] uppercase text-foreground/35 transition-opacity",
+        className="px-4 mb-2 text-[10px] font-semibold tracking-[0.15em] uppercase text-foreground/35 transition-opacity"
         style={{ opacity: collapsed ? 0 : 1 }}
       >
         {lang === "ar" ? "القائمة" : "Menu"}
@@ -136,7 +136,7 @@ export function AppSidebar({
             <button
               key={item.id}
               onClick={() => nav(item.to)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors",
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors"
               style={{
                 background: active ? "hsl(var(--accent) / 0.18)" : "transparent",
                 color: active ? "hsl(var(--text-accent))" : "hsl(var(--foreground) / 0.78)",
@@ -150,7 +150,7 @@ export function AppSidebar({
             >
               <Icon className="w-[18px] h-[18px] shrink-0" />
               <span
-                className="flex-1 text-start whitespace-nowrap transition-opacity",
+                className="flex-1 text-start whitespace-nowrap transition-opacity"
                 style={{ opacity: collapsed ? 0 : 1 }}
               >
                 {item.label}
@@ -164,13 +164,13 @@ export function AppSidebar({
       <div className="border-t p-3 space-y-2" style={{ borderColor: "var(--card-border)" }}>
         <button
           onClick={toggleTheme}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium border border-[color:var(--card-border)] hover:bg-[hsl(var(--accent))]/12 transition-colors",
-          aria-label="Toggle theme",
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium border border-[color:var(--card-border)] hover:bg-[hsl(var(--accent))]/12 transition-colors"
+          aria-label="Toggle theme"
           style={{ color: "hsl(var(--foreground))" }}
         >
           {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           <span
-            className="transition-all overflow-hidden whitespace-nowrap",
+            className="transition-all overflow-hidden whitespace-nowrap"
             style={{ width: collapsed ? 0 : "auto", opacity: collapsed ? 0 : 1 }}
           >
             {theme === "dark"
@@ -181,13 +181,13 @@ export function AppSidebar({
 
         <button
           onClick={() => setLang(lang === "ar" ? "en" : "ar")}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium border border-[color:var(--card-border)] hover:bg-[hsl(var(--accent))]/12 transition-colors",
-          aria-label="Toggle language",
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium border border-[color:var(--card-border)] hover:bg-[hsl(var(--accent))]/12 transition-colors"
+          aria-label="Toggle language"
           style={{ color: "hsl(var(--foreground))" }}
         >
           <Languages className="w-4 h-4" />
           <span
-            className="transition-all overflow-hidden whitespace-nowrap",
+            className="transition-all overflow-hidden whitespace-nowrap"
             style={{ width: collapsed ? 0 : "auto", opacity: collapsed ? 0 : 1 }}
           >
             {lang === "ar" ? "English" : "العربية"}

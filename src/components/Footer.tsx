@@ -49,8 +49,8 @@ export function Footer() {
               <a
                 key={i}
                 href={href}
-                target="_blank",
-                rel="noreferrer",
+                target="_blank"
+                rel="noreferrer"
                 className="w-10 h-10 rounded-full border border-[color:var(--card-border)] flex items-center justify-center hover:bg-green-500/20 hover:border-green-200 transition"
               >
                 <Icon className="w-4 h-4" />

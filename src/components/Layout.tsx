@@ -2,6 +2,8 @@ import { ReactNode, useEffect, useState } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { AppSidebar } from "./AppSidebar";
+import { MobileNav } from "./MobileNav";
+
 
 export function Layout({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState<boolean>(() => {

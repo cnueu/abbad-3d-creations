@@ -1,140 +1,132 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@500;600;700;800&family=Tajawal:wght@300;400;500;700;800&display=swap');
+/* Thmanyah (خط ثمانية) — the brand typeface, Arabic + Latin. */
+@import url('https://cdn.jsdelivr.net/npm/@dawod/thmanyah-font-web@1.2.0/sans.css');
+@import url('https://cdn.jsdelivr.net/npm/@dawod/thmanyah-font-web@1.2.0/serif-display.css');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ABBAD design system — preserved from user's original styles */
+/* ─────────────────────────────────────────────────────────────────────────
+   ABAAD DESIGN SYSTEM
+   Brand palette:  #16232A (deep navy)  ·  #075056 (teal)  ·  #E4EEF0 (mist)
+   Change a colour here and it propagates through the whole app.
+   ───────────────────────────────────────────────────────────────────────── */
 @layer base {
   :root,
   [data-theme="dark"] {
-    /* Backgrounds — updated per design spec */
-    --bg-root: 187 33% 5%;          /* #080F10 */
-    --bg-sidebar: 180 4% 10%;       /* #171919 (navigation) */
-    --bg-main: 187 33% 5%;          /* #080F10 */
-    --bg-section-alt: 180 4% 10%;   /* #171919 */
+    /* Surfaces */
+    --bg-root: 200 31% 13%;          /* #16232A */
+    --bg-sidebar: 200 31% 10%;
+    --bg-main: 200 31% 13%;
+    --bg-section-alt: 200 31% 16%;
 
-    /* Accents — switched from green to gold */
-    --green-100: 45 75% 78%;        /* light gold */
-    --green-200: 45 80% 65%;
-    --green-300: 45 80% 52%;        /* primary gold */
-    --green-400: 42 78% 42%;
-    --green-500: 40 75% 32%;        /* deep gold */
+    /* Accent ramp built from #075056 */
+    --green-100: 185 45% 72%;
+    --green-200: 185 55% 58%;
+    --green-300: 185 70% 40%;
+    --green-400: 185 85% 24%;
+    --green-500: 185 85% 18%;        /* #075056 */
 
-    /* Card glass — kept as raw rgba via custom utilities */
-    --text-primary: 210 6% 92%;
-    --text-secondary: 45 20% 78%;
-    --text-muted: 45 8% 60%;
-    --text-accent: 45 80% 65%;
-    --divider: 0 0% 100%;
+    --text-primary: 190 29% 92%;     /* #E4EEF0 */
+    --text-secondary: 190 20% 80%;
+    --text-muted: 190 12% 62%;
+    --text-accent: 185 55% 62%;
+    --divider: 190 29% 92%;
 
     /* Shadcn semantic mapping */
-    --background: 187 33% 5%;
-    --foreground: 210 6% 92%;
-    --card: 180 4% 10%;
-    --card-foreground: 210 6% 92%;
-    --popover: 180 4% 10%;
-    --popover-foreground: 210 6% 92%;
-    --primary: 45 80% 52%;
-    --primary-foreground: 187 33% 5%;
-    --secondary: 45 75% 78%;
-    --secondary-foreground: 187 33% 5%;
-    --muted: 180 4% 14%;
-    --muted-foreground: 45 8% 60%;
-    --accent: 45 80% 65%;
-    --accent-foreground: 187 33% 5%;
+    --background: 200 31% 13%;
+    --foreground: 190 29% 92%;
+    --card: 200 31% 17%;
+    --card-foreground: 190 29% 92%;
+    --popover: 200 31% 15%;
+    --popover-foreground: 190 29% 92%;
+    --primary: 185 70% 34%;
+    --primary-foreground: 190 29% 95%;
+    --secondary: 200 31% 20%;
+    --secondary-foreground: 190 29% 92%;
+    --muted: 200 25% 20%;
+    --muted-foreground: 190 12% 66%;
+    --accent: 185 55% 55%;
+    --accent-foreground: 200 31% 13%;
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 98%;
-    --border: 45 60% 32%;
-    --input: 180 4% 14%;
-    --ring: 45 80% 52%;
+    --border: 185 30% 26%;
+    --input: 200 25% 20%;
+    --ring: 185 70% 40%;
     --radius: 1rem;
 
-    /* Custom raw rgba tokens — gold tint */
-    --card-bg: rgba(23, 25, 25, 0.87);            /* #171919 @ 87% */
-    --card-bg-hover: rgba(120, 102, 55, 0.52);
-    --card-border: rgba(212, 175, 55, 0.28);
-    --card-border-hover: rgba(212, 175, 55, 0.55);
-    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(180, 140, 40, 0.18);
-    --card-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(212, 175, 55, 0.28);
-    --glass-border: rgba(255, 255, 255, 0.10);
-    --green-glass: rgba(212, 175, 55, 0.18);
+    --card-bg: rgba(22, 35, 42, 0.82);
+    --card-bg-hover: rgba(7, 80, 86, 0.32);
+    --card-border: rgba(228, 238, 240, 0.14);
+    --card-border-hover: rgba(94, 197, 205, 0.45);
+    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.42), 0 2px 8px rgba(7, 80, 86, 0.24);
+    --card-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(7, 80, 86, 0.4);
+    --glass-border: rgba(228, 238, 240, 0.10);
+    --green-glass: rgba(7, 80, 86, 0.28);
 
-    /* Background uses a middle radial blend from #3E3E3E -> #DEDEDE per spec,
-       layered subtly behind the dark base so the brand surface stays dark. */
-    --gradient-radial: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(222, 222, 222, 0.10), rgba(62, 62, 62, 0.10) 60%, transparent 80%);
-    --gradient-hero: linear-gradient(135deg, rgba(212, 175, 55, 0.30), rgba(255, 220, 130, 0.10));
-    --gradient-text: linear-gradient(135deg, #f4d97a 0%, #d4af37 50%, #a8801a 100%);
+    --gradient-radial: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(7, 80, 86, 0.28), transparent 75%);
+    --gradient-hero: linear-gradient(135deg, rgba(7, 80, 86, 0.45), rgba(228, 238, 240, 0.08));
+    --gradient-text: linear-gradient(135deg, #E4EEF0 0%, #7fd4da 55%, #0a7a83 100%);
   }
 
   [data-theme="light"] {
-    /* Light mode — warm gray base with same gold accents as dark mode.
-       Background uses a centered white radial fading to gray (mirrors dark mode). */
-    --bg-root: 220 6% 68%;
-    --bg-sidebar: 220 5% 74%;
-    --bg-main: 220 6% 70%;
-    --bg-section-alt: 220 6% 64%;
+    --bg-root: 190 29% 92%;          /* #E4EEF0 */
+    --bg-sidebar: 190 26% 88%;
+    --bg-main: 190 29% 93%;
+    --bg-section-alt: 190 24% 86%;
 
-    --background: 220 6% 68%;
-    --foreground: 220 14% 18%;
-    --card: 220 8% 76%;
-    --card-foreground: 220 14% 18%;
-    --popover: 220 8% 78%;
-    --popover-foreground: 220 14% 18%;
+    --background: 190 29% 92%;
+    --foreground: 200 31% 13%;       /* #16232A */
+    --card: 190 30% 96%;
+    --card-foreground: 200 31% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 200 31% 13%;
 
-    --primary: 42 78% 38%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 45 70% 50%;
-    --secondary-foreground: 220 14% 18%;
-    --muted: 220 6% 76%;
-    --muted-foreground: 220 12% 28%;
-    --accent: 42 80% 38%;
-    --accent-foreground: 0 0% 100%;
+    --primary: 185 85% 18%;          /* #075056 */
+    --primary-foreground: 190 29% 95%;
+    --secondary: 190 24% 84%;
+    --secondary-foreground: 200 31% 13%;
+    --muted: 190 22% 88%;
+    --muted-foreground: 200 16% 34%;
+    --accent: 185 85% 20%;
+    --accent-foreground: 190 29% 95%;
     --destructive: 0 70% 45%;
     --destructive-foreground: 0 0% 100%;
-    --border: 220 6% 60%;
-    --input: 220 6% 80%;
-    --ring: 42 78% 38%;
+    --border: 190 18% 74%;
+    --input: 0 0% 100%;
+    --ring: 185 85% 22%;
 
-    /* Gold accent ramp (matches dark mode) — darkened for legibility on light bg */
-    --green-100: 45 75% 55%;
-    --green-200: 45 78% 45%;
-    --green-300: 42 80% 38%;
-    --green-400: 40 78% 32%;
-    --green-500: 38 75% 26%;
+    --green-100: 185 60% 40%;
+    --green-200: 185 75% 28%;
+    --green-300: 185 85% 20%;
+    --green-400: 185 85% 16%;
+    --green-500: 185 85% 12%;
 
-    --text-primary: 220 14% 18%;
-    --text-secondary: 220 12% 26%;
-    --text-muted: 220 10% 36%;
-    --text-accent: 42 80% 34%;
-    --divider: 220 10% 50%;
+    --text-primary: 200 31% 13%;
+    --text-secondary: 200 22% 24%;
+    --text-muted: 200 14% 40%;
+    --text-accent: 185 85% 20%;
+    --divider: 200 16% 60%;
 
-    --card-bg: rgba(222, 222, 222, 0.78);
-    --card-bg-hover: rgba(232, 232, 232, 0.92);
-    --card-border: rgba(60, 50, 20, 0.22);
-    --card-border-hover: rgba(160, 120, 30, 0.45);
-    --card-shadow: 0 10px 28px rgba(20, 20, 20, 0.14), 0 2px 8px rgba(0, 0, 0, 0.08);
-    --card-shadow-hover: 0 22px 52px rgba(20, 20, 20, 0.20), 0 6px 16px rgba(180, 140, 40, 0.18);
-    --glass-border: rgba(60, 50, 20, 0.18);
-    --green-glass: rgba(212, 175, 55, 0.20);
+    --card-bg: rgba(255, 255, 255, 0.72);
+    --card-bg-hover: rgba(255, 255, 255, 0.92);
+    --card-border: rgba(22, 35, 42, 0.14);
+    --card-border-hover: rgba(7, 80, 86, 0.45);
+    --card-shadow: 0 10px 28px rgba(22, 35, 42, 0.10), 0 2px 8px rgba(22, 35, 42, 0.06);
+    --card-shadow-hover: 0 22px 52px rgba(22, 35, 42, 0.16), 0 6px 16px rgba(7, 80, 86, 0.18);
+    --glass-border: rgba(22, 35, 42, 0.12);
+    --green-glass: rgba(7, 80, 86, 0.14);
 
-    --gradient-text: linear-gradient(135deg, #8a6618 0%, #b88c1f 50%, #d4af37 100%);
+    --gradient-text: linear-gradient(135deg, #16232A 0%, #075056 60%, #0a7a83 100%);
   }
+
   [data-theme="light"] body {
     background:
-      radial-gradient(ellipse 70% 55% at 50% 40%, rgba(255, 255, 255, 0.65), rgba(222, 222, 222, 0.20) 55%, transparent 80%),
-      radial-gradient(ellipse 100% 80% at 50% 50%, rgba(180, 186, 192, 0.30), transparent 70%),
+      radial-gradient(ellipse 70% 55% at 50% 38%, rgba(255, 255, 255, 0.85), transparent 70%),
+      radial-gradient(ellipse 100% 80% at 50% 50%, rgba(7, 80, 86, 0.10), transparent 72%),
       hsl(var(--bg-root)) !important;
     background-attachment: fixed !important;
   }
-  /* Header surface for light mode so nav links remain readable */
-  [data-theme="light"] .abbad-header {
-    background: hsl(var(--bg-sidebar) / 0.85) !important;
-    border-bottom-color: hsl(var(--border)) !important;
-  }
-  [data-theme="light"] .abbad-header a,
-  [data-theme="light"] .abbad-header button { color: hsl(var(--foreground)); }
-  [data-theme="light"] .abbad-header .text-foreground\/70 { color: hsl(var(--foreground) / 0.8); }
 }
 
 @layer base {
@@ -142,26 +134,23 @@
   html, body, #root { height: 100%; }
   body {
     @apply bg-background text-foreground;
-    font-family: 'DM Sans', sans-serif;
+    font-family: 'Thmanyah Sans', 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
     background:
-      radial-gradient(ellipse 70% 55% at 50% 40%, rgba(222, 222, 222, 0.12), rgba(62, 62, 62, 0.10) 55%, transparent 80%),
-      rgba(8, 15, 16, 0.87),
+      radial-gradient(ellipse 70% 55% at 50% 38%, rgba(7, 80, 86, 0.30), transparent 72%),
       hsl(var(--bg-root));
     background-attachment: fixed;
   }
-  body[dir="rtl"] {
-    font-family: 'Tajawal', 'DM Sans', sans-serif;
-  }
   h1, h2, h3, h4 {
-    font-family: 'Syne', sans-serif;
+    font-family: 'Thmanyah Serif Display', 'Thmanyah Sans', serif;
     letter-spacing: -0.01em;
   }
-  body[dir="rtl"] h1, body[dir="rtl"] h2, body[dir="rtl"] h3, body[dir="rtl"] h4 {
-    font-family: 'Tajawal', sans-serif;
-    font-weight: 800;
-  }
 }
+
+/* Theme-aware logo artwork — see src/components/Logo.tsx */
+.logo-light { display: none; }
+[data-theme="light"] .logo-dark { display: none; }
+[data-theme="light"] .logo-light { display: block; }
 
 @layer components {
   .glass-card {
@@ -194,13 +183,13 @@
   }
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-medium transition-all;
-    background: linear-gradient(135deg, hsl(var(--green-300)), hsl(var(--green-200)));
-    color: hsl(var(--bg-root));
-    box-shadow: 0 8px 24px rgba(180, 140, 40, 0.35);
+    background: linear-gradient(135deg, hsl(var(--green-500)), hsl(var(--green-300)));
+    color: hsl(190 29% 95%);
+    box-shadow: 0 8px 24px rgba(7, 80, 86, 0.35);
   }
   .btn-primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 12px 32px rgba(180, 140, 40, 0.5);
+    box-shadow: 0 12px 32px rgba(7, 80, 86, 0.5);
   }
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full font-medium transition-all border;
@@ -219,29 +208,25 @@
     color: hsl(var(--text-primary));
   }
   .input-field:focus {
-    border-color: hsl(var(--green-200));
+    border-color: hsl(var(--accent));
     background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 0 0 4px rgba(109, 184, 172, 0.12);
+    box-shadow: 0 0 0 4px rgba(7, 80, 86, 0.20);
   }
   .input-field::placeholder { color: hsl(var(--text-muted)); }
 }
 
 [data-theme="light"] .input-field {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.92);
   color: hsl(var(--foreground));
   border-color: hsl(var(--border));
 }
 [data-theme="light"] .input-field:focus {
   background: #ffffff;
   border-color: hsl(var(--primary));
-  box-shadow: 0 0 0 4px rgba(45, 125, 111, 0.18);
+  box-shadow: 0 0 0 4px rgba(7, 80, 86, 0.18);
 }
 [data-theme="light"] .input-field::placeholder { color: hsl(var(--foreground) / 0.5); }
-[data-theme="light"] .btn-ghost { color: hsl(var(--foreground)); background: rgba(255,255,255,0.6); }
-[data-theme="light"] .btn-primary { color: #fff; }
-
-/* Logo: source PNG is white-on-transparent. Invert to black on light theme. */
-[data-theme="light"] .abbad-logo-invert { filter: invert(1) brightness(0); }
+[data-theme="light"] .btn-ghost { color: hsl(var(--foreground)); background: rgba(255,255,255,0.7); }
 
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(18px); }
@@ -263,5 +248,5 @@
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(109, 184, 172, 0.3); border-radius: 8px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(109, 184, 172, 0.5); }
+::-webkit-scrollbar-thumb { background: hsl(var(--accent) / 0.35); border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(var(--accent) / 0.55); }

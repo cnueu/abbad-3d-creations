@@ -43,9 +43,21 @@ export default function Home() {
             transition={{ delay: 2.0, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-3xl mx-auto"
           >
-            <span className="inline-block text-[11px] tracking-[0.22em] uppercase text-[hsl(var(--accent))] mb-5 px-3 py-1 rounded-full border border-[color:var(--card-border)] bg-background/40 backdrop-blur-md">
+            <span className="inline-block text-[11px] tracking-[0.22em] uppercase text-[hsl(var(--accent))] mb-3 px-3 py-1 rounded-full border border-[color:var(--card-border)] bg-background/40 backdrop-blur-md">
               {ar ? "أبعاد · صُنع في السعودية" : "ABAAD · Made in Saudi Arabia"}
             </span>
+            {/* Intellectual-property notice, deliberately in red under the "Made in Saudi Arabia" badge. */}
+            <div className="mb-5">
+              <span
+                className="inline-block text-[10px] sm:text-[11px] leading-relaxed px-3 py-1 rounded-full border"
+                style={{ color: "#e0453c", borderColor: "rgba(224, 69, 60, 0.45)", background: "rgba(224, 69, 60, 0.10)" }}
+              >
+                {ar
+                  ? "جميع المنتجات محمية ويُمنع تقليدها أو نسخها"
+                  : "All products are protected. Imitation or copying is prohibited"}
+              </span>
+            </div>
+
             <h1 className="font-display text-4xl md:text-6xl font-bold leading-[1.05] mb-6">
               <span className="text-gradient">
                 {ar ? "نظام بناء معياري للمشاريع الكبرى" : "A modular building system for large projects"}

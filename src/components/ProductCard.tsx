@@ -15,7 +15,7 @@ interface Props {
 function StaticPreview({ color }: { color: string }) {
   return (
     <div
-      className="w-full h-full flex items-center justify-center relative"
+      className="absolute inset-0 w-full h-full flex items-center justify-center"
       style={{
         background: `radial-gradient(ellipse at 30% 20%, ${color}ee 0%, ${color}aa 35%, ${color}55 70%, hsl(var(--bg-main)) 100%)`,
       }}

@@ -37,8 +37,10 @@ export function Layout({ children }: { children: ReactNode }) {
       </div>
 
       <div className="flex-1 min-w-0 flex flex-col relative">
+        <MobileNav theme={theme} toggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")} />
         <Header />
         <main className="flex-1">{children}</main>
+
         <Footer />
       </div>
     </div>

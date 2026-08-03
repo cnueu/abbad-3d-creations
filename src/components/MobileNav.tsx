@@ -51,7 +51,7 @@ export function MobileNav({
     {
       id: "about",
       label: lang === "ar" ? "من نحن" : "About",
-      icon: ({ className }: { className?: string }) => <Logo variant="icon" className={className} />,
+      icon: Sparkles,
       to: "/about",
     },
   ];

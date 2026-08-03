@@ -51,11 +51,12 @@ export function Header() {
       <div
         className={
           introDone
-            ? "absolute top-0 left-0 right-0 z-[100] pointer-events-none"
+            ? "hidden lg:block absolute top-0 left-0 right-0 z-[100] pointer-events-none"
             : "fixed inset-0 z-[100] pointer-events-none"
         }
         style={introDone ? { height: "72px" } : undefined}
       >
+
         <Link
           to="/"
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center pointer-events-auto"

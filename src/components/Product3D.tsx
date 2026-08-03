@@ -9,7 +9,7 @@ import { Product } from "@/data/products";
 // ─────────────────────────────────────────────────────────────────────────────
 // 3D PART VIEWER
 // The model file used for each part is declared in src/data/products.ts
-// (`model.url` + `model.format`). To swap a part's mesh, change it there —
+// (`model.url` + `model.format`). To swap a part's mesh, change it there
 // nothing in this file needs editing.
 // ─────────────────────────────────────────────────────────────────────────────
 

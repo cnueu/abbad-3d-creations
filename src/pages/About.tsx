@@ -90,7 +90,7 @@ export default function About() {
           </ul>
         </section>
 
-        {/* Team — one section per person */}
+        {/* Team, one section per person */}
         <div className="flex items-center gap-2 mb-8">
           <Users className="w-4 h-4 text-[hsl(var(--accent))]" />
           <span className="text-[11px] tracking-[0.22em] uppercase text-[hsl(var(--accent))]">

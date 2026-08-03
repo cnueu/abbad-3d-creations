@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SERVICES — the B2B service catalogue.
+// SERVICES, the B2B service catalogue.
 // To add/remove a service, edit the SERVICES array below.
 // ─────────────────────────────────────────────────────────────────────────────
 export default function Services() {
@@ -21,7 +21,7 @@ export default function Services() {
       title: ar ? "ديكورات المسارح والفعاليات" : "Theatre & event sets",
       body: ar
         ? "بناء ديكورات كاملة قابلة للتفكيك وإعادة التركيب لكل عرض، بتسليم سريع وتخزين مضغوط."
-        : "Full stage sets that disassemble and reassemble for every show — fast delivery, compact storage.",
+        : "Full stage sets that disassemble and reassemble for every show, fast delivery, compact storage."
     },
     {
       Icon: School,
@@ -79,8 +79,8 @@ export default function Services() {
           </h1>
           <p className="text-foreground/65">
             {ar
-              ? "أبعاد نظام بناء معياري يخدم المسارح والمدارس والعلامات التجارية والجهات الحكومية — من التوريد بالجملة حتى التنفيذ الكامل."
-              : "Abaad is a modular building system for theatres, schools, brands and public institutions — from bulk supply to full turnkey builds."}
+              ? "أبعاد نظام بناء معياري يخدم المسارح والمدارس والعلامات التجارية والجهات الحكومية، من التوريد بالجملة حتى التنفيذ الكامل."
+              : "Abaad is a modular building system for theatres, schools, brands and public institutions, from bulk supply to full turnkey builds."}
           </p>
         </header>
 

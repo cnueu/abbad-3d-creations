@@ -15,7 +15,7 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// ROUTES — no authentication anywhere; the whole site is public (B2B).
+// ROUTES, no authentication anywhere; the whole site is public (B2B).
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <LanguageProvider>

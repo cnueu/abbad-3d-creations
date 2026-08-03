@@ -4,7 +4,7 @@ import { Bell, FileText } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
-// NOTIFICATIONS — public page, no accounts. Updates are sent by email
+// NOTIFICATIONS, public page, no accounts. Updates are sent by email
 // against the reference number issued with each quote request.
 export default function Notifications() {
   const { lang } = useLang();

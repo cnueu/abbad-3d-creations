@@ -2,6 +2,8 @@ import { ReactNode, useEffect, useState } from "react";
 import { Header } from "./Header";
 import { Footer } from "./Footer";
 import { AppSidebar } from "./AppSidebar";
+import { MobileNav } from "./MobileNav";
+
 
 export function Layout({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsed] = useState<boolean>(() => {
@@ -35,8 +37,10 @@ export function Layout({ children }: { children: ReactNode }) {
       </div>
 
       <div className="flex-1 min-w-0 flex flex-col relative">
+        <MobileNav theme={theme} toggleTheme={() => setTheme(theme === "dark" ? "light" : "dark")} />
         <Header />
         <main className="flex-1">{children}</main>
+
         <Footer />
       </div>
     </div>

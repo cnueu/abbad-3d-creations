@@ -10,7 +10,7 @@ interface Props {
   index?: number;
 }
 
-// Glassy shiny preview — matches the homepage rotating-piece aesthetic.
+// Glassy shiny preview, matches the homepage rotating-piece aesthetic.
 // Real 3D loads on hover to keep the grid light.
 function StaticPreview({ color }: { color: string }) {
   return (

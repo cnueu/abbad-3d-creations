@@ -12,6 +12,7 @@ import {
   Home as HomeIcon,
   FileText,
   Briefcase,
+  Sparkles,
 } from "lucide-react";
 import { useLang } from "@/i18n/LanguageContext";
 import { Logo } from "./Logo";
@@ -51,7 +52,7 @@ export function MobileNav({
     {
       id: "about",
       label: lang === "ar" ? "من نحن" : "About",
-      icon: ({ className }: { className?: string }) => <Logo variant="icon" className={className} />,
+      icon: Sparkles,
       to: "/about",
     },
   ];

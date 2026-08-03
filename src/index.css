@@ -148,9 +148,12 @@
 }
 
 /* Theme-aware logo artwork — see src/components/Logo.tsx */
-.logo-light { display: none; }
-[data-theme="light"] .logo-dark { display: none; }
-[data-theme="light"] .logo-light { display: block; }
+/* Theme-aware logo artwork: only one set is ever visible.
+   `!important` so utility classes (e.g. `hidden lg:block`) can't reveal the wrong one. */
+.logo-light { display: none !important; }
+.logo-dark  { display: block !important; }
+[data-theme="light"] .logo-dark  { display: none !important; }
+[data-theme="light"] .logo-light { display: block !important; }
 
 @layer components {
   .glass-card {

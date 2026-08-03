@@ -40,7 +40,8 @@ export const COLORS: { hex: string; en: string; ar: string }[] = [
   { hex: "#6e4a2b", en: "Dark Wood", ar: "خشب داكن" },
 ];
 
-const DEFAULT_COLOR = COLORS[1];
+// Default finish shown in the catalogue: wood (all colours stay customizable).
+const DEFAULT_COLOR = COLORS[4];
 
 // ── Generation 1 ────────────────────────────────────────────────────────────
 const GEN1_CUBE_SIZES: number[] = [10, 20, 30];

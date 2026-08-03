@@ -143,7 +143,7 @@ export default function About() {
                   <div className="flex flex-wrap gap-3">
                     <a
                       href={`mailto:${m.email}`}
-                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[color:var(--card-border)] text-sm hover:bg-[hsl(var(--accent))]/10 transition-colors"
+                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[color:var(--card-border)] text-sm hover:bg-[hsl(var(--accent))]/10 transition-colors",
                       dir="ltr"
                     >
                       <Mail className="w-3.5 h-3.5 text-[hsl(var(--accent))]" />
@@ -151,8 +151,8 @@ export default function About() {
                     </a>
                     <a
                       href={m.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      target="_blank",
+                      rel="noopener noreferrer",
                       className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[color:var(--card-border)] text-sm hover:bg-[hsl(var(--accent))]/10 transition-colors"
                     >
                       <Linkedin className="w-3.5 h-3.5 text-[hsl(var(--accent))]" />

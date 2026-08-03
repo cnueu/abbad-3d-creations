@@ -19,8 +19,9 @@ export function Logo({
   className?: string;
   variant?: "icon" | "name";
 }) {
-  const dark = variant === "icon" ? iconDark.url : nameDark.url;
-  const light = variant === "icon" ? iconLight.url : nameLight.url;
+  const dark = variant === "icon" ? iconDark : nameDark;
+  const light = variant === "icon" ? iconLight : nameLight;
+
   return (
     <>
       <img src={dark} alt="Abaad" draggable={false} className={`${className} logo-dark`} />

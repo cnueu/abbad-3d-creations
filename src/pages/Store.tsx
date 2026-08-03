@@ -7,7 +7,7 @@ import { useLang } from "@/i18n/LanguageContext";
 import { Link } from "react-router-dom";
 import { FileText } from "lucide-react";
 
-// B2B catalogue — parts are grouped by generation and shown WITHOUT prices.
+// B2B catalogue, parts are grouped by generation and shown WITHOUT prices.
 // To add a part or a generation, edit src/data/products.ts.
 export default function Store() {
   const { t, lang } = useLang();
@@ -42,8 +42,8 @@ export default function Store() {
           </h1>
           <p className="text-foreground/65 mb-5">
             {lang === "ar"
-              ? "هندسة دقيقة مُختبرة. الأسعار حسب المشروع — اطلب عرض سعر مخصص."
-              : "Precision engineered parts. Pricing is project based — request a tailored quote."}
+              ? "هندسة دقيقة مُختبرة. الأسعار حسب المشروع، اطلب عرض سعر مخصص."
+              : "Precision engineered parts. Pricing is project based, request a tailored quote."}
           </p>
           <Link to="/quote" className="btn-primary">
             <FileText className="w-4 h-4" />

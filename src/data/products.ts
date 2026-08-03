@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// PRODUCT CATALOG  (B2B — no public pricing)
+// PRODUCT CATALOG  (B2B, no public pricing)
 //
 // WHERE TO CHANGE THINGS:
 //  • Add / remove a colour ................ COLORS (below)
@@ -20,7 +20,7 @@ export interface Product {
   generation: 1 | 2;
   kind: ProductKind;
   name: { en: string; ar: string };
-  size: number; // cm — cube edge / connecter length
+  size: number; // cm, cube edge / connecter length
   dims: { x: number; y: number; z: number };
   materials: string[];
   color: string; // default hex (fully customizable on request)
@@ -28,7 +28,7 @@ export interface Product {
   model: { url: string; format: ModelFormat; authoredCm: number };
 }
 
-// Customizable colour palette — the same swatches everywhere in the app.
+// Customizable colour palette, the same swatches everywhere in the app.
 export const COLORS: { hex: string; en: string; ar: string }[] = [
   { hex: "#E4EEF0", en: "Abaad Mist", ar: "ضباب أبعاد" },
   { hex: "#075056", en: "Abaad Teal", ar: "أخضر أبعاد" },
@@ -72,7 +72,7 @@ const GEN1_PARTS: Product[] = [
   },
 ];
 
-// ── Generation 2 — unified 20 cm system ─────────────────────────────────────
+// ── Generation 2, unified 20 cm system ─────────────────────────────────────
 const GEN2_PARTS: Product[] = [
   {
     id: "g2-cube",

@@ -70,7 +70,7 @@ export function ProductDetail({ product, onClose }: Props) {
                   {isCube
                     ? lang === "ar"
                       ? "مكعب وحدة دقيق يتركّب مع باقي القطع عبر الموصِّلات لبناء أي هيكل، ثم يُفكّك ويُعاد استخدامه."
-                      : "A precision unit cube that locks to the rest of the system through connecters — build any structure, then disassemble and reuse it."
+                      : "A precision unit cube that locks to the rest of the system through connecters, build any structure, then disassemble and reuse it."
                     : lang === "ar"
                       ? "موصِّل منزلق يربط بين مكعبين ويمنحهما ثباتاً ميكانيكياً كاملاً."
                       : "A sliding connecter that joins two cubes and locks them mechanically."}
@@ -122,7 +122,7 @@ export function ProductDetail({ product, onClose }: Props) {
               <div className="pt-5 border-t border-[color:var(--card-border)]">
                 <p className="text-xs text-foreground/60 mb-4">
                   {lang === "ar"
-                    ? "الأسعار للمشاريع والجهات — اطلب عرض سعر مخصص حسب الكمية والأبعاد."
+                    ? "الأسعار للمشاريع والجهات، اطلب عرض سعر مخصص حسب الكمية والأبعاد."
                     : "Pricing is project based. Request a tailored quote for your quantity and dimensions."}
                 </p>
                 <Link to="/quote" className="btn-primary w-full">

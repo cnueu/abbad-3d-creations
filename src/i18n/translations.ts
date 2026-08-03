@@ -8,7 +8,7 @@ export const translations: { en: Dict; ar: Dict } = {
     nav: { home: "Home", store: "Store", studio: "AI Studio", about: "About", partners: "Partners", checkout: "Checkout", auth: "Sign in" },
     hero: {
       title: "Modular building blocks for builders, makers, and dreamers.",
-      subtitle: "Cubes and connecters — endlessly assemblable. From a desk piece to a full-scale theater set.",
+      subtitle: "Cubes and connecters, endlessly assemblable. From a desk piece to a full-scale theater set."
       cta: "Explore the store",
       cta2: "Open AI Studio",
     },
@@ -22,8 +22,8 @@ export const translations: { en: Dict; ar: Dict } = {
       size: "Size",
       price: "Price",
       description: "Description",
-      cubeDesc: "Precision modular cube. Six faces, four channel slots per face for our connecters. Snap together to build anything. Connecters are included free with every cube order — you only need extras for advanced builds.",
-      sheetDesc: "Two-piece interlocking connecter. Slides between two cubes (2cm root × 1.41cm edge × 0.989cm tip × 10cm long). Connecters are already included with your cubes — order these only if you need extras.",
+      cubeDesc: "Precision modular cube. Six faces, four channel slots per face for our connecters. Snap together to build anything. Connecters are included free with every cube order, you only need extras for advanced builds."
+      sheetDesc: "Two-piece interlocking connecter. Slides between two cubes (2cm root × 1.41cm edge × 0.989cm tip × 10cm long). Connecters are already included with your cubes, order these only if you need extras."
       close: "Close",
       sheetTitle: "Connecter",
       sheetSize: "10cm × 2.3cm × 2.3cm",
@@ -84,7 +84,7 @@ export const translations: { en: Dict; ar: Dict } = {
     },
     about: {
       title: "Who we are",
-      body: "Abaad (أبعاد — \"dimensions\") is a Saudi maker of precision modular building blocks. Two parts — a cube and a connecter — assemble into anything you can imagine, from a coffee-table sculpture to a full theater set.",
+      body: "Abaad (أبعاد، \"dimensions\") is a Saudi maker of precision modular building blocks. Two parts، a cube and a connecter، assemble into anything you can imagine, from a coffee-table sculpture to a full theater set."
       incubatorLabel: "Incubated by",
       incubator: "Falak Business & Investment Company",
       mission: "Our mission",
@@ -97,7 +97,7 @@ export const translations: { en: Dict; ar: Dict } = {
       ],
       milestonesTitle: "Milestones",
       milestones: [
-        "Winners — Masrahthon (مسرحثون).",
+        "Winners، Masrahthon (مسرحثون)."
         "Incubated by Falak Business & Investment Company.",
       ],
       teamTitle: "The team",
@@ -113,7 +113,7 @@ export const translations: { en: Dict; ar: Dict } = {
             "Computer Science and Engineering track in high school.",
           ],
           achievements: [
-            "Winning team member at the AI League — Best AI Solution for 2034.",
+            "Winning team member at the AI League, Best AI Solution for 2034."
           ],
         },
         {
@@ -127,7 +127,7 @@ export const translations: { en: Dict; ar: Dict } = {
             "Computer Science and Engineering track in high school.",
           ],
           achievements: [
-            "Second-place team leader and winner at the AI League — Best AI Solution for 2034.",
+            "Second-place team leader and winner at the AI League, Best AI Solution for 2034."
             "Finalist team leader in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",
           ],
         },
@@ -195,7 +195,7 @@ export const translations: { en: Dict; ar: Dict } = {
         { title: "Government & Public Sector", body: "Reusable installations for ministries, exhibitions, and national events." },
         { title: "Architects & Designers", body: "A new physical vocabulary for spatial design, prototyping, and rapid build-outs." },
         { title: "Investors", body: "Back a Saudi born deeptech product at the intersection of materials, design, and AI." },
-        { title: "Media & Press", body: "Story-rich product, founders, and milestones — happy to collaborate on coverage." },
+        { title: "Media & Press", body: "Story-rich product, founders, and milestones, happy to collaborate on coverage." }
       ],
       statsTitle: "By the numbers",
       stats: [
@@ -214,9 +214,9 @@ export const translations: { en: Dict; ar: Dict } = {
       faqTitle: "Frequently asked",
       faq: [
         { q: "Do you ship outside Saudi Arabia?", a: "Currently we ship within KSA only. International partnerships are evaluated case by case." },
-        { q: "Can builds be reused?", a: "Yes. Every build can be disassembled and reassembled into a new shape — that's the core of the system." },
+        { q: "Can builds be reused?", a: "Yes. Every build can be disassembled and reassembled into a new shape, that's the core of the system." }
         { q: "What materials are available?", a: "Wood and PLA today, with more bio-based finishes coming. Custom colors are supported." },
-        { q: "Do you offer bulk pricing?", a: "Yes — schools, universities, theaters, and brands get partner pricing tiers." },
+        { q: "Do you offer bulk pricing?", a: "Yes, schools, universities, theaters, and brands get partner pricing tiers." }
       ],
       ctaTitle: "Let's talk",
       ctaBody: "Tell us about your project.",
@@ -254,7 +254,7 @@ export const translations: { en: Dict; ar: Dict } = {
     nav: { home: "الرئيسية", store: "المتجر", studio: "استوديو الذكاء", about: "من نحن", partners: "الشراكات", checkout: "الدفع", auth: "تسجيل الدخول" },
     hero: {
       title: "وحدات بناء قابلة للتركيب للبنّائين والمصممين والحالمين.",
-      subtitle: "مكعبات وموصِّلات — قابلة للتجميع بلا حدود. من قطعة مكتبية حتى ديكور مسرح كامل.",
+      subtitle: "مكعبات وموصِّلات، قابلة للتجميع بلا حدود. من قطعة مكتبية حتى ديكور مسرح كامل."
       cta: "تصفّح المتجر",
       cta2: "افتح استوديو الذكاء",
     },
@@ -268,8 +268,8 @@ export const translations: { en: Dict; ar: Dict } = {
       size: "المقاس",
       price: "السعر",
       description: "الوصف",
-      cubeDesc: "مكعب وحدة دقيق بستة أوجه وأربع شقوق في كل وجه للموصِّلات. ركّب أي شيء. الموصِّلات مرفقة مجاناً مع كل طلب مكعبات — لن تحتاج لشرائها إلا للتركيبات المتقدمة.",
-      sheetDesc: "موصِّل من قطعتين متداخلتين، ينزلق بين مكعبين (2سم قاعدة × 1.41سم حافة × 0.989سم رأس × 10سم طول). يأتي مجاناً مع المكعبات — اطلبه فقط إذا أردت قطعاً إضافية.",
+      cubeDesc: "مكعب وحدة دقيق بستة أوجه وأربع شقوق في كل وجه للموصِّلات. ركّب أي شيء. الموصِّلات مرفقة مجاناً مع كل طلب مكعبات، لن تحتاج لشرائها إلا للتركيبات المتقدمة."
+      sheetDesc: "موصِّل من قطعتين متداخلتين، ينزلق بين مكعبين (2سم قاعدة × 1.41سم حافة × 0.989سم رأس × 10سم طول). يأتي مجاناً مع المكعبات، اطلبه فقط إذا أردت قطعاً إضافية."
       close: "إغلاق",
       sheetTitle: "موصِّل",
       sheetSize: "10سم × 2.3سم × 2.3سم",
@@ -330,7 +330,7 @@ export const translations: { en: Dict; ar: Dict } = {
     },
     about: {
       title: "من نحن",
-      body: "أبعاد شركة سعودية تصنع وحدات بناء معيارية دقيقة. قطعتان فقط — مكعب وموصِّل — تتجمّع لتصبح أي شيء تتخيّله، من منحوتة على طاولة إلى ديكور مسرح كامل.",
+      body: "أبعاد شركة سعودية تصنع وحدات بناء معيارية دقيقة. قطعتان فقط، مكعب وموصِّل، تتجمّع لتصبح أي شيء تتخيّله، من منحوتة على طاولة إلى ديكور مسرح كامل."
       incubatorLabel: "حاضنة",
       incubator: "حاضنة من شركة فلك للأعمال والاستثمار",
       mission: "مهمتنا",
@@ -359,7 +359,7 @@ export const translations: { en: Dict; ar: Dict } = {
             "مسار علوم وهندسة الحاسب في المرحلة الثانوية.",
           ],
           achievements: [
-            "عضو الفريق الفائز في دوري الذكاء الاصطناعي — أفضل حل ذكاء اصطناعي لعام 2034.",
+            "عضو الفريق الفائز في دوري الذكاء الاصطناعي، أفضل حل ذكاء اصطناعي لعام 2034."
           ],
         },
         {
@@ -373,7 +373,7 @@ export const translations: { en: Dict; ar: Dict } = {
             "مسار علوم وهندسة الحاسب في المرحلة الثانوية.",
           ],
           achievements: [
-            "قائدة الفريق الحاصل على المركز الثاني والفائز في دوري الذكاء الاصطناعي — أفضل حل ذكاء اصطناعي لعام 2034.",
+            "قائدة الفريق الحاصل على المركز الثاني والفائز في دوري الذكاء الاصطناعي، أفضل حل ذكاء اصطناعي لعام 2034."
             "قائدة فريق مرشّح للمرحلة النهائية في مسابقة اكتشاف المواد، تحت إشراف الحائز على جائزة نوبل في الكيمياء البروفيسور عمر ياغي.",
           ],
         },
@@ -441,7 +441,7 @@ export const translations: { en: Dict; ar: Dict } = {
         { title: "الجهات الحكومية", body: "تركيبات قابلة لإعادة الاستخدام للوزارات والمعارض والفعاليات الوطنية." },
         { title: "المعماريون والمصممون", body: "مفردة فيزيائية جديدة للتصميم المكاني والنماذج الأولية والبناء السريع." },
         { title: "المستثمرون", body: "ادعم منتجًا سعوديًا تقنيًا يجمع بين المواد والتصميم والذكاء الاصطناعي." },
-        { title: "الإعلام والصحافة", body: "منتج وقصة وفريق ثري بالمحطات — نسعد بالتعاون على التغطيات." },
+        { title: "الإعلام والصحافة", body: "منتج وقصة وفريق ثري بالمحطات، نسعد بالتعاون على التغطيات." }
       ],
       statsTitle: "بالأرقام",
       stats: [
@@ -460,9 +460,9 @@ export const translations: { en: Dict; ar: Dict } = {
       faqTitle: "أسئلة متكررة",
       faq: [
         { q: "هل تشحنون خارج السعودية؟", a: "حاليًا نشحن داخل المملكة فقط. الشراكات الدولية تُدرس حالة بحالة." },
-        { q: "هل يمكن إعادة استخدام التركيبات؟", a: "نعم. كل تركيب يمكن فكّه وإعادة تجميعه في شكل جديد — هذا جوهر النظام." },
+        { q: "هل يمكن إعادة استخدام التركيبات؟", a: "نعم. كل تركيب يمكن فكّه وإعادة تجميعه في شكل جديد، هذا جوهر النظام." }
         { q: "ما المواد المتاحة؟", a: "خشب وPLA حاليًا، ومواد حيوية إضافية قادمة. الألوان المخصصة مدعومة." },
-        { q: "هل يوجد تسعير بالجملة؟", a: "نعم — للمدارس والجامعات والمسارح والعلامات تسعير شراكة خاص." },
+        { q: "هل يوجد تسعير بالجملة؟", a: "نعم، للمدارس والجامعات والمسارح والعلامات تسعير شراكة خاص." }
       ],
       ctaTitle: "لنتحدث",
       ctaBody: "احكِ لنا عن مشروعك.",

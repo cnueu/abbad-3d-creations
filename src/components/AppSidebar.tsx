@@ -25,7 +25,7 @@ interface NavItem {
   to: string;
 }
 
-/** 4-point star — now the light/dark theme toggle button. */
+/** 4-point star, now the light/dark theme toggle button. */
 function FourPointStar({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
@@ -34,7 +34,7 @@ function FourPointStar({ className = "" }: { className?: string }) {
   );
 }
 
-// SIDEBAR NAVIGATION — add or remove a page in the `items` array below.
+// SIDEBAR NAVIGATION, add or remove a page in the `items` array below.
 // There is no authentication in the app, so no account/login entries here.
 export function AppSidebar({
   collapsed,

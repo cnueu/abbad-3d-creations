@@ -7,7 +7,7 @@ import { Product3D } from "@/components/Product3D";
 import { PRODUCTS } from "@/data/products";
 import { ArrowRight, Box, Recycle, MapPin, FileText, LayoutGrid } from "lucide-react";
 
-// HOME (B2B). No prices anywhere — every CTA leads to /store or /quote.
+// HOME (B2B). No prices anywhere, every CTA leads to /store or /quote.
 export default function Home() {
   const { lang } = useLang();
   const ar = lang === "ar";
@@ -53,8 +53,8 @@ export default function Home() {
             </h1>
             <p className="text-base md:text-lg text-foreground/75 mb-8 max-w-xl mx-auto leading-relaxed">
               {ar
-                ? "مكعبات وموصِّلات دقيقة تُبنى وتُفكّك وتُعاد استخدامها — للمسارح والمدارس والعلامات التجارية والجهات الحكومية."
-                : "Precision cubes and connecters that build, disassemble and rebuild — for theatres, schools, brands and public institutions."}
+                ? "مكعبات وموصِّلات دقيقة تُبنى وتُفكّك وتُعاد استخدامها، للمسارح والمدارس والعلامات التجارية والجهات الحكومية."
+                : "Precision cubes and connecters that build, disassemble and rebuild, for theatres, schools, brands and public institutions."}
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <Link to="/quote" className="btn-primary">
@@ -110,7 +110,7 @@ export default function Home() {
         ))}
       </section>
 
-      {/* The system — Gen 2 first */}
+      {/* The system, Gen 2 first */}
       <section className="container mx-auto px-6 pb-20">
         <div className="flex items-center justify-between mb-8">
           <h2 className="font-display text-2xl md:text-3xl font-semibold">

@@ -5,7 +5,7 @@ import nameLight from "@/assets/light_theme_logo_name.png";
 
 
 /**
- * Brand logo. Two artwork sets exist — one for each theme — and the correct
+ * Brand logo. Two artwork sets exist, one for each theme, and the correct
  * one is shown purely with CSS (see `.logo-dark` / `.logo-light` in index.css),
  * so there is no flash when the theme toggles.
  *

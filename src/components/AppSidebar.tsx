@@ -77,28 +77,16 @@ export function AppSidebar({
         borderColor: "var(--card-border)",
       }}
     >
-      {/* Brand + theme toggle (the star icon toggles light/dark) */}
+      {/* Brand. The theme toggle lives at the bottom of the sidebar, not here. */}
       <div className="relative flex items-center gap-2.5 px-4 pt-5 pb-4 min-h-[72px] overflow-hidden">
-        <button
-          onClick={toggleTheme}
-          aria-label="Toggle theme"
-          title={theme === "dark" ? "Light mode" : "Dark mode"}
-          className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center transition-transform hover:scale-105"
-          style={{
-            background: "linear-gradient(135deg, hsl(var(--green-500)), hsl(var(--green-300)))",
-            color: "hsl(190 29% 95%)",
-            boxShadow: "0 0 0 2px hsl(var(--accent) / 0.25), 0 4px 12px rgba(0,0,0,0.35)",
-          }}
-        >
-          <FourPointStar className="w-5 h-5" />
-        </button>
         <Link
           to="/"
           className="overflow-hidden transition-opacity"
           style={{ opacity: collapsed ? 0 : 1 }}
         >
-          <Logo variant="name" className="h-8 w-auto object-contain" />
+          <Logo variant="name" className="h-9 w-auto object-contain" />
         </Link>
+
 
         <button
           onClick={() => setCollapsed(!collapsed)}

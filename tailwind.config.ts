@@ -8,9 +8,9 @@ export default {
     container: { center: true, padding: "2rem", screens: { "2xl": "1400px" } },
     extend: {
       fontFamily: {
-        display: ["Syne", "sans-serif"],
-        body: ["DM Sans", "sans-serif"],
-        arabic: ["Tajawal", "sans-serif"],
+        display: ["Thmanyah Serif Display", "Thmanyah Sans", "serif"],
+        body: ["Thmanyah Sans", "DM Sans", "sans-serif"],
+        arabic: ["Thmanyah Sans", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

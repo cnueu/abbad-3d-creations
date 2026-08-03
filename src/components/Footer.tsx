@@ -17,13 +17,15 @@ export function Footer() {
         </div>
 
         <div>
-          <h4 className="font-display text-base mb-4">{t.nav.store}</h4>
+          <h4 className="font-display text-base mb-4">{lang === "ar" ? "الشركة" : "Company"}</h4>
           <ul className="space-y-2 text-sm text-foreground/70">
-            <li><Link to="/store" className="hover:text-green-100">{t.store.title}</Link></li>
-            <li><Link to="/studio" className="hover:text-green-100">{t.nav.studio}</Link></li>
-            <li><Link to="/checkout" className="hover:text-green-100">{t.nav.checkout}</Link></li>
+            <li><Link to="/store" className="hover:text-[hsl(var(--accent))]">{lang === "ar" ? "المنتجات" : "Products"}</Link></li>
+            <li><Link to="/services" className="hover:text-[hsl(var(--accent))]">{lang === "ar" ? "الخدمات" : "Services"}</Link></li>
+            <li><Link to="/quote" className="hover:text-[hsl(var(--accent))]">{lang === "ar" ? "طلب عرض سعر" : "Request a quote"}</Link></li>
+            <li><Link to="/partners" className="hover:text-[hsl(var(--accent))]">{lang === "ar" ? "الشراكات" : "Partners"}</Link></li>
           </ul>
         </div>
+
 
         <div>
           <h4 className="font-display text-base mb-4">{t.footer.contact}</h4>

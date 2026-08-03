@@ -2,38 +2,30 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
-  Cpu,
-  Wallet,
   Bell,
   Info,
   Handshake,
-  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Sun,
   Moon,
-  LogIn,
-  Sparkles,
   Languages,
   Home as HomeIcon,
-  Boxes,
+  FileText,
+  Sparkles,
+  Briefcase,
 } from "lucide-react";
 import { useLang } from "@/i18n/LanguageContext";
+import { Logo } from "./Logo";
 
-interface NavChild {
-  id: string;
-  label: string;
-  to: string;
-}
 interface NavItem {
   id: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  to?: string;
-  children?: NavChild[];
+  to: string;
 }
 
-/** 4-point star account avatar */
+/** 4-point star — now the light/dark theme toggle button. */
 function FourPointStar({ className = "" }: { className?: string }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden>
@@ -42,6 +34,8 @@ function FourPointStar({ className = "" }: { className?: string }) {
   );
 }
 
+// SIDEBAR NAVIGATION — add or remove a page in the `items` array below.
+// There is no authentication in the app, so no account/login entries here.
 export function AppSidebar({
   collapsed,
   setCollapsed,
@@ -53,39 +47,23 @@ export function AppSidebar({
   theme: "dark" | "light";
   toggleTheme: () => void;
 }) {
-  const { t, lang, setLang } = useLang();
+  const { lang, setLang } = useLang();
   const loc = useLocation();
   const nav = useNavigate();
 
   const items: NavItem[] = [
     { id: "home", label: lang === "ar" ? "الرئيسية" : "Home", icon: HomeIcon, to: "/" },
-    { id: "notif", label: lang === "ar" ? "الإشعارات" : "Notifications", icon: Bell, to: "/notifications" },
-    {
-      id: "blocks",
-      label: lang === "ar" ? "أدوات البناء" : "Build Tools",
-      icon: LayoutGrid,
-      children: [
-        { id: "store", label: lang === "ar" ? "المتجر" : "Building Blocks", to: "/store" },
-        { id: "sheets", label: lang === "ar" ? "الموصِّلات" : "Connecters", to: "/store?filter=sheet" },
-      ],
-    },
-    { id: "ai", label: lang === "ar" ? "الذكاء" : "AI", icon: Cpu, to: "/studio" },
-    { id: "sim", label: lang === "ar" ? "منصة المحاكاة" : "Simulation", icon: Boxes, to: "/simulation" },
-    { id: "pay", label: lang === "ar" ? "الدفع" : "Pay", icon: Wallet, to: "/checkout" },
+    { id: "store", label: lang === "ar" ? "المنتجات" : "Products", icon: LayoutGrid, to: "/store" },
+    { id: "services", label: lang === "ar" ? "الخدمات" : "Services", icon: Briefcase, to: "/services" },
+    { id: "quote", label: lang === "ar" ? "طلب سعر" : "Request a quote", icon: FileText, to: "/quote" },
     { id: "partners", label: lang === "ar" ? "الشراكات" : "Partners", icon: Handshake, to: "/partners" },
+    { id: "notif", label: lang === "ar" ? "الإشعارات" : "Notifications", icon: Bell, to: "/notifications" },
     { id: "about", label: lang === "ar" ? "من نحن" : "About", icon: Info, to: "/about" },
   ];
 
-  const initialExpanded =
-    items.find((i) => i.children?.some((c) => loc.pathname.startsWith(c.to.split("?")[0])))?.id ??
-    null;
-  const [expanded, setExpanded] = useState<string | null>(initialExpanded);
-
-  // Strict matcher — exact path only (so Notification doesn't auto-light on "/")
   const isPathActive = (to: string) => {
-    const p = to.split("?")[0];
-    if (p === "/") return loc.pathname === "/";
-    return loc.pathname === p || loc.pathname.startsWith(p + "/");
+    if (to === "/") return loc.pathname === "/";
+    return loc.pathname === to || loc.pathname.startsWith(to + "/");
   };
 
   return (
@@ -93,42 +71,38 @@ export function AppSidebar({
       className="abbad-sidebar relative h-screen flex flex-col border-r transition-[width] duration-300 ease-in-out shrink-0"
       style={{
         width: collapsed ? 60 : 220,
-        background: "hsl(var(--bg-sidebar) / 0.87)",
+        background: "hsl(var(--bg-sidebar) / 0.9)",
         backdropFilter: "blur(18px) saturate(1.2)",
         WebkitBackdropFilter: "blur(18px) saturate(1.2)",
         borderColor: "var(--card-border)",
       }}
     >
-      {/* Account header — no extra top padding (no global header anymore) */}
+      {/* Brand + theme toggle (the star icon toggles light/dark) */}
       <div className="relative flex items-center gap-2.5 px-4 pt-5 pb-4 min-h-[72px] overflow-hidden">
-        <div
-          className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center shadow-[0_0_0_2px_rgba(255,255,255,0.12),0_4px_12px_rgba(0,0,0,0.4)]"
+        <button
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+          title={theme === "dark" ? "Light mode" : "Dark mode"}
+          className="w-9 h-9 rounded-full shrink-0 flex items-center justify-center transition-transform hover:scale-105"
           style={{
-            background: "linear-gradient(135deg, hsl(var(--green-300)), hsl(var(--green-200)))",
-            color: "hsl(var(--bg-root))",
+            background: "linear-gradient(135deg, hsl(var(--green-500)), hsl(var(--green-300)))",
+            color: "hsl(190 29% 95%)",
+            boxShadow: "0 0 0 2px hsl(var(--accent) / 0.25), 0 4px 12px rgba(0,0,0,0.35)",
           }}
         >
           <FourPointStar className="w-5 h-5" />
-        </div>
-        <div
-          className="overflow-hidden transition-opacity duration-200"
+        </button>
+        <Link
+          to="/"
+          className="overflow-hidden transition-opacity"
           style={{ opacity: collapsed ? 0 : 1 }}
         >
-          <div className="text-[9px] font-semibold tracking-[0.12em] uppercase text-foreground/45 mb-1 leading-none">
-            {lang === "ar" ? "حساب المستخدم" : "ACCOUNT USER"}
-          </div>
-          <Link
-            to="/auth"
-            className="text-xs font-medium hover:text-[hsl(var(--accent))] whitespace-nowrap transition-colors"
-            style={{ color: "hsl(var(--text-accent))" }}
-          >
-            {lang === "ar" ? "إنشاء حساب" : "Create Account"}
-          </Link>
-        </div>
+          <Logo variant="name" className="h-8 w-auto object-contain" />
+        </Link>
 
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="absolute end-2.5 top-1/2 -translate-y-1/2 w-[26px] h-[26px] rounded-full flex items-center justify-center border border-[color:var(--card-border)] hover:bg-green-500/20 transition-colors"
+          className="absolute end-2.5 top-1/2 -translate-y-1/2 w-[26px] h-[26px] rounded-full flex items-center justify-center border border-[color:var(--card-border)] hover:bg-[hsl(var(--accent))]/20 transition-colors"
           style={{ background: "hsl(var(--bg-main))" }}
           aria-label="Toggle sidebar"
         >
@@ -136,32 +110,29 @@ export function AppSidebar({
         </button>
       </div>
 
-      {/* Promo / ad above Build Tools */}
+      {/* Promo */}
       {!collapsed && (
         <div className="px-3 mb-3">
-          <div
-            className="rounded-xl p-3 border text-[11px] leading-snug"
+          <Link
+            to="/quote"
+            className="block rounded-xl p-3 border text-[11px] leading-snug transition-colors"
             style={{
               borderColor: "var(--card-border)",
-              background:
-                "linear-gradient(135deg, hsl(var(--green-500) / 0.45), hsl(var(--green-300) / 0.18))",
+              background: "linear-gradient(135deg, hsl(var(--green-500) / 0.45), hsl(var(--green-300) / 0.18))",
               color: "hsl(var(--text-accent))",
             }}
           >
             <div className="flex items-center gap-1.5 mb-1 font-semibold">
               <Sparkles className="w-3 h-3" />
-              {lang === "ar" ? "جديد · جرّب استوديو الذكاء" : "NEW · Try AI Studio"}
+              {lang === "ar" ? "للجهات والمشاريع" : "For businesses"}
             </div>
-            <div className="text-foreground/65">
-              {lang === "ar"
-                ? "صِف شكلاً، نحوّله إلى تصميم قابل للبناء."
-                : "Describe a shape — get a buildable plan."}
+            <div className="text-foreground/70">
+              {lang === "ar" ? "احصل على تقدير سعر فوري لمشروعك." : "Get an instant estimate for your project."}
             </div>
-          </div>
+          </Link>
         </div>
       )}
 
-      {/* Section label */}
       <div
         className="px-4 mb-2 text-[10px] font-semibold tracking-[0.15em] uppercase text-foreground/35 transition-opacity"
         style={{ opacity: collapsed ? 0 : 1 }}
@@ -169,80 +140,34 @@ export function AppSidebar({
         {lang === "ar" ? "القائمة" : "Menu"}
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 overflow-y-auto px-2 space-y-0.5">
         {items.map((item) => {
           const Icon = item.icon;
-          const active =
-            (item.to && isPathActive(item.to)) ||
-            (item.children?.some((c) => isPathActive(c.to)) ?? false);
-          const isExpanded = expanded === item.id;
-
+          const active = isPathActive(item.to);
           return (
-            <div key={item.id}>
-              <button
-                onClick={() => {
-                  if (item.children) {
-                    setExpanded(isExpanded ? null : item.id);
-                  } else if (item.to) {
-                    nav(item.to);
-                  }
-                }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors group"
-                style={{
-                  background: active ? "rgba(45,125,111,0.22)" : "transparent",
-                  color: active ? "hsl(var(--text-accent))" : "hsl(var(--foreground) / 0.78)",
-                }}
-                onMouseEnter={(e) => {
-                  if (!active) e.currentTarget.style.background = "rgba(45,125,111,0.15)";
-                }}
-                onMouseLeave={(e) => {
-                  if (!active) e.currentTarget.style.background = "transparent";
-                }}
+            <button
+              key={item.id}
+              onClick={() => nav(item.to)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors"
+              style={{
+                background: active ? "hsl(var(--accent) / 0.18)" : "transparent",
+                color: active ? "hsl(var(--text-accent))" : "hsl(var(--foreground) / 0.78)",
+              }}
+              onMouseEnter={(e) => {
+                if (!active) e.currentTarget.style.background = "hsl(var(--accent) / 0.10)";
+              }}
+              onMouseLeave={(e) => {
+                if (!active) e.currentTarget.style.background = "transparent";
+              }}
+            >
+              <Icon className="w-[18px] h-[18px] shrink-0" />
+              <span
+                className="flex-1 text-start whitespace-nowrap transition-opacity"
+                style={{ opacity: collapsed ? 0 : 1 }}
               >
-                <Icon className="w-[18px] h-[18px] shrink-0" />
-                <span
-                  className="flex-1 text-start whitespace-nowrap transition-opacity"
-                  style={{ opacity: collapsed ? 0 : 1 }}
-                >
-                  {item.label}
-                </span>
-                {item.children && !collapsed && (
-                  <ChevronDown
-                    className="w-3.5 h-3.5 transition-transform"
-                    style={{ transform: isExpanded ? "rotate(0deg)" : "rotate(-90deg)" }}
-                  />
-                )}
-              </button>
-
-              {item.children && isExpanded && !collapsed && (
-                <ul className="ms-7 mt-0.5 mb-1 border-s border-[color:var(--card-border)] ps-3 space-y-0.5">
-                  {item.children.map((c) => {
-                    const sActive = isPathActive(c.to);
-                    return (
-                      <li key={c.id}>
-                        <Link
-                          to={c.to}
-                          className="flex items-center gap-2 px-2 py-1.5 rounded-md text-xs transition-colors hover:bg-green-500/15"
-                          style={{
-                            color: sActive ? "hsl(var(--text-accent))" : "hsl(var(--foreground) / 0.65)",
-                            background: sActive ? "rgba(45,125,111,0.18)" : "transparent",
-                          }}
-                        >
-                          <span
-                            className="w-1.5 h-1.5 rounded-full transition-all"
-                            style={{
-                              background: sActive ? "hsl(var(--accent))" : "hsl(var(--foreground) / 0.25)",
-                            }}
-                          />
-                          {c.label}
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
+                {item.label}
+              </span>
+            </button>
           );
         })}
       </nav>
@@ -251,7 +176,7 @@ export function AppSidebar({
       <div className="border-t p-3 space-y-2" style={{ borderColor: "var(--card-border)" }}>
         <button
           onClick={toggleTheme}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium border border-[color:var(--card-border)] hover:bg-green-500/15 transition-colors"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium border border-[color:var(--card-border)] hover:bg-[hsl(var(--accent))]/12 transition-colors"
           aria-label="Toggle theme"
           style={{ color: "hsl(var(--foreground))" }}
         >
@@ -268,7 +193,7 @@ export function AppSidebar({
 
         <button
           onClick={() => setLang(lang === "ar" ? "en" : "ar")}
-          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium border border-[color:var(--card-border)] hover:bg-green-500/15 transition-colors"
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium border border-[color:var(--card-border)] hover:bg-[hsl(var(--accent))]/12 transition-colors"
           aria-label="Toggle language"
           style={{ color: "hsl(var(--foreground))" }}
         >
@@ -280,17 +205,6 @@ export function AppSidebar({
             {lang === "ar" ? "English" : "العربية"}
           </span>
         </button>
-
-        {!collapsed && (
-          <Link
-            to="/auth"
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium bg-green-500/30 hover:bg-green-500/50 transition-colors"
-            style={{ color: "hsl(var(--text-accent))" }}
-          >
-            <LogIn className="w-3.5 h-3.5" />
-            {t.nav.auth}
-          </Link>
-        )}
       </div>
     </aside>
   );

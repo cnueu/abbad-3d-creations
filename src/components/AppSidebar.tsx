@@ -24,9 +24,9 @@ interface NavItem {
   to: string;
 }
 
-/** The Abaad cube mark, used as the icon for the "About" ("من نحن") menu entry. */
+/** "About" ("من نحن") uses the star icon. */
 function AbaadMark({ className = "" }: { className?: string }) {
-  return <Logo variant="icon" className={className} />;
+  return <Sparkles className={className} />;
 }
 
 // SIDEBAR NAVIGATION, add or remove a page in the `items` array below.

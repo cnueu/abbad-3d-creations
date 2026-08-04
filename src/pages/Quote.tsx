@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
 import { QUOTE_RATES } from "@/data/products";
-import { Upload, X, Calculator, Send, Ruler, Layers, Palette } from "lucide-react";
+import { Upload, X, Calculator, Send, Ruler, Layers, Palette, Building2, User, Wrench, ShoppingCart, CalendarClock } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -21,11 +21,21 @@ import { z } from "zod";
 const CONTACT_EMAIL = "info@abaadblocks.com";
 const MAX_IMAGES = 6;
 
+// Common domains suggested while the visitor types their email.
+const EMAIL_DOMAINS = ["gmail.com", "hotmail.com", "outlook.com", "icloud.com", "yahoo.com"];
+
+export type EngagementMode = "rent" | "rentInstalled" | "buy";
+
 const schema = z.object({
   name: z.string().trim().min(2, "Name is too short").max(100),
   company: z.string().trim().max(120).optional(),
   email: z.string().trim().email("Invalid email").max(255),
-  phone: z.string().trim().max(40).optional(),
+  phone: z
+    .string()
+    .trim()
+    .regex(/^\+966[0-9]{9}$/, "Phone must start with +966 and have 9 digits after it"),
+  city: z.string().trim().max(80).optional(),
+  eventDate: z.string().trim().max(40).optional(),
   notes: z.string().trim().max(1500).optional(),
 });
 
@@ -39,7 +49,26 @@ export default function Quote() {
   const [h, setH] = useState(2.5);
   const [d, setD] = useState(2);
   const [customColor, setCustomColor] = useState(true);
-  const [form, setForm] = useState({ name: "", company: "", email: "", phone: "", notes: "" });
+  const [entity, setEntity] = useState<"company" | "individual">("company");
+  const [mode, setMode] = useState<EngagementMode>("rent");
+  const [form, setForm] = useState({
+    name: "",
+    company: "",
+    email: "",
+    phone: "+966",
+    city: "",
+    eventDate: "",
+    notes: "",
+  });
+
+  // Suggest a full address once the visitor typed the local part of the email.
+  const emailSuggestions = (() => {
+    const v = form.email;
+    if (!v || v.includes("@") === false) return v ? EMAIL_DOMAINS.map((d) => `${v}@${d}`) : [];
+    const [local, domain] = v.split("@");
+    if (!local) return [];
+    return EMAIL_DOMAINS.filter((d) => d.startsWith(domain || "")).map((d) => `${local}@${d}`);
+  })();
 
   function addImages(list: FileList | null) {
     if (!list) return;
@@ -59,13 +88,16 @@ export default function Quote() {
     if (customColor) price *= QUOTE_RATES.customColor;
     const tier = QUOTE_RATES.bulkTiers.find((tt) => volume >= tt.minM3);
     if (tier) price *= tier.factor;
+    // Engagement mode: rent / rent with installation / outright purchase.
+    price *= QUOTE_RATES.modes[mode];
+    if (mode === "rentInstalled") price += QUOTE_RATES.installationFee;
     return {
       volume,
       cubes,
       low: Math.round((price * 0.85) / 100) * 100,
       high: Math.round((price * 1.15) / 100) * 100,
     };
-  }, [w, h, d, gen, customColor]);
+  }, [w, h, d, gen, customColor, mode]);
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -75,10 +107,14 @@ export default function Quote() {
       return;
     }
     const body = [
+      `Type: ${entity === "company" ? "Company / organisation" : "Individual"}`,
+      `Mode: ${mode}`,
       `Name: ${parsed.data.name}`,
       `Company: ${parsed.data.company || "-"}`,
       `Email: ${parsed.data.email}`,
-      `Phone: ${parsed.data.phone || "-"}`,
+      `Phone: ${parsed.data.phone}`,
+      `City: ${parsed.data.city || "-"}`,
+      `Needed on: ${parsed.data.eventDate || "-"}`,
       `Generation: ${gen}`,
       `Dimensions (W×H×D m): ${w} × ${h} × ${d}`,
       `Volume: ${estimate.volume.toFixed(2)} m³ (~${estimate.cubes} cubes)`,
@@ -114,7 +150,7 @@ export default function Quote() {
           {/* ── Left: inputs ─────────────────────────────────────────────── */}
           <div className="space-y-6">
             {/* Images */}
-            <section className="glass-panel rounded-2xl p-6">
+            <section className="glass-panel neon-edge rounded-2xl p-6">
               <h2 className="font-display text-lg mb-1 flex items-center gap-2">
                 <Upload className="w-4 h-4 text-[hsl(var(--accent))]" />
                 {ar ? "١. صور المشروع" : "1. Project images"}
@@ -147,7 +183,7 @@ export default function Quote() {
             </section>
 
             {/* Dimensions */}
-            <section className="glass-panel rounded-2xl p-6">
+            <section className="glass-panel neon-edge rounded-2xl p-6">
               <h2 className="font-display text-lg mb-1 flex items-center gap-2">
                 <Ruler className="w-4 h-4 text-[hsl(var(--accent))]" />
                 {ar ? "٢. الأبعاد المطلوبة" : "2. Target dimensions"}
@@ -204,22 +240,99 @@ export default function Quote() {
               </div>
             </section>
 
-            {/* Contact */}
-            <section className="glass-panel rounded-2xl p-6">
-              <h2 className="font-display text-lg mb-4 flex items-center gap-2">
-                <Send className="w-4 h-4 text-[hsl(var(--accent))]" />
-                {ar ? "٣. بيانات التواصل" : "3. Your details"}
+            {/* Engagement mode: rent, rent with installation, or purchase */}
+            <section className="glass-panel neon-edge rounded-2xl p-6">
+              <h2 className="font-display text-lg mb-1 flex items-center gap-2">
+                <ShoppingCart className="w-4 h-4 text-[hsl(var(--accent))]" />
+                {ar ? "٣. نوع التعامل" : "3. Engagement"}
               </h2>
+              <p className="text-xs text-foreground/60 mb-4">
+                {ar ? "اختر ما يناسب مشروعك، ينعكس فوراً على التقدير." : "Pick what suits your project, the estimate updates instantly."}
+              </p>
+              <div className="grid sm:grid-cols-3 gap-3">
+                {([
+                  { id: "rent", Icon: CalendarClock, t: ar ? "تأجير بدون تركيب" : "Rent, no installation", s: ar ? "نسلّم القطع لموقعك" : "Parts delivered to you" },
+                  { id: "rentInstalled", Icon: Wrench, t: ar ? "تأجير مع التركيب" : "Rent with installation", s: ar ? "فريقنا يركّب ويفكّك" : "We install and strike" },
+                  { id: "buy", Icon: ShoppingCart, t: ar ? "شراء" : "Purchase", s: ar ? "ملكية دائمة للقطع" : "You own the parts" },
+                ] as const).map(({ id, Icon, t, s }) => (
+                  <button key={id} type="button" onClick={() => setMode(id)}
+                    className="text-start rounded-xl p-3.5 border transition"
+                    style={{
+                      borderColor: mode === id ? "hsl(var(--accent))" : "var(--card-border)",
+                      background: mode === id ? "hsl(var(--accent) / 0.15)" : "transparent",
+                    }}>
+                    <Icon className="w-4 h-4 mb-2 text-[hsl(var(--accent))]" />
+                    <div className="text-sm font-medium">{t}</div>
+                    <div className="text-[11px] text-foreground/55">{s}</div>
+                  </button>
+                ))}
+              </div>
+            </section>
+
+            {/* Contact */}
+            <section className="glass-panel neon-edge rounded-2xl p-6">
+              <h2 className="font-display text-lg mb-1 flex items-center gap-2">
+                <Send className="w-4 h-4 text-[hsl(var(--accent))]" />
+                {ar ? "٤. بيانات التواصل" : "4. Your details"}
+              </h2>
+              <p className="text-xs text-foreground/60 mb-4">
+                {ar ? "كل ما نحتاجه للرد عليك بعرض دقيق خلال يوم عمل." : "Everything we need to reply with an accurate offer within one business day."}
+              </p>
+
+              {/* Company or individual */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                {([
+                  { id: "company", Icon: Building2, t: ar ? "جهة / شركة" : "Company" },
+                  { id: "individual", Icon: User, t: ar ? "فرد" : "Individual" },
+                ] as const).map(({ id, Icon, t }) => (
+                  <button key={id} type="button" onClick={() => setEntity(id)}
+                    className="flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-sm border transition"
+                    style={{
+                      borderColor: entity === id ? "hsl(var(--accent))" : "var(--card-border)",
+                      background: entity === id ? "hsl(var(--accent) / 0.15)" : "transparent",
+                    }}>
+                    <Icon className="w-3.5 h-3.5" />{t}
+                  </button>
+                ))}
+              </div>
+
               <form onSubmit={submit} className="space-y-3">
                 <div className="grid sm:grid-cols-2 gap-3">
-                  <input className="input-field" placeholder={ar ? "الاسم" : "Full name"} maxLength={100}
-                    value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-                  <input className="input-field" placeholder={ar ? "الجهة / الشركة" : "Company"} maxLength={120}
-                    value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
-                  <input className="input-field" type="email" placeholder={ar ? "البريد الإلكتروني" : "Email"} maxLength={255}
-                    value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} dir="ltr" />
-                  <input className="input-field" placeholder={ar ? "رقم الجوال" : "Phone"} maxLength={40}
-                    value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} dir="ltr" />
+                  <Field label={ar ? "الاسم الكامل" : "Full name"} hint={ar ? "الاسم الذي نخاطبك به" : "How we should address you"}>
+                    <input className="input-field" maxLength={100} placeholder={ar ? "مثال: سارة العتيبي" : "e.g. Sarah Alotaibi"}
+                      value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+                  </Field>
+                  {entity === "company" && (
+                    <Field label={ar ? "اسم الجهة" : "Organisation"} hint={ar ? "الاسم الرسمي في العقد" : "Legal name used on the contract"}>
+                      <input className="input-field" maxLength={120} placeholder={ar ? "مثال: مؤسسة أبعاد" : "e.g. Abaad Co."}
+                        value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} />
+                    </Field>
+                  )}
+                  <Field label={ar ? "البريد الإلكتروني" : "Email"} hint={ar ? "اكتب اسمك ثم اختر النطاق من القائمة" : "Type your name then pick a domain"}>
+                    <input className="input-field" type="email" maxLength={255} list="email-suggestions" dir="ltr"
+                      placeholder="name@company.com"
+                      value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+                    <datalist id="email-suggestions">
+                      {emailSuggestions.map((sug) => <option key={sug} value={sug} />)}
+                    </datalist>
+                  </Field>
+                  <Field label={ar ? "رقم الجوال" : "Mobile"} hint={ar ? "يبدأ بـ +966 ثم ٩ أرقام" : "Starts with +966 then 9 digits"}>
+                    <input className="input-field" maxLength={13} dir="ltr" inputMode="tel" placeholder="+9665XXXXXXXX"
+                      value={form.phone}
+                      onChange={(e) => {
+                        // Always keep the +966 country prefix, digits only after it.
+                        const digits = e.target.value.replace(/[^0-9]/g, "").replace(/^966/, "").slice(0, 9);
+                        setForm({ ...form, phone: `+966${digits}` });
+                      }} />
+                  </Field>
+                  <Field label={ar ? "المدينة" : "City"} hint={ar ? "موقع التسليم أو التركيب" : "Delivery or install site"}>
+                    <input className="input-field" maxLength={80} placeholder={ar ? "مثال: الرياض" : "e.g. Riyadh"}
+                      value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} />
+                  </Field>
+                  <Field label={ar ? "تاريخ الحاجة" : "Needed on"} hint={ar ? "متى تحتاج المشروع جاهزاً" : "When it must be ready"}>
+                    <input className="input-field" type="date" dir="ltr"
+                      value={form.eventDate} onChange={(e) => setForm({ ...form, eventDate: e.target.value })} />
+                  </Field>
                 </div>
                 <textarea className="input-field min-h-[110px]" maxLength={1500}
                   placeholder={ar ? "تفاصيل المشروع، المدة الزمنية، مكان التركيب…" : "Project details, timeline, installation site…"}
@@ -233,7 +346,7 @@ export default function Quote() {
           </div>
 
           {/* ── Right: live estimate ─────────────────────────────────────── */}
-          <aside className="glass-panel rounded-2xl p-6 lg:sticky lg:top-6">
+          <aside className="glass-panel neon-edge rounded-2xl p-6 lg:sticky lg:top-6">
             <h2 className="font-display text-lg mb-4 flex items-center gap-2">
               <Calculator className="w-4 h-4 text-[hsl(var(--accent))]" />
               {ar ? "التقدير المبدئي" : "Indicative estimate"}
@@ -242,6 +355,11 @@ export default function Quote() {
               <Row label={ar ? "الحجم الإجمالي" : "Total volume"} value={`${estimate.volume.toFixed(2)} m³`} />
               <Row label={ar ? "عدد المكعبات التقريبي" : "Approx. cubes"} value={`≈ ${estimate.cubes.toLocaleString()}`} />
               <Row label={ar ? "الجيل" : "Generation"} value={ar ? `الجيل ${gen}` : `Gen ${gen}`} />
+              <Row label={ar ? "نوع التعامل" : "Engagement"} value={
+                mode === "rent" ? (ar ? "تأجير بدون تركيب" : "Rent, no install")
+                : mode === "rentInstalled" ? (ar ? "تأجير مع التركيب" : "Rent + install")
+                : (ar ? "شراء" : "Purchase")
+              } />
               <Row label={ar ? "لون مخصص" : "Custom color"} value={customColor ? (ar ? "نعم" : "Yes") : (ar ? "لا" : "No")} />
             </div>
             <div className="rounded-xl p-5 text-center border" style={{ borderColor: "var(--card-border)", background: "hsl(var(--accent) / 0.10)" }}>
@@ -261,6 +379,16 @@ export default function Quote() {
         </div>
       </div>
     </Layout>
+  );
+}
+
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="text-[10px] tracking-[0.16em] uppercase text-foreground/45 mb-1.5 block">{label}</label>
+      {children}
+      {hint && <p className="text-[11px] text-foreground/50 mt-1">{hint}</p>}
+    </div>
   );
 }
 

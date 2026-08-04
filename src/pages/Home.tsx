@@ -24,7 +24,9 @@ export default function Home() {
           aria-hidden
         >
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(92vw,860px)] h-[min(92vw,860px)]">
-            <Product3D product={hero} autoRotate shinyWood colorOverride="#a47148" /* wood, not teal */ />
+            {/* Hero cube tone, deeper walnut so it does not glare */}
+            <Product3D product={hero} autoRotate shinyWood colorOverride="#6f4a2c" />
+
           </div>
           <div
             className="absolute inset-0"

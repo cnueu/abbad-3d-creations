@@ -55,12 +55,13 @@
     --ring: 185 70% 40%;
     --radius: 1rem;
 
-    --card-bg: rgba(22, 35, 42, 0.82);
-    --card-bg-hover: rgba(7, 80, 86, 0.32);
-    --card-border: rgba(228, 238, 240, 0.14);
-    --card-border-hover: rgba(94, 197, 205, 0.45);
-    --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.42), 0 2px 8px rgba(7, 80, 86, 0.24);
-    --card-shadow-hover: 0 16px 48px rgba(0, 0, 0, 0.5), 0 4px 16px rgba(7, 80, 86, 0.4);
+    /* Cards sit clearly ABOVE the page background, never the same tone. */
+    --card-bg: rgba(38, 58, 68, 0.92);
+    --card-bg-hover: rgba(14, 92, 99, 0.55);
+    --card-border: rgba(228, 238, 240, 0.22);
+    --card-border-hover: rgba(94, 197, 205, 0.6);
+    --card-shadow: 0 10px 34px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(7, 80, 86, 0.3);
+    --card-shadow-hover: 0 18px 52px rgba(0, 0, 0, 0.62), 0 4px 16px rgba(7, 80, 86, 0.45);
     --glass-border: rgba(228, 238, 240, 0.10);
     --green-glass: rgba(7, 80, 86, 0.28);
 

@@ -44,7 +44,8 @@ export const COLORS: { hex: string; en: string; ar: string }[] = [
 const DEFAULT_COLOR = COLORS[4];
 
 // ── Generation 1 ────────────────────────────────────────────────────────────
-const GEN1_CUBE_SIZES: number[] = [10, 20, 30];
+// All cubes, both generations, are 20cm.
+const GEN1_CUBE_SIZES: number[] = [20];
 
 const GEN1_PARTS: Product[] = [
   ...GEN1_CUBE_SIZES.map<Product>((size) => ({

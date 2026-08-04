@@ -11,7 +11,7 @@ type Ctx = {
 const LanguageContext = createContext<Ctx | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(() => (localStorage.getItem("abbad_lang") as Lang) || "en");
+  const [lang, setLangState] = useState<Lang>(() => (localStorage.getItem("abbad_lang") as Lang) || "ar");
 
   const setLang = (l: Lang) => {
     setLangState(l);

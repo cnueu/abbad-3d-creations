@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutGrid,
-  Bell,
+  LayoutTemplate,
   Handshake,
   ChevronLeft,
   ChevronRight,
@@ -52,7 +52,7 @@ export function AppSidebar({
     { id: "services", label: lang === "ar" ? "الخدمات" : "Services", icon: Briefcase, to: "/services" },
     { id: "quote", label: lang === "ar" ? "طلب سعر" : "Request a quote", icon: FileText, to: "/quote" },
     { id: "partners", label: lang === "ar" ? "الشراكات" : "Partners", icon: Handshake, to: "/partners" },
-    { id: "notif", label: lang === "ar" ? "الإشعارات" : "Notifications", icon: Bell, to: "/notifications" },
+    { id: "models", label: lang === "ar" ? "نماذجنا" : "Our models", icon: LayoutTemplate, to: "/models" },
     { id: "about", label: lang === "ar" ? "من نحن" : "About", icon: AbaadMark, to: "/about" },
   ];
 

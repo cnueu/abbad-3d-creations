@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { useState } from "react";
 import { useLang } from "@/i18n/LanguageContext";
 import { Layout } from "@/components/Layout";
 import { Product3D } from "@/components/Product3D";
@@ -25,7 +24,7 @@ export default function Home() {
           aria-hidden
         >
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(92vw,860px)] h-[min(92vw,860px)]">
-            <Product3D product={hero} autoRotate shinyWood colorOverride="#075056" />
+            <Product3D product={hero} autoRotate shinyWood colorOverride="#a47148" /* wood, not teal */ />
           </div>
           <div
             className="absolute inset-0"
@@ -142,6 +141,7 @@ export default function Home() {
   );
 }
 
+// Static card, the heavy 3D viewer only runs on the store detail sheet.
 function HomeProductCard({
   product: p,
   index: i,
@@ -151,21 +151,14 @@ function HomeProductCard({
   index: number;
   ar: boolean;
 }) {
-  const [hover, setHover] = useState(false);
   return (
     <Link
       to="/store"
-      className="glass-card rounded-2xl overflow-hidden group block"
+      className="glass-card neon-edge rounded-2xl overflow-hidden group block"
       style={{ animationDelay: `${i * 0.08}s` }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
     >
       <div className="aspect-square relative overflow-hidden flex items-center justify-center">
-        {hover ? (
-          <Product3D product={p} autoRotate />
-        ) : (
+        {(
           <div
             className="w-full h-full flex items-center justify-center"
             style={{

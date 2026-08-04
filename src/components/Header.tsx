@@ -4,8 +4,10 @@ import { useEffect, useState } from "react";
 import { Logo } from "./Logo";
 
 /**
- * Minimal header: logo only, no background, no nav items.
- * All navigation lives in the sidebar.
+ * HEADER
+ * Intro: the logo starts large, dead-center of the viewport, then settles into
+ * a full width rectangular header strip (not a circle) with the logo centered.
+ * The strip sits behind the sidebar (z-30) and holds no navigation.
  */
 export function Header() {
   const [introDone, setIntroDone] = useState(false);
@@ -23,8 +25,7 @@ export function Header() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Intro: 50% larger than before (was min(60vw, 360px) → now min(90vw, 540px))
-  const logoSize = !introDone ? "min(90vw, 540px)" : "72px";
+  const logoSize = !introDone ? "min(90vw, 540px)" : "56px";
 
   return (
     <>
@@ -43,19 +44,25 @@ export function Header() {
         )}
       </AnimatePresence>
 
-      {/*
-        While intro is playing, anchor to the full viewport (fixed) so the logo
-        sits dead-center regardless of the sidebar. After the intro, switch to
-        the in-pane absolute header position (top-right area of the content pane).
-      */}
       <div
         className={
           introDone
-            ? "hidden lg:block absolute top-0 left-0 right-0 z-[100] pointer-events-none"
+            ? "hidden lg:block absolute top-0 left-0 right-0 z-30 pointer-events-none"
             : "fixed inset-0 z-[100] pointer-events-none"
         }
         style={introDone ? { height: "72px" } : undefined}
       >
+        {/* Rectangular header strip, behind the sidebar. */}
+        {introDone && (
+          <div
+            aria-hidden
+            className="absolute inset-x-0 top-0 h-[72px] border-b backdrop-blur-xl"
+            style={{
+              background: "hsl(var(--bg-sidebar) / 0.72)",
+              borderColor: "var(--card-border)",
+            }}
+          />
+        )}
 
         <Link
           to="/"
@@ -65,13 +72,9 @@ export function Header() {
             layout
             transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             style={{ width: logoSize, height: logoSize }}
-            className={
-              introDone
-                ? "flex items-center justify-center px-4 py-1.5 rounded-full border border-[color:var(--card-border)] bg-background/55 backdrop-blur-md shadow-[0_4px_18px_rgba(0,0,0,0.18)]"
-                : "flex items-center justify-center"
-            }
+            className="flex items-center justify-center"
           >
-            <Logo className={introDone ? "w-[88%] h-[88%] object-contain" : "w-full h-full object-contain"} />
+            <Logo className="w-full h-full object-contain" />
           </motion.div>
         </Link>
       </div>

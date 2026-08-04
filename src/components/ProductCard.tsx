@@ -1,8 +1,6 @@
 import { Product } from "@/data/products";
-import { Product3D } from "./Product3D";
 import { useLang } from "@/i18n/LanguageContext";
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 interface Props {
   product: Product;
@@ -11,7 +9,8 @@ interface Props {
 }
 
 // Glassy shiny preview, matches the homepage rotating-piece aesthetic.
-// Real 3D loads on hover to keep the grid light.
+// The grid stays fully static for performance; the interactive 3D model only
+// loads inside the detail sheet after the card is clicked.
 function StaticPreview({ color }: { color: string }) {
   return (
     <div
@@ -42,7 +41,6 @@ function StaticPreview({ color }: { color: string }) {
 }
 
 export function ProductCard({ product, onClick, index = 0 }: Props) {
-  const [hover, setHover] = useState(false);
   const { t, lang } = useLang();
   const title = lang === "ar" ? product.name.ar : product.name.en;
   const subtitle =
@@ -57,18 +55,10 @@ export function ProductCard({ product, onClick, index = 0 }: Props) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(index, 8) * 0.05, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -6 }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
-      onFocus={() => setHover(true)}
-      onBlur={() => setHover(false)}
-      className="glass-card rounded-2xl overflow-hidden text-start group"
+      className="glass-card neon-edge rounded-2xl overflow-hidden text-start group"
     >
       <div className="aspect-square w-full relative overflow-hidden flex items-center justify-center">
-        {hover ? (
-          <Product3D product={product} autoRotate interactive shinyWood />
-        ) : (
-          <StaticPreview color={product.color} />
-        )}
+        <StaticPreview color={product.color} />
         <span className="absolute top-3 start-3 text-[10px] tracking-[0.14em] uppercase px-2 py-1 rounded-full bg-background/70 border border-[color:var(--card-border)] text-foreground/75">
           {lang === "ar" ? `الجيل ${product.generation}` : `Gen ${product.generation}`}
         </span>

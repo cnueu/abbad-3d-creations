@@ -24,8 +24,9 @@ export default function About() {
       <div className="container mx-auto px-6 py-20 max-w-5xl">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           {/* Hero */}
-          <div className="flex justify-center mb-8">
-            <Logo className="w-28 h-28 opacity-90" />
+          {/* Large wordmark, roughly half a section tall. */}
+          <div className="flex justify-center items-center mb-10 min-h-[38vh]">
+            <Logo variant="name" className="w-[min(90vw,720px)] h-auto object-contain" />
           </div>
           <h1 className="font-display text-4xl md:text-6xl font-bold text-center mb-6">
             <span className="text-gradient">{about.title}</span>

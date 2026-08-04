@@ -44,7 +44,8 @@ export const COLORS: { hex: string; en: string; ar: string }[] = [
 const DEFAULT_COLOR = COLORS[4];
 
 // ── Generation 1 ────────────────────────────────────────────────────────────
-const GEN1_CUBE_SIZES: number[] = [10, 20, 30];
+// All cubes, both generations, are 20cm.
+const GEN1_CUBE_SIZES: number[] = [20];
 
 const GEN1_PARTS: Product[] = [
   ...GEN1_CUBE_SIZES.map<Product>((size) => ({
@@ -141,6 +142,15 @@ export function findProduct(id: string) {
 export const QUOTE_RATES = {
   /** SAR per cubic metre of finished volume, per generation. */
   perCubicMeter: { 1: 2200, 2: 2600 } as Record<1 | 2, number>,
+  /**
+   * Engagement mode multipliers, applied to the base rental price:
+   *  rent            = bare rental, no installation
+   *  rentInstalled   = rental including on-site installation (a few thousand more)
+   *  buy             = outright purchase, more than double a bare rental
+   */
+  modes: { rent: 1, rentInstalled: 1, buy: 2.4 } as Record<"rent" | "rentInstalled" | "buy", number>,
+  /** Flat installation fee in SAR added for `rentInstalled`. */
+  installationFee: 4000,
   /** Multiplier applied when a custom colour is requested. */
   customColor: 1.12,
   /** Bulk discount tiers keyed by minimum volume in m³. */

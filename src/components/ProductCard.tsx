@@ -1,6 +1,9 @@
 import { Product } from "@/data/products";
 import { useLang } from "@/i18n/LanguageContext";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { Product3D } from "./Product3D";
+import { RotateCw } from "lucide-react";
 
 interface Props {
   product: Product;
@@ -8,40 +11,11 @@ interface Props {
   index?: number;
 }
 
-// Glassy shiny preview, matches the homepage rotating-piece aesthetic.
-// The grid stays fully static for performance; the interactive 3D model only
-// loads inside the detail sheet after the card is clicked.
-function StaticPreview({ color }: { color: string }) {
-  return (
-    <div
-      className="absolute inset-0 w-full h-full flex items-center justify-center"
-      style={{
-        background: `radial-gradient(ellipse at 30% 20%, ${color}ee 0%, ${color}aa 35%, ${color}55 70%, hsl(var(--bg-main)) 100%)`,
-      }}
-    >
-      <div
-        aria-hidden
-        className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at 50% -10%, rgba(255,255,255,0.18) 0%, transparent 55%)" }}
-      />
-      <div
-        className="w-24 h-24 rounded-2xl"
-        style={{
-          background: `linear-gradient(135deg, ${color} 0%, ${color}cc 50%, ${color}77 100%)`,
-          boxShadow: [
-            `0 18px 40px ${color}55`,
-            "inset 0 -10px 24px rgba(0,0,0,0.35)",
-            "inset 0 10px 22px rgba(255,255,255,0.22)",
-            "0 0 0 1px rgba(255,255,255,0.08)",
-          ].join(", "),
-        }}
-      />
-    </div>
-  );
-}
-
 export function ProductCard({ product, onClick, index = 0 }: Props) {
   const { t, lang } = useLang();
+  // The model renders as a still 3D frame. It only becomes rotatable after the
+  // user clicks the preview (keeps the grid cheap on the GPU).
+  const [live, setLive] = useState(false);
   const title = lang === "ar" ? product.name.ar : product.name.en;
   const subtitle =
     product.kind === "cube" || product.kind === "cube-smooth"
@@ -49,21 +23,46 @@ export function ProductCard({ product, onClick, index = 0 }: Props) {
       : `${product.dims.x} × ${product.dims.y} × ${product.dims.z} ${t.common.cm}`;
 
   return (
-    <motion.button
-      onClick={onClick}
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: Math.min(index, 8) * 0.05, duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -6 }}
       className="glass-card neon-edge rounded-2xl overflow-hidden text-start group"
     >
-      <div className="aspect-square w-full relative overflow-hidden flex items-center justify-center">
-        <StaticPreview color={product.color} />
-        <span className="absolute top-3 start-3 text-[10px] tracking-[0.14em] uppercase px-2 py-1 rounded-full bg-background/70 border border-[color:var(--card-border)] text-foreground/75">
+      {/* PREVIEW PANEL, tinted with the theme gradient so it never matches the page bg */}
+      <div
+        className="aspect-square w-full relative overflow-hidden cursor-pointer"
+        onClick={() => setLive(true)}
+        style={{
+          background:
+            "linear-gradient(160deg, hsl(var(--accent) / 0.30) 0%, hsl(var(--bg-sidebar)) 45%, hsl(var(--accent) / 0.14) 100%)",
+        }}
+      >
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.20) 0%, transparent 60%)" }}
+        />
+        <Product3D
+          product={product}
+          autoRotate={live}
+          interactive={live}
+          shinyWood
+          colorOverride={product.color}
+        />
+        {!live && (
+          <span className="absolute bottom-3 end-3 z-10 flex items-center gap-1 text-[10px] px-2 py-1 rounded-full bg-background/70 border border-[color:var(--card-border)] text-foreground/70">
+            <RotateCw className="w-3 h-3" />
+            {lang === "ar" ? "اضغط للتدوير" : "Click to rotate"}
+          </span>
+        )}
+        <span className="absolute top-3 start-3 z-10 text-[10px] tracking-[0.14em] uppercase px-2 py-1 rounded-full bg-background/70 border border-[color:var(--card-border)] text-foreground/75">
           {lang === "ar" ? `الجيل ${product.generation}` : `Gen ${product.generation}`}
         </span>
       </div>
-      <div className="px-4 pt-4 pb-5">
+
+      <button onClick={onClick} className="w-full text-start px-4 pt-4 pb-5">
         <h3 className="font-display text-base font-semibold text-foreground mb-1 leading-snug">{title}</h3>
         <p className="text-xs text-foreground/65 mb-2">{subtitle}</p>
         <div className="flex items-center justify-between">
@@ -71,10 +70,10 @@ export function ProductCard({ product, onClick, index = 0 }: Props) {
             {product.materials.join(" · ")}
           </span>
           <span className="text-[11px] font-medium text-[hsl(var(--accent))]">
-            {lang === "ar" ? "ألوان مخصصة" : "Custom colors"}
+            {lang === "ar" ? "التفاصيل" : "Details"}
           </span>
         </div>
-      </div>
-    </motion.button>
+      </button>
+    </motion.div>
   );
 }

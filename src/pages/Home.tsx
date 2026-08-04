@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
+
 import { motion } from "framer-motion";
 import { useLang } from "@/i18n/LanguageContext";
 import { Layout } from "@/components/Layout";
@@ -24,7 +26,9 @@ export default function Home() {
           aria-hidden
         >
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(92vw,860px)] h-[min(92vw,860px)]">
-            <Product3D product={hero} autoRotate shinyWood colorOverride="#a47148" /* wood, not teal */ />
+            {/* Hero cube tone, deeper walnut so it does not glare */}
+            <Product3D product={hero} autoRotate shinyWood colorOverride="#6f4a2c" />
+
           </div>
           <div
             className="absolute inset-0"
@@ -121,11 +125,11 @@ export default function Home() {
         ))}
       </section>
 
-      {/* The system, Gen 2 first */}
+      {/* Products, Gen 2 first */}
       <section className="container mx-auto px-6 pb-20">
         <div className="flex items-center justify-between mb-8">
           <h2 className="font-display text-2xl md:text-3xl font-semibold">
-            {ar ? "النظام" : "The system"}
+            {ar ? "المنتجات" : "Products"}
           </h2>
           <Link to="/store" className="text-sm flex items-center gap-2 hover:text-[hsl(var(--accent))] transition">
             {ar ? "عرض الكل" : "View all"} <ArrowRight className="w-4 h-4" />
@@ -141,7 +145,7 @@ export default function Home() {
   );
 }
 
-// Static card, the heavy 3D viewer only runs on the store detail sheet.
+// 3D preview that stays still until the user clicks it, then becomes rotatable.
 function HomeProductCard({
   product: p,
   index: i,
@@ -151,31 +155,28 @@ function HomeProductCard({
   index: number;
   ar: boolean;
 }) {
+  const [live, setLive] = useState(false);
   return (
-    <Link
-      to="/store"
+    <div
       className="glass-card neon-edge rounded-2xl overflow-hidden group block"
       style={{ animationDelay: `${i * 0.08}s` }}
     >
-      <div className="aspect-square relative overflow-hidden flex items-center justify-center">
-        {(
-          <div
-            className="w-full h-full flex items-center justify-center"
-            style={{
-              background: `radial-gradient(ellipse at 30% 20%, ${p.color}dd 0%, ${p.color}88 45%, hsl(var(--bg-main)) 100%)`,
-            }}
-          >
-            <div
-              className="w-16 h-16 rounded-2xl"
-              style={{
-                background: `linear-gradient(135deg, ${p.color} 0%, ${p.color}bb 60%, ${p.color}66 100%)`,
-                boxShadow: `0 14px 34px ${p.color}55, inset 0 -8px 22px rgba(0,0,0,0.30), inset 0 8px 20px rgba(255,255,255,0.20)`,
-              }}
-            />
-          </div>
+      <div
+        className="aspect-square relative overflow-hidden cursor-pointer"
+        onClick={() => setLive(true)}
+        style={{
+          background:
+            "linear-gradient(160deg, hsl(var(--accent) / 0.30) 0%, hsl(var(--bg-sidebar)) 45%, hsl(var(--accent) / 0.14) 100%)",
+        }}
+      >
+        <Product3D product={p} autoRotate={live} interactive={live} shinyWood colorOverride={p.color} />
+        {!live && (
+          <span className="absolute bottom-2 end-2 z-10 text-[10px] px-2 py-1 rounded-full bg-background/70 border border-[color:var(--card-border)] text-foreground/70">
+            {ar ? "اضغط للتدوير" : "Click to rotate"}
+          </span>
         )}
       </div>
-      <div className="p-3">
+      <Link to="/store" className="block p-3">
         <span className="text-[10px] tracking-wider uppercase text-[hsl(var(--accent))]">
           {ar ? `الجيل ${p.generation === 2 ? "الثاني" : "الأول"}` : `Gen ${p.generation}`}
         </span>
@@ -183,7 +184,8 @@ function HomeProductCard({
         <p className="text-[11px] text-foreground/55">
           {p.dims.x} × {p.dims.y} × {p.dims.z} {ar ? "سم" : "cm"}
         </p>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
+
 }

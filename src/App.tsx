@@ -10,7 +10,7 @@ import Quote from "./pages/Quote";
 import Services from "./pages/Services";
 import About from "./pages/About";
 import Partners from "./pages/Partners";
-import Notifications from "./pages/Notifications";
+import Models from "./pages/Models";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,8 +30,9 @@ const App = () => (
             <Route path="/quote" element={<Quote />} />
             <Route path="/about" element={<About />} />
             <Route path="/partners" element={<Partners />} />
-            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/models" element={<Models />} />
             {/* Legacy routes → redirect to the new B2B flow */}
+            <Route path="/notifications" element={<Navigate to="/" replace />} />
             <Route path="/studio" element={<Navigate to="/quote" replace />} />
             <Route path="/simulation" element={<Navigate to="/quote" replace />} />
             <Route path="/checkout" element={<Navigate to="/quote" replace />} />

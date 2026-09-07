@@ -22,7 +22,7 @@ import {
   Building2,
 } from "lucide-react";
 import bgBlueprint from "@/assets/bg-blueprint.jpg";
-import bgStage from "@/assets/bg-stage.jpg";
+import bgProcessTech from "@/assets/bg-process-tech.jpg";
 import bgCraft from "@/assets/bg-craft.jpg";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -155,10 +155,12 @@ export default function Home() {
       {/* ── HOW IT WORKS, over the stage photograph ──────────────────────── */}
       <section className="relative overflow-hidden mb-20 border-y" style={{ borderColor: "var(--card-border)" }}>
         <img
-          src={bgStage}
+          src={bgProcessTech}
           alt=""
           aria-hidden
           loading="lazy"
+          width={1920}
+          height={1080}
           className="absolute inset-0 w-full h-full object-cover opacity-30"
         />
         <div

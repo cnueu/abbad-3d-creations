@@ -88,15 +88,13 @@ export default function Home() {
 
             <h1 className="font-display text-4xl md:text-6xl font-bold leading-[1.1] mb-6">
               <span className="text-gradient">
-                {ar
-                  ? "وحدات بناء تُنفَّذ اليوم، وتُعاد غداً في مشروع آخر"
-                  : "Building units delivered today, reused tomorrow on another project"}
+                {ar ? "وحدات بناء أبعاد" : "Abaad building units"}
               </span>
             </h1>
             <p className="text-base md:text-lg text-foreground/78 mb-8 max-w-xl mx-auto leading-relaxed">
               {ar
-                ? "نوفّر وحدات وموصّلات مصنّعة بدقة لتنفيذ المسارح والمعارض والفصول والفعاليات، مع تركيب سريع وإمكانية إعادة الاستخدام دون هدر."
-                : "Precision units and connecters for stages, exhibitions, classrooms and events, with fast installation and full reuse without waste."}
+                ? "وحدات وموصّلات مصنّعة بدقة لتنفيذ المسارح والفعاليات."
+                : "Precision units and connecters for theatres and events."}
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <Link to="/quote" className="btn-primary">

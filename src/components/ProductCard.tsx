@@ -36,13 +36,13 @@ export function ProductCard({ product, onClick, index = 0 }: Props) {
         onClick={() => setLive(true)}
         style={{
           background:
-            "linear-gradient(160deg, hsl(var(--accent) / 0.30) 0%, hsl(var(--bg-sidebar)) 45%, hsl(var(--accent) / 0.14) 100%)",
+            "linear-gradient(165deg, hsl(var(--accent) / 0.16) 0%, hsl(var(--bg-sidebar)) 50%, hsl(var(--accent) / 0.08) 100%)",
         }}
       >
         <div
           aria-hidden
           className="absolute inset-0 pointer-events-none"
-          style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.20) 0%, transparent 60%)" }}
+          style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.12) 0%, transparent 65%)" }}
         />
         <Product3D
           product={product}

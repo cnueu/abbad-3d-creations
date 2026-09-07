@@ -63,7 +63,7 @@ export default function Home() {
 
             <h1 className="font-display text-4xl md:text-6xl font-bold leading-[1.05] mb-6">
               <span className="text-gradient">
-                {ar ? "نظام بناء معياري للمشاريع الكبرى" : "A modular building system for large projects"}
+                {ar ? "قطعتان تتركّبان لتبني أي شيء" : "Two parts that click together to build anything"}
               </span>
             </h1>
             <p className="text-base md:text-lg text-foreground/75 mb-8 max-w-xl mx-auto leading-relaxed">

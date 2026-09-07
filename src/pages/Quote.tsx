@@ -18,7 +18,7 @@ import { z } from "zod";
 //                                     function when one is wired up)
 // ─────────────────────────────────────────────────────────────────────────────
 
-const CONTACT_EMAIL = "info@abaadblocks.com";
+const CONTACT_EMAIL = "abaad.company.sa@gmail.com";
 const MAX_IMAGES = 6;
 
 // Common domains suggested while the visitor types their email.

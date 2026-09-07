@@ -70,8 +70,8 @@
     --neon-strong: rgba(255, 255, 255, 0.60);
 
     --gradient-radial: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(7, 80, 86, 0.28), transparent 75%);
-    --gradient-hero: linear-gradient(135deg, rgba(7, 80, 86, 0.45), rgba(228, 238, 240, 0.08));
-    --gradient-text: linear-gradient(135deg, #E4EEF0 0%, #7fd4da 55%, #0a7a83 100%);
+    --gradient-hero: linear-gradient(135deg, rgba(7, 80, 86, 0.28), rgba(228, 238, 240, 0.05));
+    --gradient-text: linear-gradient(135deg, #E4EEF0 0%, #9fdfe4 70%, #4fb3ba 100%);
   }
 
   /* LIGHT THEME
@@ -135,8 +135,8 @@
 
   [data-theme="light"] body {
     background:
-      radial-gradient(ellipse 65% 50% at 50% 36%, rgba(244, 251, 252, 0.95), transparent 68%),
-      radial-gradient(ellipse 100% 85% at 50% 55%, rgba(7, 80, 86, 0.16), transparent 74%),
+      radial-gradient(ellipse 80% 60% at 50% 32%, rgba(250, 253, 254, 0.9), transparent 76%),
+      radial-gradient(ellipse 110% 90% at 50% 60%, rgba(7, 80, 86, 0.08), transparent 80%),
       hsl(var(--bg-root)) !important;
     background-attachment: fixed !important;
   }
@@ -150,7 +150,7 @@
     font-family: 'Thmanyah Sans', 'DM Sans', sans-serif;
     -webkit-font-smoothing: antialiased;
     background:
-      radial-gradient(ellipse 70% 55% at 50% 38%, rgba(7, 80, 86, 0.30), transparent 72%),
+      radial-gradient(ellipse 85% 65% at 50% 32%, rgba(7, 80, 86, 0.16), transparent 78%),
       hsl(var(--bg-root));
     background-attachment: fixed;
   }

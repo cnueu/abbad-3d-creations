@@ -4,7 +4,7 @@ type Dict = any;
 export const translations: { en: Dict; ar: Dict } = {
   en: {
     brand: "Abaad",
-    tagline: "Build any shape. From cubes and connecters.",
+    tagline: "Two parts. Build any shape you need.",
     nav: { home: "Home", store: "Store", studio: "AI Studio", about: "About", partners: "Partners", checkout: "Checkout", auth: "Sign in" },
     hero: {
       title: "Modular building blocks for builders, makers, and dreamers.",
@@ -13,8 +13,8 @@ export const translations: { en: Dict; ar: Dict } = {
       cta2: "Open AI Studio",
     },
     store: {
-      title: "Building Blocks",
-      subtitle: "Hand-tested geometry. PLA / Wood. Snap together with our connecters.",
+      title: "Our units",
+      subtitle: "Tested parts in PLA or wood, they click together with our connecters.",
       viewAll: "View all",
       details: "Details",
       addToCart: "Add to cart",
@@ -84,21 +84,32 @@ export const translations: { en: Dict; ar: Dict } = {
     },
     about: {
       title: "Who we are",
-      body: "Abaad (أبعاد، \"dimensions\") is a Saudi maker of precision modular building blocks. Two parts, a cube and a connecter, assemble into anything you can imagine, from a coffee-table sculpture to a full theater set.",
+      // Plain language on purpose: anyone should understand it in one read.
+      body: "Abaad is a young Saudi company. We make two simple parts, a cube and a connecter, that click together into any shape you need: a stage, a booth, a classroom setup, or a display.",
+      short: "Two parts. Endless shapes.",
       incubatorLabel: "Incubated by",
       incubator: "Falak Business & Investment Company",
       mission: "Our mission",
-      missionBody: "Give every maker, designer, and dreamer the smallest possible vocabulary for the largest possible idea.",
-      goalsTitle: "Our goals",
+      missionBody: "Make building easy, reusable and open to everyone, without tools, waste or specialists.",
+      storyTitle: "Our story",
+      storyBody: "We started as a student team with one idea: building something big should not mean building it from scratch every time. Today Abaad is at its beginning, with a working product, a first set of units, and a team that builds it hands-on.",
+      goalsTitle: "What we are working on",
       goals: [
-        "Make 3D construction accessible to anyone, regardless of skill.",
-        "Empower designers with an AI-assisted, physical building system.",
-        "Build a Saudi-born product that ships to makers worldwide.",
+        "Making 3D building simple for anyone, with no experience needed.",
+        "Units that are used, taken apart, and used again instead of thrown away.",
+        "A Saudi made product, produced locally.",
       ],
-      milestonesTitle: "Milestones",
+      milestonesTitle: "Where we are so far",
       milestones: [
-        "Winners, Masrahthon (مسرحثون).",
+        "Winners of Masrahthon.",
         "Incubated by Falak Business & Investment Company.",
+        "First generation of units produced and tested.",
+      ],
+      valuesTitle: "What we care about",
+      values: [
+        { title: "Simple", body: "Two parts, no tools, no manual needed." },
+        { title: "Reusable", body: "Take a build apart and use the same units for the next one." },
+        { title: "Local", body: "Designed and made in Saudi Arabia." },
       ],
       teamTitle: "The team",
       team: [
@@ -107,13 +118,13 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "Founder",
           email: "hessaibrahim129@gmail.com",
           linkedin: "https://www.linkedin.com/in/hessa-althuwaib-870742325/",
-          bio: "Founder of Abaad. Leads the product vision and the modular building system.",
+          bio: "Founder of Abaad. Leads the product and the building system.",
           studies: [
             "Information Systems student at Imam Muhammad ibn Saud Islamic University.",
             "Computer Science and Engineering track in high school.",
           ],
           achievements: [
-            "Winning team member at the AI League, Best AI Solution for 2034."
+            "Winning team member at the AI League, Best AI Solution for 2034.",
           ],
         },
         {
@@ -121,7 +132,7 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "CEO",
           email: "uaaljasem@gmail.com",
           linkedin: "https://www.linkedin.com/in/yumna-aljasem/",
-          bio: "Chief Executive Officer. Drives strategy, operations, and partnerships, with deep knowledge in chemistry.",
+          bio: "Leads strategy, operations and partnerships, with deep knowledge in chemistry.",
           studies: [
             "Human Medicine student at Al-Nahda College.",
             "Computer Science and Engineering track in high school.",
@@ -136,39 +147,10 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "COO",
           email: "maryamfarouk59@gmail.com",
           linkedin: "https://www.linkedin.com/in/maryam-farouk-b14340386/",
-          bio: "Chief Operating Officer. Oversees operations and execution.",
+          bio: "Oversees day to day operations and execution.",
           studies: [
             "Biomedical Engineering student at Al-Nahda College.",
             "Computer Science and Engineering track in high school.",
-          ],
-          achievements: [
-            "Finalist team member in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",
-          ],
-        },
-        {
-          name: "Ranad Alotaibi",
-          role: "CFO",
-          email: "ranadalotaibi9@gmail.com",
-          linkedin: "https://www.linkedin.com/in/ranad-alotaibi-11092836a/",
-          bio: "Chief Financial Officer. Oversees finance, planning, and growth.",
-          studies: [
-            "Financial Economics student.",
-            "Computer Science and Engineering track in high school.",
-          ],
-          achievements: [
-            "Participant in the Albilad Competition.",
-            "Certified by Monshaat (منشآت).",
-            "Finalist team member in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",
-          ],
-        },
-        {
-          name: "Noor Alshabeeb",
-          role: "Technical Team",
-          email: "noor_sh2006@outlook.com",
-          linkedin: "https://www.linkedin.com/in/noor-alshabeeb-162630367/",
-          bio: "Technical team member. Supports product engineering and technical execution.",
-          studies: [
-            "AI student.",
           ],
           achievements: [
             "Finalist team member in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",
@@ -178,13 +160,13 @@ export const translations: { en: Dict; ar: Dict } = {
     },
     partners: {
       title: "Partnerships & Collaboration",
-      subtitle: "We're building Saudi's most flexible modular building system. We'd love to build it with you.",
+      subtitle: "نحن في بداية طريقنا، ونبحث عن جهات نبني معها.",
       whyTitle: "Why partner with Abaad",
       why: [
-        "A young Saudi born product with a focused, ambitious team.",
+        "A young Saudi product built by a small, hands-on team.",
         "Eco friendly materials that serve Vision 2030.",
         "Winners of Masrahthon.",
-        "AI assisted physical building, ready for theaters, schools, retail, and brands.",
+        "Units ready for theatres, schools, retail and brands.",
       ],
       formsTitle: "Ways to collaborate",
       forms: [
@@ -199,7 +181,7 @@ export const translations: { en: Dict; ar: Dict } = {
       ],
       statsTitle: "By the numbers",
       stats: [
-        { value: "2", label: "Core products" },
+        { value: "2", label: "Core parts" },
         { value: "∞", label: "Possible builds" },
         { value: "100%", label: "Made in KSA" },
         { value: "48h", label: "Reply time" },
@@ -250,7 +232,7 @@ export const translations: { en: Dict; ar: Dict } = {
   },
   ar: {
     brand: "أبعاد",
-    tagline: "ابنِ أي شكل. من المكعبات والموصِّلات.",
+    tagline: "قطعتان تبنيان أي شكل تحتاجه.",
     nav: { home: "الرئيسية", store: "المتجر", studio: "استوديو الذكاء", about: "من نحن", partners: "الشراكات", checkout: "الدفع", auth: "تسجيل الدخول" },
     hero: {
       title: "وحدات بناء قابلة للتركيب للبنّائين والمصممين والحالمين.",
@@ -259,8 +241,8 @@ export const translations: { en: Dict; ar: Dict } = {
       cta2: "افتح استوديو الذكاء",
     },
     store: {
-      title: "وحدات البناء",
-      subtitle: "هندسة دقيقة مُختبرة. PLA / خشب. تتركّب بموصِّلاتنا.",
+      title: "وحداتنا",
+      subtitle: "قطع مُختبرة من PLA أو خشب، تتركّب مع بعضها بالموصِّلات.",
       viewAll: "عرض الكل",
       details: "التفاصيل",
       addToCart: "أضِف للسلة",
@@ -330,21 +312,32 @@ export const translations: { en: Dict; ar: Dict } = {
     },
     about: {
       title: "من نحن",
-      body: "أبعاد شركة سعودية تصنع وحدات بناء معيارية دقيقة. قطعتان فقط، مكعب وموصِّل، تتجمّع لتصبح أي شيء تتخيّله، من منحوتة على طاولة إلى ديكور مسرح كامل.",
+      // لغة بسيطة ومباشرة، يفهمها أي شخص من أول قراءة.
+      body: "أبعاد شركة سعودية ناشئة. نصنع قطعتين فقط، مكعب وموصِّل، تتركّبان معاً لتكوّن أي شكل تحتاجه: مسرح، جناح معرض، ترتيب فصل دراسي، أو واجهة عرض.",
+      short: "قطعتان، وأشكال بلا حدود.",
       incubatorLabel: "حاضنة",
-      incubator: "حاضنة من شركة فلك للأعمال والاستثمار",
+      incubator: "شركة فلك للأعمال والاستثمار",
       mission: "مهمتنا",
-      missionBody: "أن نمنح كل صانع ومصمم وحالم أصغر مفردات ممكنة لأكبر فكرة ممكنة.",
-      goalsTitle: "أهدافنا",
+      missionBody: "أن يصبح البناء سهلاً وقابلاً لإعادة الاستخدام ومتاحاً للجميع، بلا أدوات ولا هدر ولا حاجة لمختصين.",
+      storyTitle: "قصتنا",
+      storyBody: "بدأنا كفريق طالبات بفكرة واحدة: بناء شيء كبير لا يجب أن يعني البدء من الصفر في كل مرة. اليوم أبعاد في بدايتها، لدينا منتج يعمل، وأول مجموعة من الوحدات، وفريق ينفّذ بيده.",
+      goalsTitle: "ما نعمل عليه",
       goals: [
-        "جعل البناء ثلاثي الأبعاد متاحاً للجميع بغضّ النظر عن الخبرة.",
-        "تمكين المصممين بنظام بناء فيزيائي مدعوم بالذكاء الاصطناعي.",
-        "بناء منتج سعودي يصل إلى صنّاع المحتوى حول العالم.",
+        "أن يصبح البناء ثلاثي الأبعاد سهلاً لأي شخص، بدون خبرة سابقة.",
+        "وحدات تُستخدم وتُفكّك وتُستخدم من جديد بدل أن تُرمى.",
+        "منتج سعودي يُصنع محلياً.",
       ],
-      milestonesTitle: "إنجازاتنا",
+      milestonesTitle: "أين وصلنا حتى الآن",
       milestones: [
-        "الفائزون في مسرحثون.",
-        "حاضنة من شركة فلك للأعمال والاستثمار.",
+        "الفوز في مسرحثون.",
+        "احتضان من شركة فلك للأعمال والاستثمار.",
+        "إنتاج واختبار الجيل الأول من الوحدات.",
+      ],
+      valuesTitle: "ما يهمّنا",
+      values: [
+        { title: "البساطة", body: "قطعتان فقط، بلا أدوات وبلا دليل استخدام." },
+        { title: "إعادة الاستخدام", body: "فكّ التركيب واستخدم نفس الوحدات في المشروع التالي." },
+        { title: "محلي", body: "تصميم وتصنيع داخل المملكة." },
       ],
       teamTitle: "الفريق",
       team: [
@@ -353,13 +346,13 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "المؤسِّسة",
           email: "hessaibrahim129@gmail.com",
           linkedin: "https://www.linkedin.com/in/hessa-althuwaib-870742325/",
-          bio: "مؤسِّسة أبعاد. تقود رؤية المنتج ونظام البناء المعياري.",
+          bio: "مؤسِّسة أبعاد. تقود المنتج ونظام التركيب.",
           studies: [
             "طالبة نظم معلومات في جامعة الإمام محمد بن سعود الإسلامية.",
             "مسار علوم وهندسة الحاسب في المرحلة الثانوية.",
           ],
           achievements: [
-            "عضو الفريق الفائز في دوري الذكاء الاصطناعي، أفضل حل ذكاء اصطناعي لعام 2034."
+            "عضو الفريق الفائز في دوري الذكاء الاصطناعي، أفضل حل ذكاء اصطناعي لعام 2034.",
           ],
         },
         {
@@ -367,7 +360,7 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "الرئيسة التنفيذية",
           email: "uaaljasem@gmail.com",
           linkedin: "https://www.linkedin.com/in/yumna-aljasem/",
-          bio: "الرئيسة التنفيذية. تقود الاستراتيجية والعمليات والشراكات، وذات معرفة عميقة بالكيمياء.",
+          bio: "تقود الاستراتيجية والعمليات والشراكات، وذات معرفة عميقة بالكيمياء.",
           studies: [
             "طالبة طب بشري في كلية النهضة.",
             "مسار علوم وهندسة الحاسب في المرحلة الثانوية.",
@@ -382,39 +375,10 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "مديرة العمليات",
           email: "maryamfarouk59@gmail.com",
           linkedin: "https://www.linkedin.com/in/maryam-farouk-b14340386/",
-          bio: "مديرة العمليات. تشرف على العمليات والتنفيذ.",
+          bio: "تشرف على العمليات اليومية والتنفيذ.",
           studies: [
             "طالبة هندسة طبية حيوية في كلية النهضة.",
             "مسار علوم وهندسة الحاسب في المرحلة الثانوية.",
-          ],
-          achievements: [
-            "عضو فريق مرشّح للمرحلة النهائية في مسابقة اكتشاف المواد، تحت إشراف الحائز على جائزة نوبل في الكيمياء البروفيسور عمر ياغي.",
-          ],
-        },
-        {
-          name: "رَناد العتيبي",
-          role: "المديرة المالية",
-          email: "ranadalotaibi9@gmail.com",
-          linkedin: "https://www.linkedin.com/in/ranad-alotaibi-11092836a/",
-          bio: "المديرة المالية. تشرف على المالية والتخطيط والنمو.",
-          studies: [
-            "طالبة اقتصاد مالي.",
-            "مسار علوم وهندسة الحاسب في المرحلة الثانوية.",
-          ],
-          achievements: [
-            "مشاركة في مسابقة البلاد.",
-            "حاصلة على شهادة من منشآت.",
-            "عضو فريق مرشّح للمرحلة النهائية في مسابقة اكتشاف المواد، تحت إشراف الحائز على جائزة نوبل في الكيمياء البروفيسور عمر ياغي.",
-          ],
-        },
-        {
-          name: "نور الشبيب",
-          role: "الفريق التقني",
-          email: "noor_sh2006@outlook.com",
-          linkedin: "https://www.linkedin.com/in/noor-alshabeeb-162630367/",
-          bio: "عضو الفريق التقني. تدعم هندسة المنتج والتنفيذ التقني.",
-          studies: [
-            "طالبة ذكاء اصطناعي.",
           ],
           achievements: [
             "عضو فريق مرشّح للمرحلة النهائية في مسابقة اكتشاف المواد، تحت إشراف الحائز على جائزة نوبل في الكيمياء البروفيسور عمر ياغي.",
@@ -424,13 +388,13 @@ export const translations: { en: Dict; ar: Dict } = {
     },
     partners: {
       title: "الشراكات والتعاون",
-      subtitle: "نبني أكثر نظام وحدات بناء مرونةً في السعودية، ونحبّ أن نبنيه معك.",
+      subtitle: "نحن في بداية طريقنا، ونبحث عن جهات نبني معها.",
       whyTitle: "لماذا الشراكة مع أبعاد",
       why: [
-        "منتج سعودي ناشئ بفريق طموح ومركّز.",
+        "منتج سعودي ناشئ يبنيه فريق صغير بيده.",
         "مواد صديقة للبيئة تخدم رؤية الوطن.",
         "الفائزون في مسرحثون.",
-        "بناء فيزيائي مدعوم بالذكاء، جاهز للمسارح والمدارس والعلامات.",
+        "وحدات جاهزة للمسارح والمدارس والمتاجر والعلامات التجارية.",
       ],
       formsTitle: "صور التعاون",
       forms: [
@@ -445,7 +409,7 @@ export const translations: { en: Dict; ar: Dict } = {
       ],
       statsTitle: "بالأرقام",
       stats: [
-        { value: "٢", label: "منتجات أساسية" },
+        { value: "٢", label: "قطع أساسية" },
         { value: "∞", label: "تركيبات ممكنة" },
         { value: "١٠٠٪", label: "صُنع في السعودية" },
         { value: "٤٨س", label: "زمن الرد" },

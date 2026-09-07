@@ -1,9 +1,18 @@
 import { Layout } from "@/components/Layout";
 import { useLang } from "@/i18n/LanguageContext";
-import { Logo } from "@/components/Logo";
 import { motion } from "framer-motion";
-import { Building2, Target, Users, Award, Mail, Linkedin } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Target, Users, Award, Mail, Linkedin, Sparkles, ArrowRight, FileText } from "lucide-react";
 import falakLogo from "@/assets/falak-logo.png";
+import { Logo } from "@/components/Logo";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ABOUT / من نحن
+// Rewritten from scratch: a calm top-to-bottom read, no oversized centre logo.
+// WHERE TO CHANGE THINGS:
+//  • All copy and team members ..... src/i18n/translations.ts → about
+//  • Incubator badge image ......... src/assets/falak-logo.png
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface TeamMember {
   name: string;
@@ -18,154 +27,167 @@ interface TeamMember {
 export default function About() {
   const { t, lang } = useLang();
   const about = t.about;
+  const ar = lang === "ar";
 
   return (
     <Layout>
-      <div className="container mx-auto px-6 py-20 max-w-5xl">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          {/* Hero */}
-          {/* Large wordmark, roughly half a section tall. */}
-          <div className="flex justify-center items-center mb-10 min-h-[38vh]">
-            <Logo variant="name" className="w-[min(90vw,720px)] h-auto object-contain" />
-          </div>
-          <h1 className="font-display text-4xl md:text-6xl font-bold text-center mb-6">
-            <span className="text-gradient">{about.title}</span>
-          </h1>
-          <p className="text-lg text-foreground/75 leading-relaxed text-center mb-10 max-w-2xl mx-auto">
-            {about.body}
-          </p>
-
-          {/* Incubator badge with Falak logo */}
-          <div className="flex justify-center mb-16">
-            <div className="inline-flex items-center gap-3 px-5 py-3 rounded-full border border-[color:var(--card-border)] glass-card">
+      <div className="container mx-auto px-6 py-14 max-w-5xl">
+        {/* Intro, small wordmark on the side instead of a giant centred logo */}
+        <motion.header
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid md:grid-cols-[1.4fr_1fr] gap-10 items-center mb-14"
+        >
+          <div>
+            <span className="text-[11px] tracking-[0.2em] uppercase text-[hsl(var(--accent))]">
+              {about.short}
+            </span>
+            <h1 className="font-display text-3xl md:text-5xl font-bold mt-2 mb-4">
+              <span className="text-gradient">{about.title}</span>
+            </h1>
+            <p className="text-base md:text-lg text-foreground/75 leading-relaxed mb-6">{about.body}</p>
+            <div className="inline-flex items-center gap-3 px-4 py-2.5 rounded-full border border-[color:var(--card-border)] glass-card">
               <img src={falakLogo} alt="Falak" className="w-6 h-6 rounded-full object-cover" />
-              <span className="text-[11px] tracking-[0.22em] uppercase text-foreground/60">
+              <span className="text-[11px] tracking-[0.18em] uppercase text-foreground/55">
                 {about.incubatorLabel}
               </span>
-              <span className="font-display font-semibold text-foreground">{about.incubator}</span>
+              <span className="font-display font-semibold text-foreground text-sm">{about.incubator}</span>
             </div>
           </div>
-        </motion.div>
-
-        {/* Mission */}
-        <section className="glass-panel rounded-3xl p-8 md:p-12 mb-10">
-          <div className="text-[11px] tracking-[0.22em] uppercase text-[hsl(var(--accent))] mb-3">
-            {about.mission}
+          <div className="glass-panel rounded-3xl p-8 flex items-center justify-center">
+            <Logo variant="name" className="w-full max-w-[260px] h-auto object-contain" />
           </div>
-          <p className="font-display text-2xl md:text-3xl leading-snug">{about.missionBody}</p>
+        </motion.header>
+
+        {/* Mission + story side by side */}
+        <div className="grid md:grid-cols-2 gap-5 mb-5">
+          <section className="glass-panel rounded-3xl p-8">
+            <Label icon={Sparkles} text={about.mission} />
+            <p className="font-display text-xl md:text-2xl leading-snug">{about.missionBody}</p>
+          </section>
+          <section className="glass-panel rounded-3xl p-8">
+            <Label icon={Award} text={about.storyTitle} />
+            <p className="text-base text-foreground/75 leading-relaxed">{about.storyBody}</p>
+          </section>
+        </div>
+
+        {/* Values */}
+        <section className="grid sm:grid-cols-3 gap-4 mb-5">
+          {about.values.map((v: { title: string; body: string }) => (
+            <div key={v.title} className="glass-card rounded-2xl p-6">
+              <h3 className="font-display text-lg font-semibold mb-1.5">{v.title}</h3>
+              <p className="text-sm text-foreground/65 leading-relaxed">{v.body}</p>
+            </div>
+          ))}
         </section>
 
-        {/* Goals */}
-        <section className="glass-panel rounded-3xl p-8 md:p-12 mb-10">
-          <div className="flex items-center gap-2 mb-6">
-            <Target className="w-4 h-4 text-[hsl(var(--accent))]" />
-            <span className="text-[11px] tracking-[0.22em] uppercase text-[hsl(var(--accent))]">
-              {about.goalsTitle}
-            </span>
-          </div>
-          <ul className="space-y-3">
-            {about.goals.map((g: string, i: number) => (
-              <li key={i} className="flex gap-3 text-base md:text-lg text-foreground/80">
-                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] shrink-0" />
-                <span>{g}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
+        {/* Goals + milestones */}
+        <div className="grid md:grid-cols-2 gap-5 mb-16">
+          <section className="glass-panel rounded-3xl p-8">
+            <Label icon={Target} text={about.goalsTitle} />
+            <Bullets items={about.goals} />
+          </section>
+          <section className="glass-panel rounded-3xl p-8">
+            <Label icon={Award} text={about.milestonesTitle} />
+            <Bullets items={about.milestones} />
+          </section>
+        </div>
 
-        {/* Milestones */}
-        <section className="glass-panel rounded-3xl p-8 md:p-12 mb-16">
-          <div className="flex items-center gap-2 mb-6">
-            <Award className="w-4 h-4 text-[hsl(var(--accent))]" />
-            <span className="text-[11px] tracking-[0.22em] uppercase text-[hsl(var(--accent))]">
-              {about.milestonesTitle}
-            </span>
-          </div>
-          <ul className="space-y-3">
-            {about.milestones.map((m: string, i: number) => (
-              <li key={i} className="flex gap-3 text-base md:text-lg text-foreground/80">
-                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] shrink-0" />
-                <span>{m}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* Team, one section per person */}
-        <div className="flex items-center gap-2 mb-8">
+        {/* Team */}
+        <div className="flex items-center gap-2 mb-6">
           <Users className="w-4 h-4 text-[hsl(var(--accent))]" />
-          <span className="text-[11px] tracking-[0.22em] uppercase text-[hsl(var(--accent))]">
+          <span className="text-[11px] tracking-[0.2em] uppercase text-[hsl(var(--accent))]">
             {about.teamTitle}
           </span>
         </div>
 
-        <div className="space-y-8">
+        <div className="grid md:grid-cols-3 gap-5 mb-16">
           {about.team.map((m: TeamMember, i: number) => (
-            <motion.section
+            <motion.article
               key={m.name}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className="glass-panel rounded-3xl p-8 md:p-10"
+              transition={{ delay: i * 0.07 }}
+              className="glass-card rounded-3xl p-7 flex flex-col"
             >
-              <div className="flex flex-col md:flex-row gap-8 items-start">
-                <div className="shrink-0 w-24 h-24 md:w-32 md:h-32 rounded-2xl flex items-center justify-center font-display text-3xl md:text-4xl font-bold bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))]">
-                  {m.name.charAt(0)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[11px] tracking-[0.22em] uppercase text-foreground/55 mb-1">
-                    {m.role}
-                  </div>
-                  <h2 className="font-display text-2xl md:text-3xl font-semibold mb-3">{m.name}</h2>
-                  <p className="text-base text-foreground/75 leading-relaxed mb-4">{m.bio}</p>
-
-                  {m.studies && m.studies.length > 0 && (
-                    <ul className="space-y-2 mb-5">
-                      {m.studies.map((s, si) => (
-                        <li key={si} className="flex gap-3 text-sm md:text-base text-foreground/80">
-                          <span className="mt-2 w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] shrink-0" />
-                          <span>{s}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  {m.achievements && m.achievements.length > 0 && (
-                    <ul className="space-y-2 mb-5">
-                      {m.achievements.map((a, ai) => (
-                        <li key={ai} className="flex gap-3 text-sm md:text-base text-foreground/80">
-                          <span className="mt-2 w-1.5 h-1.5 rounded-full bg-[hsl(var(--accent))] shrink-0" />
-                          <span>{a}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                  <div className="flex flex-wrap gap-3">
-                    <a
-                      href={`mailto:${m.email}`}
-                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[color:var(--card-border)] text-sm hover:bg-[hsl(var(--accent))]/10 transition-colors"
-                      dir="ltr"
-                    >
-                      <Mail className="w-3.5 h-3.5 text-[hsl(var(--accent))]" />
-                      {m.email}
-                    </a>
-                    <a
-                      href={m.linkedin}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[color:var(--card-border)] text-sm hover:bg-[hsl(var(--accent))]/10 transition-colors"
-                    >
-                      <Linkedin className="w-3.5 h-3.5 text-[hsl(var(--accent))]" />
-                      LinkedIn
-                    </a>
-                  </div>
-                </div>
+              <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-display text-2xl font-bold mb-4 bg-[hsl(var(--accent))]/15 text-[hsl(var(--accent))]">
+                {m.name.charAt(0)}
               </div>
-            </motion.section>
+              <div className="text-[10px] tracking-[0.2em] uppercase text-foreground/50 mb-1">{m.role}</div>
+              <h2 className="font-display text-xl font-semibold mb-2">{m.name}</h2>
+              <p className="text-sm text-foreground/70 leading-relaxed mb-4">{m.bio}</p>
+
+              {m.studies && m.studies.length > 0 && (
+                <Bullets items={m.studies} small />
+              )}
+              {m.achievements && m.achievements.length > 0 && (
+                <Bullets items={m.achievements} small />
+              )}
+
+              <div className="flex flex-wrap gap-2 mt-auto pt-4">
+                <a
+                  href={`mailto:${m.email}`}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[color:var(--card-border)] text-xs hover:bg-[hsl(var(--accent))]/10 transition-colors"
+                  dir="ltr"
+                >
+                  <Mail className="w-3.5 h-3.5 text-[hsl(var(--accent))]" />
+                  {ar ? "البريد" : "Email"}
+                </a>
+                <a
+                  href={m.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[color:var(--card-border)] text-xs hover:bg-[hsl(var(--accent))]/10 transition-colors"
+                >
+                  <Linkedin className="w-3.5 h-3.5 text-[hsl(var(--accent))]" />
+                  LinkedIn
+                </a>
+              </div>
+            </motion.article>
           ))}
         </div>
+
+        {/* Closing CTA */}
+        <section className="glass-panel rounded-3xl p-8 md:p-10 text-center">
+          <h2 className="font-display text-2xl md:text-3xl font-semibold mb-3">
+            {ar ? "عندك فكرة تبي تبنيها؟" : "Have something you want to build?"}
+          </h2>
+          <p className="text-foreground/70 mb-6">
+            {ar ? "أرسل لنا التفاصيل ونرجع لك بعرض واضح." : "Send us the details and we reply with a clear offer."}
+          </p>
+          <Link to="/quote" className="btn-primary">
+            <FileText className="w-4 h-4" />
+            {ar ? "اطلب عرض سعر" : "Request a quote"}
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </section>
       </div>
     </Layout>
+  );
+}
+
+function Label({ icon: Icon, text }: { icon: React.ComponentType<{ className?: string }>; text: string }) {
+  return (
+    <div className="flex items-center gap-2 mb-4">
+      <Icon className="w-4 h-4 text-[hsl(var(--accent))]" />
+      <span className="text-[11px] tracking-[0.2em] uppercase text-[hsl(var(--accent))]">{text}</span>
+    </div>
+  );
+}
+
+function Bullets({ items, small = false }: { items: string[]; small?: boolean }) {
+  return (
+    <ul className={small ? "space-y-1.5 mb-3" : "space-y-3"}>
+      {items.map((it, i) => (
+        <li
+          key={i}
+          className={`flex gap-3 text-foreground/80 ${small ? "text-xs leading-relaxed" : "text-base"}`}
+        >
+          <span className={`rounded-full bg-[hsl(var(--accent))] shrink-0 ${small ? "mt-1.5 w-1 h-1" : "mt-2 w-1.5 h-1.5"}`} />
+          <span>{it}</span>
+        </li>
+      ))}
+    </ul>
   );
 }

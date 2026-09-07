@@ -107,37 +107,64 @@ export function Product3D({
   const color = colorOverride ?? product.color;
   const { url, format } = product.model;
 
+  // PERFORMANCE / STABILITY
+  // Every canvas is a WebGL context and browsers only allow a handful of them.
+  // A whole grid of them at once used to crash the page, so a canvas is created
+  // only once its card scrolls into view, and dropped again when it leaves.
+  const holder = useRef<HTMLDivElement | null>(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = holder.current;
+    if (!el || typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => entries.forEach((e) => setVisible(e.isIntersecting)),
+      { rootMargin: "200px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
   return (
-    <Canvas
-      shadows
-      camera={{ position: [4, 3.4, 4.4], fov: 28 }}
-      style={{ width: "100%", height: "100%" }}
-      gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
-      frameloop={interactive ? "always" : "demand"}
-      dpr={[1, 1.5]}
-    >
-      <ambientLight intensity={0.6} />
-      <directionalLight position={[10, 16, 8]} intensity={1.1} castShadow shadow-mapSize={[1024, 1024]} />
-      <Suspense fallback={null}>
-        <Bounds fit clip observe margin={1.7}>
-          {format === "stl" ? (
-            <StlPiece key={url} url={url} color={color} shiny={shinyWood} />
-          ) : (
-            <ObjPiece key={url} url={url} color={color} shiny={shinyWood} />
-          )}
-        </Bounds>
-        <ContactShadows position={[0, -1.6, 0]} opacity={0.35} scale={14} blur={2.4} />
-        <Environment preset="city" />
-      </Suspense>
-      <OrbitControls
-        enablePan={false}
-        enableZoom={false}
-        enableRotate={interactive}
-        autoRotate={autoRotate && interactive}
-        autoRotateSpeed={1.2}
-        minPolarAngle={Math.PI / 3.5}
-        maxPolarAngle={Math.PI / 1.7}
-      />
-    </Canvas>
+    <div ref={holder} style={{ width: "100%", height: "100%" }}>
+      {visible && (
+        <Canvas
+          camera={{ position: [4, 3.4, 4.4], fov: 28 }}
+          style={{ width: "100%", height: "100%" }}
+          gl={{ antialias: true, alpha: true, powerPreference: "low-power" }}
+          frameloop={interactive ? "always" : "demand"}
+          dpr={[1, 1.5]}
+        >
+          <ambientLight intensity={0.75} />
+          <hemisphereLight intensity={0.5} groundColor={"#1b1b1b"} />
+          <directionalLight position={[10, 16, 8]} intensity={1.15} />
+          <directionalLight position={[-8, 6, -6]} intensity={0.45} />
+          <Suspense fallback={null}>
+            <Bounds fit clip observe margin={1.7}>
+              {format === "stl" ? (
+                <StlPiece key={url} url={url} color={color} shiny={shinyWood} />
+              ) : (
+                <ObjPiece key={url} url={url} color={color} shiny={shinyWood} />
+              )}
+            </Bounds>
+            {/* The HDR environment is heavy, so it loads only for the piece the
+                visitor is actually playing with. */}
+            {interactive && <Environment preset="city" />}
+          </Suspense>
+          <OrbitControls
+            enablePan={false}
+            enableZoom={false}
+            enableRotate={interactive}
+            autoRotate={autoRotate && interactive}
+            autoRotateSpeed={1.2}
+            minPolarAngle={Math.PI / 3.5}
+            maxPolarAngle={Math.PI / 1.7}
+          />
+        </Canvas>
+      )}
+    </div>
   );
 }

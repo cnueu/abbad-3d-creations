@@ -194,8 +194,8 @@ export default function Partners() {
           <div className="mt-6 pt-6 border-t border-[color:var(--card-border)] text-sm text-foreground/65 flex flex-wrap items-center gap-2">
             <Mail className="w-4 h-4 text-[hsl(var(--accent))]" />
             <span>{p.directEmail}:</span>
-            <a href="mailto:partners@abaad.sa" className="text-[hsl(var(--text-accent))] hover:underline" dir="ltr">
-              partners@abaad.sa
+            <a href="mailto:abaad.company.sa@gmail.com" className="text-[hsl(var(--text-accent))] hover:underline" dir="ltr">
+              abaad.company.sa@gmail.com
             </a>
           </div>
         </section>

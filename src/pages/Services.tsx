@@ -79,8 +79,8 @@ export default function Services() {
           </h1>
           <p className="text-foreground/65">
             {ar
-              ? "أبعاد نظام بناء معياري يخدم المسارح والمدارس والعلامات التجارية والجهات الحكومية، من التوريد بالجملة حتى التنفيذ الكامل."
-              : "Abaad is a modular building system for theatres, schools, brands and public institutions, from bulk supply to full turnkey builds."}
+              ? "نوفّر وحدات أبعاد للمسارح والمدارس والمتاجر والعلامات التجارية والجهات الحكومية، من توريد القطع فقط حتى التنفيذ الكامل."
+              : "We supply Abaad units to theatres, schools, retail, brands and public bodies, from parts only to a fully built setup."}
           </p>
         </header>
 

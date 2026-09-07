@@ -28,7 +28,7 @@ const MODELS = [
     },
     size: { ar: "٦ × ٤ × ٢٫٤ م", en: "6 × 4 × 2.4 m" },
     cubes: 420,
-    days: { ar: "١ ,٢ يوم تركيب", en: "1, 2 days install" },
+    days: { ar: "التركيب من ٣ إلى ٨ ساعات", en: "3 to 8 hours to install" },
   },
   {
     id: "booth",
@@ -40,7 +40,7 @@ const MODELS = [
     },
     size: { ar: "٥ × ٣ × ٢٫٤ م", en: "5 × 3 × 2.4 m" },
     cubes: 310,
-    days: { ar: "يوم تركيب واحد", en: "1 day install" },
+    days: { ar: "التركيب من ٣ إلى ٥ ساعات", en: "3 to 5 hours to install" },
   },
   {
     id: "classroom",
@@ -52,7 +52,7 @@ const MODELS = [
     },
     size: { ar: "٧ × ٦ × ٢ م", en: "7 × 6 × 2 m" },
     cubes: 560,
-    days: { ar: "يوم تركيب واحد", en: "1 day install" },
+    days: { ar: "التركيب من ٣ إلى ٥ ساعات", en: "3 to 5 hours to install" },
   },
 ];
 

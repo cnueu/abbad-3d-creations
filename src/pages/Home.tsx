@@ -224,7 +224,7 @@ export default function Home() {
           {[
             { Icon: Theater, t: ar ? "المسارح والفعاليات" : "Theatres and events", b: ar ? "خلفيات ومنصّات ومستويات." : "Backdrops, platforms and levels." },
             { Icon: StoreIcon, t: ar ? "المعارض والعلامات" : "Exhibitions and brands", b: ar ? "أجنحة وواجهات عرض." : "Booths and display fronts." },
-            { Icon: GraduationCap, t: ar ? "التعليم" : "Education", b: ar ? "فصول مرنة وأنشطة عملية." : "Flexible classrooms and hands on activities." },
+            { Icon: GraduationCap, t: ar ? "التعليم" : "Education", b: ar ? "المسارح الطلابية والجامعية." : "Student and university theatres." },
             { Icon: Building2, t: ar ? "الجهات الحكومية" : "Public institutions", b: ar ? "مبادرات ومناسبات متكررة." : "Recurring initiatives and occasions." },
           ].map(({ Icon, t, b }, i) => (
             <motion.div
@@ -248,7 +248,7 @@ export default function Home() {
         <div className="grid md:grid-cols-2 gap-6 items-stretch">
           <div className="rounded-3xl overflow-hidden border min-h-[280px]" style={{ borderColor: "var(--card-border)" }}>
             <img
-              src={bgCraft}
+              src={bgCraftAsset.url}
               alt={ar ? "وحدة خشبية مصنّعة بدقة" : "A precision manufactured wooden unit"}
               loading="lazy"
               className="w-full h-full object-cover"

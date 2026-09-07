@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import bgBlueprint from "@/assets/bg-blueprint.jpg";
 import bgProcessTech from "@/assets/bg-process-tech.jpg";
-import bgCraft from "@/assets/bg-craft.jpg";
+import bgCraftAsset from "@/assets/bg-craft.jpg.asset.json";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HOME (B2B). No prices anywhere, every call to action leads to /store or /quote.
@@ -88,15 +88,13 @@ export default function Home() {
 
             <h1 className="font-display text-4xl md:text-6xl font-bold leading-[1.1] mb-6">
               <span className="text-gradient">
-                {ar
-                  ? "وحدات بناء تُنفَّذ اليوم، وتُعاد غداً في مشروع آخر"
-                  : "Building units delivered today, reused tomorrow on another project"}
+                {ar ? "وحدات بناء أبعاد" : "Abaad building units"}
               </span>
             </h1>
             <p className="text-base md:text-lg text-foreground/78 mb-8 max-w-xl mx-auto leading-relaxed">
               {ar
-                ? "نوفّر وحدات وموصّلات مصنّعة بدقة لتنفيذ المسارح والمعارض والفصول والفعاليات، مع تركيب سريع وإمكانية إعادة الاستخدام دون هدر."
-                : "Precision units and connecters for stages, exhibitions, classrooms and events, with fast installation and full reuse without waste."}
+                ? "وحدات وموصّلات مصنّعة بدقة لتنفيذ المسارح والفعاليات."
+                : "Precision units and connecters for theatres and events."}
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <Link to="/quote" className="btn-primary">
@@ -172,9 +170,7 @@ export default function Home() {
             {ar ? "كيف نعمل" : "How we work"}
           </h2>
           <p className="text-center text-foreground/65 max-w-xl mx-auto mb-12">
-            {ar
-              ? "من أول رسالة حتى تسليم المشروع جاهزاً، أربع خطوات واضحة."
-              : "From the first message to a finished handover, four clear steps."}
+            {ar ? "رحلة العمل" : "The work journey"}
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[
@@ -228,7 +224,7 @@ export default function Home() {
           {[
             { Icon: Theater, t: ar ? "المسارح والفعاليات" : "Theatres and events", b: ar ? "خلفيات ومنصّات ومستويات." : "Backdrops, platforms and levels." },
             { Icon: StoreIcon, t: ar ? "المعارض والعلامات" : "Exhibitions and brands", b: ar ? "أجنحة وواجهات عرض." : "Booths and display fronts." },
-            { Icon: GraduationCap, t: ar ? "التعليم" : "Education", b: ar ? "فصول مرنة وأنشطة عملية." : "Flexible classrooms and hands on activities." },
+            { Icon: GraduationCap, t: ar ? "التعليم" : "Education", b: ar ? "المسارح الطلابية والجامعية." : "Student and university theatres." },
             { Icon: Building2, t: ar ? "الجهات الحكومية" : "Public institutions", b: ar ? "مبادرات ومناسبات متكررة." : "Recurring initiatives and occasions." },
           ].map(({ Icon, t, b }, i) => (
             <motion.div
@@ -252,7 +248,7 @@ export default function Home() {
         <div className="grid md:grid-cols-2 gap-6 items-stretch">
           <div className="rounded-3xl overflow-hidden border min-h-[280px]" style={{ borderColor: "var(--card-border)" }}>
             <img
-              src={bgCraft}
+              src={bgCraftAsset.url}
               alt={ar ? "وحدة خشبية مصنّعة بدقة" : "A precision manufactured wooden unit"}
               loading="lazy"
               className="w-full h-full object-cover"

@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import { Mail, Linkedin, ArrowRight, FileText, Quote } from "lucide-react";
 import falakLogo from "@/assets/falak-logo.png";
 import bgBlueprint from "@/assets/bg-blueprint.jpg";
-import bgCraft from "@/assets/bg-craft.jpg";
+import bgCraftAsset from "@/assets/bg-craft.jpg.asset.json";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ABOUT / من نحن  — rebuilt from scratch.
@@ -84,7 +84,7 @@ export default function About() {
           </div>
           <div className="rounded-3xl overflow-hidden border min-h-[260px]" style={{ borderColor: "var(--card-border)" }}>
             <img
-              src={bgCraft}
+              src={bgCraftAsset.url}
               alt={ar ? "وحدة أبعاد الخشبية عن قرب" : "Close up of an Abaad wooden unit"}
               loading="lazy"
               className="w-full h-full object-cover"

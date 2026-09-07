@@ -84,21 +84,32 @@ export const translations: { en: Dict; ar: Dict } = {
     },
     about: {
       title: "Who we are",
-      body: "Abaad (أبعاد، \"dimensions\") is a Saudi maker of precision modular building blocks. Two parts, a cube and a connecter, assemble into anything you can imagine, from a coffee-table sculpture to a full theater set.",
+      // Plain language on purpose: anyone should understand it in one read.
+      body: "Abaad is a young Saudi company. We make two simple parts, a cube and a connecter, that click together into any shape you need: a stage, a booth, a classroom setup, or a display.",
+      short: "Two parts. Endless shapes.",
       incubatorLabel: "Incubated by",
       incubator: "Falak Business & Investment Company",
       mission: "Our mission",
-      missionBody: "Give every maker, designer, and dreamer the smallest possible vocabulary for the largest possible idea.",
-      goalsTitle: "Our goals",
+      missionBody: "Make building easy, reusable and open to everyone, without tools, waste or specialists.",
+      storyTitle: "Our story",
+      storyBody: "We started as a student team with one idea: building something big should not mean building it from scratch every time. Today Abaad is at its beginning, with a working product, a first set of units, and a team that builds it hands-on.",
+      goalsTitle: "What we are working on",
       goals: [
-        "Make 3D construction accessible to anyone, regardless of skill.",
-        "Empower designers with an AI-assisted, physical building system.",
-        "Build a Saudi-born product that ships to makers worldwide.",
+        "Making 3D building simple for anyone, with no experience needed.",
+        "Units that are used, taken apart, and used again instead of thrown away.",
+        "A Saudi made product, produced locally.",
       ],
-      milestonesTitle: "Milestones",
+      milestonesTitle: "Where we are so far",
       milestones: [
-        "Winners, Masrahthon (مسرحثون).",
+        "Winners of Masrahthon.",
         "Incubated by Falak Business & Investment Company.",
+        "First generation of units produced and tested.",
+      ],
+      valuesTitle: "What we care about",
+      values: [
+        { title: "Simple", body: "Two parts, no tools, no manual needed." },
+        { title: "Reusable", body: "Take a build apart and use the same units for the next one." },
+        { title: "Local", body: "Designed and made in Saudi Arabia." },
       ],
       teamTitle: "The team",
       team: [
@@ -107,13 +118,13 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "Founder",
           email: "hessaibrahim129@gmail.com",
           linkedin: "https://www.linkedin.com/in/hessa-althuwaib-870742325/",
-          bio: "Founder of Abaad. Leads the product vision and the modular building system.",
+          bio: "Founder of Abaad. Leads the product and the building system.",
           studies: [
             "Information Systems student at Imam Muhammad ibn Saud Islamic University.",
             "Computer Science and Engineering track in high school.",
           ],
           achievements: [
-            "Winning team member at the AI League, Best AI Solution for 2034."
+            "Winning team member at the AI League, Best AI Solution for 2034.",
           ],
         },
         {
@@ -121,7 +132,7 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "CEO",
           email: "uaaljasem@gmail.com",
           linkedin: "https://www.linkedin.com/in/yumna-aljasem/",
-          bio: "Chief Executive Officer. Drives strategy, operations, and partnerships, with deep knowledge in chemistry.",
+          bio: "Leads strategy, operations and partnerships, with deep knowledge in chemistry.",
           studies: [
             "Human Medicine student at Al-Nahda College.",
             "Computer Science and Engineering track in high school.",
@@ -136,39 +147,10 @@ export const translations: { en: Dict; ar: Dict } = {
           role: "COO",
           email: "maryamfarouk59@gmail.com",
           linkedin: "https://www.linkedin.com/in/maryam-farouk-b14340386/",
-          bio: "Chief Operating Officer. Oversees operations and execution.",
+          bio: "Oversees day to day operations and execution.",
           studies: [
             "Biomedical Engineering student at Al-Nahda College.",
             "Computer Science and Engineering track in high school.",
-          ],
-          achievements: [
-            "Finalist team member in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",
-          ],
-        },
-        {
-          name: "Ranad Alotaibi",
-          role: "CFO",
-          email: "ranadalotaibi9@gmail.com",
-          linkedin: "https://www.linkedin.com/in/ranad-alotaibi-11092836a/",
-          bio: "Chief Financial Officer. Oversees finance, planning, and growth.",
-          studies: [
-            "Financial Economics student.",
-            "Computer Science and Engineering track in high school.",
-          ],
-          achievements: [
-            "Participant in the Albilad Competition.",
-            "Certified by Monshaat (منشآت).",
-            "Finalist team member in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",
-          ],
-        },
-        {
-          name: "Noor Alshabeeb",
-          role: "Technical Team",
-          email: "noor_sh2006@outlook.com",
-          linkedin: "https://www.linkedin.com/in/noor-alshabeeb-162630367/",
-          bio: "Technical team member. Supports product engineering and technical execution.",
-          studies: [
-            "AI student.",
           ],
           achievements: [
             "Finalist team member in the Materials Discovery Competition, supervised by Nobel Laureate in Chemistry Prof. Omar Yaghi.",

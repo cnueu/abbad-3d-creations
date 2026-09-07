@@ -1,6 +1,6 @@
-import { Suspense, useMemo } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useLoader } from "@react-three/fiber";
-import { OrbitControls, Environment, ContactShadows, Center, Bounds } from "@react-three/drei";
+import { OrbitControls, Environment, Center, Bounds } from "@react-three/drei";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 import { STLLoader } from "three/examples/jsm/loaders/STLLoader.js";
 import * as THREE from "three";

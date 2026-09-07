@@ -83,10 +83,10 @@ export const translations: { en: Dict; ar: Dict } = {
       backToStore: "Browse the store",
     },
     about: {
-      title: "Who we are",
-      // Plain language on purpose: anyone should understand it in one read.
-      body: "Abaad is a young Saudi company. We make two simple parts, a cube and a connecter, that click together into any shape you need: a stage, a booth, a classroom setup, or a display.",
-      short: "Two parts. Endless shapes.",
+      title: "We build spaces from units that assemble, disassemble and return",
+      // Clear, professional language: understandable in one read.
+      body: "Abaad is a Saudi startup specialised in modular building units. A core unit and a precision connecter make it possible to deliver stages, exhibition booths, classrooms and display fronts in a short time, then reuse the very same units on the next project.",
+      short: "Saudi building units, made to be reused",
       incubatorLabel: "Incubated by",
       incubator: "Falak Business & Investment Company",
       mission: "Our mission",
@@ -311,10 +311,10 @@ export const translations: { en: Dict; ar: Dict } = {
       backToStore: "تصفّح المتجر",
     },
     about: {
-      title: "من نحن",
-      // لغة بسيطة ومباشرة، يفهمها أي شخص من أول قراءة.
-      body: "أبعاد شركة سعودية ناشئة. نصنع قطعتين فقط، مكعب وموصِّل، تتركّبان معاً لتكوّن أي شكل تحتاجه: مسرح، جناح معرض، ترتيب فصل دراسي، أو واجهة عرض.",
-      short: "قطعتان، وأشكال بلا حدود.",
+      title: "نبني الفراغات بوحدات تُركّب وتُفكّك وتُعاد",
+      // لغة رسمية ومفهومة، بأسلوب تسويقي هادئ.
+      body: "أبعاد شركة سعودية ناشئة متخصصة في وحدات البناء القابلة للتركيب. نوفّر وحدة أساسية وموصّلاً دقيقاً يتيحان تنفيذ المسارح والأجنحة والمعارض والفصول الدراسية وواجهات العرض في وقت قصير، ثم إعادة استخدام الوحدات نفسها في المشروع التالي.",
+      short: "وحدات بناء سعودية، قابلة لإعادة الاستخدام",
       incubatorLabel: "حاضنة",
       incubator: "شركة فلك للأعمال والاستثمار",
       mission: "مهمتنا",

@@ -170,9 +170,7 @@ export default function Home() {
             {ar ? "كيف نعمل" : "How we work"}
           </h2>
           <p className="text-center text-foreground/65 max-w-xl mx-auto mb-12">
-            {ar
-              ? "من أول رسالة حتى تسليم المشروع جاهزاً، أربع خطوات واضحة."
-              : "From the first message to a finished handover, four clear steps."}
+            {ar ? "رحلة العمل" : "The work journey"}
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[

@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import bgBlueprint from "@/assets/bg-blueprint.jpg";
 import bgProcessTech from "@/assets/bg-process-tech.jpg";
-import bgCraft from "@/assets/bg-craft.jpg";
+import bgCraftAsset from "@/assets/bg-craft.jpg.asset.json";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HOME (B2B). No prices anywhere, every call to action leads to /store or /quote.

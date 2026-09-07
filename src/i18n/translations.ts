@@ -4,7 +4,7 @@ type Dict = any;
 export const translations: { en: Dict; ar: Dict } = {
   en: {
     brand: "Abaad",
-    tagline: "Build any shape. From cubes and connecters.",
+    tagline: "Two parts. Build any shape you need.",
     nav: { home: "Home", store: "Store", studio: "AI Studio", about: "About", partners: "Partners", checkout: "Checkout", auth: "Sign in" },
     hero: {
       title: "Modular building blocks for builders, makers, and dreamers.",
@@ -13,8 +13,8 @@ export const translations: { en: Dict; ar: Dict } = {
       cta2: "Open AI Studio",
     },
     store: {
-      title: "Building Blocks",
-      subtitle: "Hand-tested geometry. PLA / Wood. Snap together with our connecters.",
+      title: "Our units",
+      subtitle: "Tested parts in PLA or wood, they click together with our connecters.",
       viewAll: "View all",
       details: "Details",
       addToCart: "Add to cart",
@@ -160,13 +160,13 @@ export const translations: { en: Dict; ar: Dict } = {
     },
     partners: {
       title: "Partnerships & Collaboration",
-      subtitle: "We're building Saudi's most flexible modular building system. We'd love to build it with you.",
+      subtitle: "نحن في بداية طريقنا، ونبحث عن جهات نبني معها.",
       whyTitle: "Why partner with Abaad",
       why: [
-        "A young Saudi born product with a focused, ambitious team.",
+        "A young Saudi product built by a small, hands-on team.",
         "Eco friendly materials that serve Vision 2030.",
         "Winners of Masrahthon.",
-        "AI assisted physical building, ready for theaters, schools, retail, and brands.",
+        "Units ready for theatres, schools, retail and brands.",
       ],
       formsTitle: "Ways to collaborate",
       forms: [
@@ -181,7 +181,7 @@ export const translations: { en: Dict; ar: Dict } = {
       ],
       statsTitle: "By the numbers",
       stats: [
-        { value: "2", label: "Core products" },
+        { value: "2", label: "Core parts" },
         { value: "∞", label: "Possible builds" },
         { value: "100%", label: "Made in KSA" },
         { value: "48h", label: "Reply time" },
@@ -232,7 +232,7 @@ export const translations: { en: Dict; ar: Dict } = {
   },
   ar: {
     brand: "أبعاد",
-    tagline: "ابنِ أي شكل. من المكعبات والموصِّلات.",
+    tagline: "قطعتان تبنيان أي شكل تحتاجه.",
     nav: { home: "الرئيسية", store: "المتجر", studio: "استوديو الذكاء", about: "من نحن", partners: "الشراكات", checkout: "الدفع", auth: "تسجيل الدخول" },
     hero: {
       title: "وحدات بناء قابلة للتركيب للبنّائين والمصممين والحالمين.",
@@ -241,8 +241,8 @@ export const translations: { en: Dict; ar: Dict } = {
       cta2: "افتح استوديو الذكاء",
     },
     store: {
-      title: "وحدات البناء",
-      subtitle: "هندسة دقيقة مُختبرة. PLA / خشب. تتركّب بموصِّلاتنا.",
+      title: "وحداتنا",
+      subtitle: "قطع مُختبرة من PLA أو خشب، تتركّب مع بعضها بالموصِّلات.",
       viewAll: "عرض الكل",
       details: "التفاصيل",
       addToCart: "أضِف للسلة",
@@ -388,13 +388,13 @@ export const translations: { en: Dict; ar: Dict } = {
     },
     partners: {
       title: "الشراكات والتعاون",
-      subtitle: "نبني أكثر نظام وحدات بناء مرونةً في السعودية، ونحبّ أن نبنيه معك.",
+      subtitle: "نحن في بداية طريقنا، ونبحث عن جهات نبني معها.",
       whyTitle: "لماذا الشراكة مع أبعاد",
       why: [
-        "منتج سعودي ناشئ بفريق طموح ومركّز.",
+        "منتج سعودي ناشئ يبنيه فريق صغير بيده.",
         "مواد صديقة للبيئة تخدم رؤية الوطن.",
         "الفائزون في مسرحثون.",
-        "بناء فيزيائي مدعوم بالذكاء، جاهز للمسارح والمدارس والعلامات.",
+        "وحدات جاهزة للمسارح والمدارس والمتاجر والعلامات التجارية.",
       ],
       formsTitle: "صور التعاون",
       forms: [
@@ -409,7 +409,7 @@ export const translations: { en: Dict; ar: Dict } = {
       ],
       statsTitle: "بالأرقام",
       stats: [
-        { value: "٢", label: "منتجات أساسية" },
+        { value: "٢", label: "قطع أساسية" },
         { value: "∞", label: "تركيبات ممكنة" },
         { value: "١٠٠٪", label: "صُنع في السعودية" },
         { value: "٤٨س", label: "زمن الرد" },
